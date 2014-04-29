@@ -1,0 +1,16 @@
+todo.md
+private.properties
+
+.springBeans
+.classpath
+.project
+.settings/
+target/
+*.class
+*.pyc
+.DS_Store
+
+# Package Files #
+*.war
+*.ear
+/target
