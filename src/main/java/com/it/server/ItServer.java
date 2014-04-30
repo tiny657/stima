@@ -1,7 +1,6 @@
 package com.it.server;
 
 import io.netty.bootstrap.ServerBootstrap;
-
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -10,10 +9,17 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ItServer {
+    private static final Logger logger = LoggerFactory
+            .getLogger(ItServer.class);
+    private String host;
     private int port;
 
-    public ItServer(int port) {
+    public ItServer(String host, int port) {
+        this.host = host;
         this.port = port;
     }
 
@@ -33,12 +39,11 @@ public class ItServer {
                     }).option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            // Bind and start to accept incoming connections.
             ChannelFuture f = b.bind(port).sync();
-            System.out.println("Server");
+            logger.info("server started ({}:{})", host, port);
 
             f.channel().closeFuture().sync();
-            System.out.println("Close");
+            logger.info("server closed ({}:{})", host, port);
         } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();

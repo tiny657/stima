@@ -9,4 +9,9 @@ public class Category {
     public void addServer(Server server) {
         servers.add(server);
     }
+
+    @Override
+    public String toString() {
+        return servers.toString();
+    }
 }

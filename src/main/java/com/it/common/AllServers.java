@@ -2,7 +2,6 @@ package com.it.common;
 
 import java.util.List;
 import java.util.Map;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -34,5 +33,25 @@ public class AllServers {
 
     public List<Server> getServers() {
         return servers;
+    }
+
+    public void setStatus(String host, int port, boolean isRunning) {
+        for (Server server : servers) {
+            if (server.getHost().equals(host) && server.getPort() == port) {
+                server.setRunning(isRunning);
+                break;
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer result = new StringBuffer("show servers\n");
+        for (String category : categories.keySet()) {
+            result.append(category).append(categories.get(category).toString())
+                    .append("\n");
+        }
+
+        return result.toString();
     }
 }

@@ -38,7 +38,9 @@ public class Server {
         this.isRunning = isRunning;
     }
 
+    @Override
     public String toString() {
-        return host + ":" + port + "(status:" + isRunning + ")";
+        return host + ":" + port + "("
+                + (isRunning == true ? "running" : "standby") + ")";
     }
 }

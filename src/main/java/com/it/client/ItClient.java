@@ -12,6 +12,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.it.common.AllServers;
+
 public class ItClient implements Runnable {
     private static final Logger logger = LoggerFactory
             .getLogger(ItClient.class);
@@ -29,36 +31,48 @@ public class ItClient implements Runnable {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
-            Bootstrap b = new Bootstrap();
-            b.group(workerGroup);
-            b.channel(NioSocketChannel.class);
-            b.option(ChannelOption.SO_KEEPALIVE, true);
-            b.handler(new ChannelInitializer<SocketChannel>() {
+            Bootstrap bootstrap = new Bootstrap();
+            bootstrap.group(workerGroup);
+            bootstrap.channel(NioSocketChannel.class);
+            bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
+            bootstrap.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
-                public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(new ClientHandler());
+                public void initChannel(SocketChannel socketChannel)
+                        throws Exception {
+                    socketChannel.pipeline().addLast(new ClientHandler());
                 }
             });
 
-            // Start the client.
-            // ChannelFuture f = b.connect(host, port).sync();
-            ChannelFuture f;
             while (true) {
-                f = b.connect(host, port).await();
-                if (f.isSuccess()) {
-                    break;
-                }
+                logger.info("connecting {}:{}", host, port);
+
+                ChannelFuture channelFuture = waitUntilConnected(bootstrap);
+                AllServers.getInstance().setStatus(host, port, true);
+
+                logger.info("connected {}:{}", host, port);
+                logger.info(AllServers.getInstance().toString());
+
+                // wait until closed.
+                channelFuture.channel().closeFuture().sync();
+                AllServers.getInstance().setStatus(host, port, false);
+
+                logger.info("closed {}:{}", host, port);
+                logger.info(AllServers.getInstance().toString());
             }
-
-            logger.info("connected {}:{}", host, port);
-
-            // Wait until the connection is closed.
-            f.channel().closeFuture().sync();
-            logger.info("client closed {}:{}", host, port);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
             workerGroup.shutdownGracefully();
         }
+    }
+
+    public ChannelFuture waitUntilConnected(Bootstrap bootstrap)
+            throws InterruptedException {
+        ChannelFuture channelFuture;
+        do {
+            channelFuture = bootstrap.connect(host, port).await();
+        } while (!channelFuture.isSuccess());
+
+        return channelFuture;
     }
 }

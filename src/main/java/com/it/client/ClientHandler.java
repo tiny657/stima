@@ -1,7 +1,6 @@
 package com.it.client;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
@@ -9,13 +8,12 @@ import io.netty.util.ReferenceCountUtil;
 public class ClientHandler extends ChannelHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        System.out.println("send initial messages");
-        ByteBuf messages = Unpooled.buffer(100);
-        for (int i = 0; i < messages.capacity(); i++) {
-            messages.writeByte((byte) i);
-        }
-
-        ctx.writeAndFlush(messages);
+        // System.out.println("send initial messages");
+        // ByteBuf messages = Unpooled.buffer(100);
+        // for (int i = 0; i < messages.capacity(); i++) {
+        // messages.writeByte((byte) i);
+        // }
+        // ctx.writeAndFlush(messages);
     }
 
     @Override

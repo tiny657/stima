@@ -9,13 +9,12 @@ import io.netty.util.ReferenceCountUtil;
 public class ServerHandler extends ChannelHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        System.out.println("send initial messages");
-        ByteBuf messages = Unpooled.buffer(50);
-        for (int i = 0; i < messages.capacity(); i++) {
-            messages.writeByte((byte) i);
-        }
-
-        ctx.writeAndFlush(messages);
+//        System.out.println("send initial messages");
+//        ByteBuf messages = Unpooled.buffer(50);
+//        for (int i = 0; i < messages.capacity(); i++) {
+//            messages.writeByte((byte) i);
+//        }
+//        ctx.writeAndFlush(messages);
     }
 
     @Override

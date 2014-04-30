@@ -11,7 +11,7 @@ import com.it.server.ItServer;
 public class TestServer {
     public static void main(String[] args) throws Exception {
         Config config = new Config(args);
-
+        
         // clients
         ExecutorService executor = Executors.newFixedThreadPool(config
                 .getServers().size());
@@ -20,6 +20,6 @@ public class TestServer {
         }
 
         // server
-        new ItServer(config.getPort()).run();
+        new ItServer(config.getHost(), config.getPort()).run();
     }
 }

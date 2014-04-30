@@ -23,7 +23,7 @@ public class Config {
     private OptionParser parser = new OptionParser();
     private ArgumentAcceptingOptionSpec<String> hostOpt = parser
             .accepts("host", "this host").withOptionalArg()
-            .ofType(String.class);
+            .ofType(String.class).defaultsTo(StringUtils.EMPTY);
     private ArgumentAcceptingOptionSpec<Integer> portOpt = parser
             .accepts("port", "this port").withOptionalArg()
             .ofType(Integer.class).defaultsTo(0);
@@ -55,21 +55,19 @@ public class Config {
         }
 
         // setting
-        if (host == null) {
+        if (host.equals(StringUtils.EMPTY)) {
             setHost(getStringValue(properties, HOST));
         }
         if (port == 0) {
             setPort(getIntegerValue(properties, PORT));
         }
         setCategory(getStringValue(properties, CATEGORY));
-        logger.info("server list");
         for (String category : AllServers.getInstance().getCategories()
                 .keySet()) {
             setServer(category,
                     getStringValue(properties, CATEGORY + "." + category));
-            logger.info("{} {}", category, AllServers.getInstance()
-                    .getCategories().get(category).toString());
         }
+        logger.info(AllServers.getInstance().toString());
     }
 
     public List<Server> getServers() {
