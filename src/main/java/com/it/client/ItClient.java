@@ -9,8 +9,23 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-public class ItClient {
-    public ItClient(String host, int port) throws Exception {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ItClient implements Runnable {
+    private static final Logger logger = LoggerFactory
+            .getLogger(ItClient.class);
+
+    private String host;
+    private int port;
+
+    public ItClient(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    @Override
+    public void run() {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
@@ -24,14 +39,24 @@ public class ItClient {
                     ch.pipeline().addLast(new ClientHandler());
                 }
             });
-            System.out.println("Client");
 
             // Start the client.
-            ChannelFuture f = b.connect(host, port).sync();
+            // ChannelFuture f = b.connect(host, port).sync();
+            ChannelFuture f;
+            while (true) {
+                f = b.connect(host, port).await();
+                if (f.isSuccess()) {
+                    break;
+                }
+            }
+
+            logger.info("connected {}:{}", host, port);
 
             // Wait until the connection is closed.
             f.channel().closeFuture().sync();
-            System.out.println("Closed");
+            logger.info("client closed {}:{}", host, port);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             workerGroup.shutdownGracefully();
         }

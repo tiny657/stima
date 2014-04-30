@@ -122,7 +122,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.it.perf.PerfServer</mainClass>
+                            <mainClass>com.it.test.TestServer</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
@@ -181,7 +181,7 @@
                     </appendAssemblyId>
                     <archive>
                         <manifest>
-                            <mainClass>com.it.perf.PerfServer</mainClass>
+                            <mainClass>com.it.test.TestServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
