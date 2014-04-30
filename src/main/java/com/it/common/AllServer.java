@@ -2,15 +2,17 @@ package com.it.common;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class AllServers {
-    public static AllServers instance = new AllServers();
+public class AllServer {
+    public static AllServer instance = new AllServer();
     private Map<String, Category> categories = Maps.newHashMap();
     private List<Server> servers = Lists.newArrayList();
 
-    public static AllServers getInstance() {
+    public static AllServer getInstance() {
         return instance;
     }
 
@@ -35,10 +37,25 @@ public class AllServers {
         return servers;
     }
 
+    public List<Server> getServers(String category) {
+        return categories.get(category).getServers();
+    }
+
+    public Server getRandomServer(String category) {
+        return categories.get(category).randomRunningServer();
+    }
+
     public void setStatus(String host, int port, boolean isRunning) {
-        for (Server server : servers) {
-            if (server.getHost().equals(host) && server.getPort() == port) {
+        for (Entry<String, Category> entry : categories.entrySet()) {
+            Server server = entry.getValue().findServer(host, port);
+            if (server != null) {
+                boolean oldRunning = server.isRunning();
                 server.setRunning(isRunning);
+                if (oldRunning == false && isRunning == true) {
+                    entry.getValue().addRunningServer(server);
+                } else if (oldRunning == true && isRunning == false) {
+                    entry.getValue().removeRunningServer(server);
+                }
                 break;
             }
         }

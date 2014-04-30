@@ -62,16 +62,16 @@ public class Config {
             setPort(getIntegerValue(properties, PORT));
         }
         setCategory(getStringValue(properties, CATEGORY));
-        for (String category : AllServers.getInstance().getCategories()
+        for (String category : AllServer.getInstance().getCategories()
                 .keySet()) {
             setServer(category,
                     getStringValue(properties, CATEGORY + "." + category));
         }
-        logger.info(AllServers.getInstance().toString());
+        logger.info(AllServer.getInstance().toString());
     }
 
     public List<Server> getServers() {
-        return AllServers.getInstance().getServers();
+        return AllServer.getInstance().getServers();
     }
 
     public String getHost() {
@@ -102,16 +102,16 @@ public class Config {
     private void setCategory(String categoryInProperties) {
         String[] categories = StringUtils.split(categoryInProperties, ",");
         for (String category : categories) {
-            AllServers.getInstance().addCategory(category);
+            AllServer.getInstance().addCategory(category);
         }
     }
 
     private void setServer(String category, String serverInProperties) {
         String[] hostPorts = StringUtils.split(serverInProperties, ",");
         for (String hostPort : hostPorts) {
-            String[] split = StringUtils.split(hostPort, ":");
-            AllServers.getInstance().addServer(category,
-                    new Server(split[0], split[1]));
+            String[] splitedHostPort = StringUtils.split(hostPort, ":");
+            AllServer.getInstance().addServer(category,
+                    new Server(splitedHostPort[0], splitedHostPort[1]));
         }
     }
 

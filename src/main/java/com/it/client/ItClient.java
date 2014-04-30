@@ -12,7 +12,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.common.AllServers;
+import com.it.common.AllServer;
 
 public class ItClient implements Runnable {
     private static final Logger logger = LoggerFactory
@@ -45,19 +45,19 @@ public class ItClient implements Runnable {
 
             while (true) {
                 logger.info("connecting {}:{}", host, port);
-
-                ChannelFuture channelFuture = waitUntilConnected(bootstrap);
-                AllServers.getInstance().setStatus(host, port, true);
+                
+                ChannelFuture channelFuture = awaitConnection(bootstrap);
+                AllServer.getInstance().setStatus(host, port, true);
 
                 logger.info("connected {}:{}", host, port);
-                logger.info(AllServers.getInstance().toString());
+                logger.info(AllServer.getInstance().toString());
 
                 // wait until closed.
                 channelFuture.channel().closeFuture().sync();
-                AllServers.getInstance().setStatus(host, port, false);
+                AllServer.getInstance().setStatus(host, port, false);
 
                 logger.info("closed {}:{}", host, port);
-                logger.info(AllServers.getInstance().toString());
+                logger.info(AllServer.getInstance().toString());
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -66,7 +66,7 @@ public class ItClient implements Runnable {
         }
     }
 
-    public ChannelFuture waitUntilConnected(Bootstrap bootstrap)
+    public ChannelFuture awaitConnection(Bootstrap bootstrap)
             throws InterruptedException {
         ChannelFuture channelFuture;
         do {

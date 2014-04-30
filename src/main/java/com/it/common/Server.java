@@ -1,5 +1,7 @@
 package com.it.common;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Server {
     private String host;
     private int port;
@@ -36,6 +38,13 @@ public class Server {
 
     public void setRunning(boolean isRunning) {
         this.isRunning = isRunning;
+    }
+
+    public boolean equals(String host, int port) {
+        if (StringUtils.equals(this.host, host) && this.port == port) {
+            return true;
+        }
+        return false;
     }
 
     @Override
