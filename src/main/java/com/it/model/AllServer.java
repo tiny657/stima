@@ -1,4 +1,4 @@
-package com.it.common;
+package com.it.model;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +39,15 @@ public class AllServer {
 
     public List<Server> getServers(String category) {
         return categories.get(category).getServers();
+    }
+    
+    public Server getServer(String host, int port) {
+        for (Server server : servers) {
+            if (server.equals(host, port)) {
+                return server;
+            }
+        }
+        return null;
     }
 
     public Server getRandomServer(String category) {

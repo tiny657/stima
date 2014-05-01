@@ -5,22 +5,23 @@ import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ClientHandler extends ChannelHandlerAdapter {
+    private static final Logger logger = LoggerFactory
+            .getLogger(ItClient.class);
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        // System.out.println("send initial messages");
-        // ByteBuf messages = Unpooled.buffer(100);
-        // for (int i = 0; i < messages.capacity(); i++) {
-        // messages.writeByte((byte) i);
-        // }
-        // ctx.writeAndFlush(messages);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         try {
             ByteBuf in = (ByteBuf) msg;
-            System.out.println(in.toString(io.netty.util.CharsetUtil.US_ASCII));
+            logger.info("server received: {}",
+                    in.toString(io.netty.util.CharsetUtil.US_ASCII));
         } finally {
             ReferenceCountUtil.release(msg);
         }

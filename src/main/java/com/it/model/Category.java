@@ -1,4 +1,4 @@
-package com.it.common;
+package com.it.model;
 
 import java.util.List;
 import java.util.Random;
@@ -14,10 +14,14 @@ public class Category {
         return servers;
     }
 
+    public List<Server> getRunningServers() {
+        return runningServers;
+    }
+
     public Server randomRunningServer() {
         return servers.get(random.nextInt(runningServers.size()));
     }
-    
+
     public Server findServer(String host, int port) {
         for (Server server : servers) {
             if (server.equals(host, port)) {

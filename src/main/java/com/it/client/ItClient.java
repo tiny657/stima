@@ -12,18 +12,23 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.common.AllServer;
+import com.it.model.AllServer;
+import com.it.model.Server;
+import com.it.sender.UnicastSender;
 
 public class ItClient implements Runnable {
     private static final Logger logger = LoggerFactory
             .getLogger(ItClient.class);
 
-    private String host;
-    private int port;
+    private String profile;
 
-    public ItClient(String host, int port) {
-        this.host = host;
-        this.port = port;
+    private String serverHost;
+    private int serverPort;
+
+    public ItClient(String profile, String serverHost, int serverPort) {
+        this.profile = profile;
+        this.serverHost = serverHost;
+        this.serverPort = serverPort;
     }
 
     @Override
@@ -44,19 +49,28 @@ public class ItClient implements Runnable {
             });
 
             while (true) {
-                logger.info("connecting {}:{}", host, port);
-                
-                ChannelFuture channelFuture = awaitConnection(bootstrap);
-                AllServer.getInstance().setStatus(host, port, true);
+                logger.info("connecting {}:{}", serverHost, serverPort);
 
-                logger.info("connected {}:{}", host, port);
+                ChannelFuture channelFuture = awaitConnection(bootstrap);
+                AllServer.getInstance().setStatus(serverHost, serverPort, true);
+                Server server = AllServer.getInstance().getServer(serverHost,
+                        serverPort);
+                if (server != null) {
+                    server.setChannelFuture(channelFuture);
+                }
+
+                logger.info("connected {}:{}", serverHost, serverPort);
                 logger.info(AllServer.getInstance().toString());
+
+                UnicastSender.send(serverHost, serverPort, "Hi, I'm " + profile
+                        + " to " + serverHost + ":" + serverPort);
 
                 // wait until closed.
                 channelFuture.channel().closeFuture().sync();
-                AllServer.getInstance().setStatus(host, port, false);
+                AllServer.getInstance()
+                        .setStatus(serverHost, serverPort, false);
 
-                logger.info("closed {}:{}", host, port);
+                logger.info("closed {}:{}", serverHost, serverPort);
                 logger.info(AllServer.getInstance().toString());
             }
         } catch (InterruptedException e) {
@@ -70,7 +84,7 @@ public class ItClient implements Runnable {
             throws InterruptedException {
         ChannelFuture channelFuture;
         do {
-            channelFuture = bootstrap.connect(host, port).await();
+            channelFuture = bootstrap.connect(serverHost, serverPort).await();
         } while (!channelFuture.isSuccess());
 
         return channelFuture;

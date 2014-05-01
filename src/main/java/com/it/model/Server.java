@@ -1,8 +1,11 @@
-package com.it.common;
+package com.it.model;
+
+import io.netty.channel.ChannelFuture;
 
 import org.apache.commons.lang3.StringUtils;
 
 public class Server {
+    private ChannelFuture channelFuture;
     private String host;
     private int port;
     private boolean isRunning = false;
@@ -14,6 +17,14 @@ public class Server {
     public Server(String host, int port) {
         this.host = host;
         this.port = port;
+    }
+
+    public ChannelFuture getChannelFuture() {
+        return channelFuture;
+    }
+
+    public void setChannelFuture(ChannelFuture channelFuture) {
+        this.channelFuture = channelFuture;
     }
 
     public String getHost() {
