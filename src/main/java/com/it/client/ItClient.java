@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import com.it.model.AllServer;
 import com.it.model.Server;
-import com.it.sender.UnicastSender;
 
 public class ItClient implements Runnable {
     private static final Logger logger = LoggerFactory
@@ -61,9 +60,6 @@ public class ItClient implements Runnable {
 
                 logger.info("connected {}:{}", serverHost, serverPort);
                 logger.info(AllServer.getInstance().toString());
-
-                UnicastSender.send(serverHost, serverPort, "Hi, I'm " + profile
-                        + " to " + serverHost + ":" + serverPort);
 
                 // wait until closed.
                 channelFuture.channel().closeFuture().sync();

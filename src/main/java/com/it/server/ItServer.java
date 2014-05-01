@@ -12,7 +12,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ItServer {
+public class ItServer implements Runnable {
     private static final Logger logger = LoggerFactory
             .getLogger(ItServer.class);
     private String host;
@@ -23,7 +23,8 @@ public class ItServer {
         this.port = port;
     }
 
-    public void run() throws Exception {
+    @Override
+    public void run() {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -44,6 +45,7 @@ public class ItServer {
 
             f.channel().closeFuture().sync();
             logger.info("server closed ({}:{})", host, port);
+        } catch (InterruptedException e) {
         } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
