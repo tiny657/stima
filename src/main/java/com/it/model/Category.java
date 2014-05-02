@@ -19,6 +19,10 @@ public class Category {
     }
 
     public Server randomRunningServer() {
+        if (runningServers.size() == 0) {
+            return null;
+        }
+
         return servers.get(random.nextInt(runningServers.size()));
     }
 

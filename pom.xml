@@ -25,6 +25,8 @@
         <!-- LOGGING -->
         <slf4j.version>1.7.6</slf4j.version>
         <logback.version>1.1.1</logback.version>
+        <!-- CONFIGURATION -->
+        <commons-configuration.version>1.7</commons-configuration.version>
     </properties>
 
     <repositories>
@@ -107,6 +109,13 @@
             <artifactId>logback-core</artifactId>
             <version>${logback.version}</version>
         </dependency>
+
+        <!-- CONFIGURATION -->
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>${commons-configuration.version}</version>
+		</dependency>
     </dependencies>
 
     <build>

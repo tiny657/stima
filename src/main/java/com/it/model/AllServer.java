@@ -16,6 +16,12 @@ public class AllServer {
         return instance;
     }
 
+    public void addCategory(String[] categoryNames) {
+        for (String categoryName : categoryNames) {
+            addCategory(categoryName);
+        }
+    }
+
     public void addCategory(String categoryName) {
         categories.put(categoryName, new Category());
     }
@@ -40,7 +46,7 @@ public class AllServer {
     public List<Server> getServers(String category) {
         return categories.get(category).getServers();
     }
-    
+
     public Server getServer(String host, int port) {
         for (Server server : servers) {
             if (server.equals(host, port)) {

@@ -11,4 +11,6 @@ public class TestServer {
         Thread.sleep(2000);
         it.sendAnycast("global", "I'm " + it.getProfile());
     }
+    
+    // TODO: add server dynamically.
 }
