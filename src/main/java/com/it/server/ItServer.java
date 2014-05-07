@@ -1,5 +1,7 @@
 package com.it.server;
 
+import java.util.concurrent.ExecutorService;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -12,15 +14,17 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.it.common.Config;
+
 public class ItServer implements Runnable {
     private static final Logger logger = LoggerFactory
             .getLogger(ItServer.class);
     private String host;
     private int port;
 
-    public ItServer(String host, int port) {
-        this.host = host;
-        this.port = port;
+    public ItServer() {
+        this.host = Config.getInstance().getHost();
+        this.port = Config.getInstance().getPort();
     }
 
     @Override

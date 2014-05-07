@@ -24,8 +24,8 @@ public class ItClient implements Runnable {
     private String serverHost;
     private int serverPort;
 
-    public ItClient(String profile, String serverHost, int serverPort) {
-        this.profile = profile;
+    public ItClient(String serverHost, int serverPort) {
+        this.profile = "me" + serverPort;
         this.serverHost = serverHost;
         this.serverPort = serverPort;
     }
@@ -55,11 +55,14 @@ public class ItClient implements Runnable {
                 Server server = AllServer.getInstance().getServer(serverHost,
                         serverPort);
                 if (server != null) {
-                    AllServer.getInstance().getChannelFutureInfo().add(server, channelFuture);
+                    AllServer.getInstance().getServerInfo()
+                            .add(server, channelFuture);
                 }
 
                 logger.info("connected {}:{}", serverHost, serverPort);
                 logger.info(AllServer.getInstance().toString());
+
+                AllServer.getInstance().getServerInfo().add(server, this);
 
                 // wait until closed.
                 channelFuture.channel().closeFuture().sync();

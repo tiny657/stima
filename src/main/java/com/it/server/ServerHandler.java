@@ -1,15 +1,16 @@
 package com.it.server;
 
-import java.util.Map;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.it.client.ItClient;
 import com.it.common.Config;
 import com.it.common.JsonUtils;
 import com.it.model.AllServer;
@@ -39,17 +40,21 @@ public class ServerHandler extends ChannelHandlerAdapter {
                 Map<String, ServerList> addedServer = AllServer.getInstance()
                         .getCategories().addedServerFrom(categories);
                 logger.info("added server: " + addedServer.toString());
-                
+
                 // add properties file
                 for (String category : addedServer.keySet()) {
+                    AllServer.getInstance().addCategory(category);
                     for (Server server : addedServer.get(category).getServers()) {
+                        AllServer.getInstance().addServer(category, server);
                         Config.getInstance().addServer(category,
                                 server.getHost() + ":" + server.getPort());
+
+                        // start client thread
+                        new Thread(new ItClient(server.getHost(),
+                                server.getPort())).start();
                     }
                 }
             }
-
-            // TODO :: AllServer 에 Server 추가
 
             logger.info("server received: {}", categories.toString());
         } finally {

@@ -19,7 +19,9 @@ public class Categories {
     }
 
     public void addCategory(String categoryName) {
-        serverListMap.put(categoryName, new ServerList());
+        if (!serverListMap.containsKey(categoryName)) {
+            serverListMap.put(categoryName, new ServerList());
+        }
     }
 
     public void addServer(String categoryName, Server server) {
@@ -85,8 +87,6 @@ public class Categories {
     }
 
     public Map<String, ServerList> addedServerFrom(Categories categories) {
-        System.out.println(AllServer.getInstance().getCategories().getServerListMap().toString());
-        System.out.println(categories.getServerListMap().toString());
         Map<String, ServerList> result = Maps.newHashMap();
         for (String category : categories.getServerListMap().keySet()) {
             if (serverListMap.containsKey(category)) {

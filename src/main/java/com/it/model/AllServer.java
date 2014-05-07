@@ -7,7 +7,7 @@ import java.util.Set;
 public class AllServer {
     public static AllServer instance = new AllServer();
     private Categories categories = new Categories();
-    private ChannelFutureInfo channelFutureInfo = new ChannelFutureInfo();
+    private ServerInfo serverInfo = new ServerInfo();
 
     public static AllServer getInstance() {
         return instance;
@@ -59,8 +59,8 @@ public class AllServer {
         categories.setStatus(host, port, isRunning);
     }
     
-    public ChannelFutureInfo getChannelFutureInfo() {
-        return channelFutureInfo;
+    public ServerInfo getServerInfo() {
+        return serverInfo;
     }
 
     @Override
