@@ -55,7 +55,7 @@ public class ItClient implements Runnable {
                 Server server = AllServer.getInstance().getServer(serverHost,
                         serverPort);
                 if (server != null) {
-                    server.setChannelFuture(channelFuture);
+                    AllServer.getInstance().getChannelFutureInfo().add(server, channelFuture);
                 }
 
                 logger.info("connected {}:{}", serverHost, serverPort);
@@ -81,6 +81,7 @@ public class ItClient implements Runnable {
         ChannelFuture channelFuture;
         do {
             channelFuture = bootstrap.connect(serverHost, serverPort).await();
+            Thread.sleep(1000);
         } while (!channelFuture.isSuccess());
 
         return channelFuture;

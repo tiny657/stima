@@ -1,16 +1,13 @@
 package com.it.model;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.Set;
 
 public class AllServer {
     public static AllServer instance = new AllServer();
-    private Map<String, Category> categories = Maps.newHashMap();
-    private List<Server> servers = Lists.newArrayList();
+    private Categories categories = new Categories();
+    private ChannelFutureInfo channelFutureInfo = new ChannelFutureInfo();
 
     public static AllServer getInstance() {
         return instance;
@@ -23,67 +20,51 @@ public class AllServer {
     }
 
     public void addCategory(String categoryName) {
-        categories.put(categoryName, new Category());
+        categories.addCategory(categoryName);
     }
 
     public void addServer(String categoryName, Server server) {
-        categories.get(categoryName).addServer(server);
-        servers.add(server);
+        categories.addServer(categoryName, server);
     }
 
-    public Map<String, Category> getCategories() {
+    public Categories getCategories() {
         return categories;
     }
 
-    public Category getCategory(String category) {
-        return categories.get(category);
+    public ServerList getCategory(String category) {
+        return categories.getCategory(category);
     }
 
-    public List<Server> getServers() {
-        return servers;
-    }
-
-    public List<Server> getServers(String category) {
-        return categories.get(category).getServers();
+    public Set<Server> getServers(String category) {
+        return categories.getCategory(category).getServers();
     }
 
     public Server getServer(String host, int port) {
-        for (Server server : servers) {
-            if (server.equals(host, port)) {
+        Map<String, ServerList> serverListMap = categories.getServerListMap();
+        for (Entry<String, ServerList> entry : serverListMap.entrySet()) {
+            Server server = entry.getValue().findServer(host, port);
+            if (server != null) {
                 return server;
             }
         }
+
         return null;
     }
 
     public Server getRandomServer(String category) {
-        return categories.get(category).randomRunningServer();
+        return categories.getCategory(category).randomRunningServer();
     }
 
     public void setStatus(String host, int port, boolean isRunning) {
-        for (Entry<String, Category> entry : categories.entrySet()) {
-            Server server = entry.getValue().findServer(host, port);
-            if (server != null) {
-                boolean oldRunning = server.isRunning();
-                server.setRunning(isRunning);
-                if (oldRunning == false && isRunning == true) {
-                    entry.getValue().addRunningServer(server);
-                } else if (oldRunning == true && isRunning == false) {
-                    entry.getValue().removeRunningServer(server);
-                }
-                break;
-            }
-        }
+        categories.setStatus(host, port, isRunning);
+    }
+    
+    public ChannelFutureInfo getChannelFutureInfo() {
+        return channelFutureInfo;
     }
 
     @Override
     public String toString() {
-        StringBuffer result = new StringBuffer("show servers\n");
-        for (String category : categories.keySet()) {
-            result.append(category).append(categories.get(category).toString())
-                    .append("\n");
-        }
-
-        return result.toString();
+        return categories.toString();
     }
 }

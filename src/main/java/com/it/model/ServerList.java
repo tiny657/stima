@@ -2,15 +2,24 @@ package com.it.model;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
-public class Category {
-    private List<Server> servers = Lists.newArrayList();
+public class ServerList {
+    private Set<Server> servers = Sets.newTreeSet();
     private List<Server> runningServers = Lists.newArrayList();
     private final Random random = new Random();
 
-    public List<Server> getServers() {
+    public ServerList() {
+    }
+
+    public ServerList(Set<Server> servers) {
+        this.servers.addAll(servers);
+    }
+
+    public Set<Server> getServers() {
         return servers;
     }
 
@@ -23,7 +32,7 @@ public class Category {
             return null;
         }
 
-        return servers.get(random.nextInt(runningServers.size()));
+        return runningServers.get(random.nextInt(runningServers.size()));
     }
 
     public Server findServer(String host, int port) {
@@ -42,6 +51,10 @@ public class Category {
 
     public void addRunningServer(Server server) {
         runningServers.add(server);
+    }
+
+    public void removeServer(Server server) {
+        servers.remove(server);
     }
 
     public void removeRunningServer(Server server) {

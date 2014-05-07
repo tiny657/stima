@@ -27,6 +27,9 @@
         <logback.version>1.1.1</logback.version>
         <!-- CONFIGURATION -->
         <commons-configuration.version>1.7</commons-configuration.version>
+        <!-- JSON -->
+        <gson.version>2.2.4</gson.version>
+        <jackson.core.version>2.3.3</jackson.core.version>
     </properties>
 
     <repositories>
@@ -115,6 +118,30 @@
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
 			<version>${commons-configuration.version}</version>
+		</dependency>
+
+		<!-- GOOGLE GSON -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>${gson.version}</version>
+		</dependency>
+
+		<!-- JACKSON -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.core.version}</version>
 		</dependency>
     </dependencies>
 

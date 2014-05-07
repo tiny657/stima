@@ -12,26 +12,26 @@ import com.it.model.Server;
 public class Sender {
     private static final Logger logger = LoggerFactory.getLogger(Sender.class);
 
-    public static boolean sendBroadcast(String targetCategory, String message) {
-        ByteBuf byteBuf = Unpooled.buffer(message.length());
-        byteBuf.writeBytes(message.getBytes());
-        System.out.println(AllServer.getInstance().getCategory(targetCategory)
-                .getRunningServers().toString());
+    public static boolean sendBroadcast(String targetCategory, String msg) {
+        ByteBuf byteBuf = Unpooled.buffer(msg.length());
+        byteBuf.writeBytes(msg.getBytes());
         for (Server server : AllServer.getInstance()
                 .getCategory(targetCategory).getRunningServers()) {
-            server.getChannelFuture().channel().writeAndFlush(byteBuf);
+            AllServer.getInstance().getChannelFutureInfo()
+                    .getChannelFuture(server).channel().writeAndFlush(byteBuf);
         }
 
         return true;
     }
 
-    public static boolean sendAnycast(String targetCategory, String message) {
-        ByteBuf byteBuf = Unpooled.buffer(message.length());
-        byteBuf.writeBytes(message.getBytes());
+    public static boolean sendAnycast(String targetCategory, String msg) {
+        ByteBuf byteBuf = Unpooled.buffer(msg.length());
+        byteBuf.writeBytes(msg.getBytes());
         Server server = AllServer.getInstance().getCategory(targetCategory)
                 .randomRunningServer();
         if (server != null) {
-            server.getChannelFuture().channel().writeAndFlush(byteBuf);
+            AllServer.getInstance().getChannelFutureInfo()
+                    .getChannelFuture(server).channel().writeAndFlush(byteBuf);
         } else {
             logger.info("No server");
         }
@@ -40,13 +40,14 @@ public class Sender {
     }
 
     public static boolean sendUnicast(String targetHost, int targetPort,
-            String message) {
-        ByteBuf byteBuf = Unpooled.buffer(message.length());
-        byteBuf.writeBytes(message.getBytes());
+            String msg) {
+        ByteBuf byteBuf = Unpooled.buffer(msg.length());
+        byteBuf.writeBytes(msg.getBytes());
         Server server = AllServer.getInstance().getServer(targetHost,
                 targetPort);
         if (server != null) {
-            server.getChannelFuture().channel().writeAndFlush(byteBuf);
+            AllServer.getInstance().getChannelFutureInfo()
+                    .getChannelFuture(server).channel().writeAndFlush(byteBuf);
         }
 
         return true;

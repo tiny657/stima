@@ -13,22 +13,25 @@ public class It {
     private String profile;
 
     It(String[] args) throws Exception {
-        Config config = new Config(args);
-        profile = "me" + config.getPort();
+        Config.getInstance().init(args);
+        profile = "me" + Config.getInstance().getPort();
 
-        ExecutorService executor = Executors.newFixedThreadPool(config
-                .getServers().size() + 1);
-
+        // + 10 threads are spare.
+        ExecutorService executor = Executors.newFixedThreadPool(Config
+                .getInstance().getServers().size() + 1 + 10);
+        
+        
         // clients
-        for (Server server : config.getServers()) {
+        for (Server server : Config.getInstance().getServers()) {
             executor.execute(new ItClient(profile, server.getHost(), server
                     .getPort()));
         }
 
         // server
-        executor.execute(new ItServer(config.getHost(), config.getPort()));
+        executor.execute(new ItServer(Config.getInstance().getHost(), Config
+                .getInstance().getPort()));
     }
-    
+
     public String getProfile() {
         return profile;
     }
