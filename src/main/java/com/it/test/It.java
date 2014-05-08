@@ -3,6 +3,7 @@ package com.it.test;
 import com.it.client.ItClient;
 import com.it.common.Config;
 import com.it.common.Sender;
+import com.it.model.AllServer;
 import com.it.model.Server;
 import com.it.server.ItServer;
 
@@ -12,12 +13,13 @@ public class It {
 
         // clients
         for (Server server : Config.getInstance().getServers()) {
-            new Thread(new ItClient(server.getHost(), server.getPort()))
-                    .start();
+            ItClient itClient = new ItClient(server.getHost(), server.getPort());
+            AllServer.getInstance().getServerInfo().add(server, itClient);
+            itClient.start();
         }
 
         // server
-        new Thread(new ItServer()).start();
+        new ItServer().start();
     }
 
     public void sendBroadcast(String targetCategory, String message) {

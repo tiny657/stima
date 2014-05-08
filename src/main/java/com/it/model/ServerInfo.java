@@ -5,14 +5,15 @@ import io.netty.channel.ChannelFuture;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
+import com.it.client.ItClient;
 
 public class ServerInfo {
     private Map<Server, ChannelFuture> channelFutureMap;
-    private Map<Server, Runnable> clientRunnableMap;
+    private Map<Server, ItClient> itClientMap;
 
     public ServerInfo() {
         channelFutureMap = Maps.newHashMap();
-        clientRunnableMap = Maps.newHashMap();
+        itClientMap = Maps.newHashMap();
     }
 
     public ChannelFuture getChannelFuture(Server server) {
@@ -23,11 +24,16 @@ public class ServerInfo {
         channelFutureMap.put(server, channelFuture);
     }
 
-    public Runnable getClientThreadMap(Server server) {
-        return clientRunnableMap.get(server);
+    public ItClient getItClient(Server server) {
+        return itClientMap.get(server);
     }
 
-    public void add(Server server, Runnable clientThread) {
-        clientRunnableMap.put(server, clientThread);
+    public void add(Server server, ItClient itClient) {
+        itClientMap.put(server, itClient);
+    }
+
+    public void remove(Server server) {
+        channelFutureMap.remove(server);
+        itClientMap.remove(server);
     }
 }

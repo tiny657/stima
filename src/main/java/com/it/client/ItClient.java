@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.it.model.AllServer;
 import com.it.model.Server;
 
-public class ItClient implements Runnable {
+public class ItClient extends Thread {
     private static final Logger logger = LoggerFactory
             .getLogger(ItClient.class);
 
@@ -48,7 +48,7 @@ public class ItClient implements Runnable {
             });
 
             while (true) {
-                logger.info("connecting {}:{}", serverHost, serverPort);
+                logger.info("Connecting to {}:{}", serverHost, serverPort);
 
                 ChannelFuture channelFuture = awaitConnection(bootstrap);
                 AllServer.getInstance().setStatus(serverHost, serverPort, true);
@@ -59,7 +59,7 @@ public class ItClient implements Runnable {
                             .add(server, channelFuture);
                 }
 
-                logger.info("connected {}:{}", serverHost, serverPort);
+                logger.info("Connection({}:{}) is established.", serverHost, serverPort);
                 logger.info(AllServer.getInstance().toString());
 
                 AllServer.getInstance().getServerInfo().add(server, this);
@@ -69,11 +69,12 @@ public class ItClient implements Runnable {
                 AllServer.getInstance()
                         .setStatus(serverHost, serverPort, false);
 
-                logger.info("closed {}:{}", serverHost, serverPort);
+                logger.info("Connection({}:{}) is closed.", serverHost,
+                        serverPort);
                 logger.info(AllServer.getInstance().toString());
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.info("Connection({}:{}) is closed.", serverHost, serverPort);
         } finally {
             workerGroup.shutdownGracefully();
         }

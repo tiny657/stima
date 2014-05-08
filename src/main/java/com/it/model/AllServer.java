@@ -20,11 +20,19 @@ public class AllServer {
     }
 
     public void addCategory(String categoryName) {
-        categories.addCategory(categoryName);
+        categories.add(categoryName);
+    }
+    
+    public void removeCategory(String categoryName) {
+        categories.remove(categoryName);
     }
 
     public void addServer(String categoryName, Server server) {
-        categories.addServer(categoryName, server);
+        categories.add(categoryName, server);
+    }
+
+    public void removeServer(String categoryName, Server server) {
+        categories.remove(categoryName, server);
     }
 
     public Categories getCategories() {

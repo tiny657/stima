@@ -37,28 +37,63 @@ public class ServerHandler extends ChannelHandlerAdapter {
                 logger.info("server properties is same.");
             } else {
                 logger.info("server properties is different.");
-                Map<String, ServerList> addedServer = AllServer.getInstance()
-                        .getCategories().addedServerFrom(categories);
-                logger.info("added server: " + addedServer.toString());
-
-                // add properties file
-                for (String category : addedServer.keySet()) {
-                    AllServer.getInstance().addCategory(category);
-                    for (Server server : addedServer.get(category).getServers()) {
-                        AllServer.getInstance().addServer(category, server);
-                        Config.getInstance().addServer(category,
-                                server.getHost() + ":" + server.getPort());
-
-                        // start client thread
-                        new Thread(new ItClient(server.getHost(),
-                                server.getPort())).start();
-                    }
-                }
+                checkServersToRemove(categories);
+                checkServersToAdd(categories);
             }
 
             logger.info("server received: {}", categories.toString());
         } finally {
             ReferenceCountUtil.release(msg);
+        }
+    }
+
+    private void checkServersToAdd(Categories categories) {
+        Map<String, ServerList> addedServer = categories.diff(AllServer
+                .getInstance().getCategories());
+        logger.info("added server: " + addedServer.toString());
+
+        for (String category : addedServer.keySet()) {
+            AllServer.getInstance().addCategory(category);
+            for (Server server : addedServer.get(category).getServers()) {
+                // start client thread
+                ItClient itClient = new ItClient(server.getHost(),
+                        server.getPort());
+                itClient.start();
+
+                // add client data
+                AllServer.getInstance().addServer(category, server);
+                AllServer.getInstance().getServerInfo().add(server, itClient);
+                Config.getInstance().addServer(category,
+                        server.getHost() + ":" + server.getPort());
+            }
+        }
+    }
+
+    private void checkServersToRemove(Categories categories) {
+        System.out.println(categories.toString());
+        Map<String, ServerList> removedServer = AllServer.getInstance()
+                .getCategories().diff(categories);
+        logger.info("removed server: " + removedServer.toString());
+
+        for (String category : removedServer.keySet()) {
+            for (Server server : removedServer.get(category).getServers()) {
+                // stop client thread
+                ItClient itClient = AllServer.getInstance().getServerInfo()
+                        .getItClient(server);
+                itClient.interrupt();
+
+                // remove client data
+                AllServer.getInstance().removeServer(category, server);
+                AllServer.getInstance().getServerInfo().remove(server);
+                Config.getInstance().removeServer(category,
+                        server.getHost() + ":" + server.getPort());
+            }
+            
+            // remove category
+            if (AllServer.getInstance().getCategory(category).getServers()
+                    .size() == 0) {
+                AllServer.getInstance().removeCategory(category);
+            }
         }
     }
 

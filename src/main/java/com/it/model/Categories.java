@@ -6,26 +6,34 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Sets.SetView;
 
 public class Categories {
     private Map<String, ServerList> serverListMap = Maps.newHashMap();
 
     public void addCategory(String[] categoryNames) {
         for (String categoryName : categoryNames) {
-            addCategory(categoryName);
+            add(categoryName);
         }
     }
 
-    public void addCategory(String categoryName) {
+    public void add(String categoryName) {
         if (!serverListMap.containsKey(categoryName)) {
             serverListMap.put(categoryName, new ServerList());
         }
     }
 
-    public void addServer(String categoryName, Server server) {
+    public void remove(String categoryName) {
+        if (serverListMap.containsKey(categoryName)) {
+            serverListMap.remove(categoryName);
+        }
+    }
+
+    public void add(String categoryName, Server server) {
         serverListMap.get(categoryName).addServer(server);
+    }
+
+    public void remove(String categoryName, Server server) {
+        serverListMap.get(categoryName).removeServer(server);
     }
 
     public Map<String, ServerList> getServerListMap() {
@@ -86,20 +94,17 @@ public class Categories {
         return true;
     }
 
-    public Map<String, ServerList> addedServerFrom(Categories categories) {
+    public Map<String, ServerList> diff(Categories categories) {
         Map<String, ServerList> result = Maps.newHashMap();
-        for (String category : categories.getServerListMap().keySet()) {
-            if (serverListMap.containsKey(category)) {
-                SetView<Server> differenceServers = Sets.difference(categories
-                        .getServerListMap().get(category).getServers(),
-                        serverListMap.get(category).getServers());
-                result.put(category, new ServerList(differenceServers));
-            } else {
-                result.put(category, categories.getServerListMap()
-                        .get(category));
+        for (String category : serverListMap.keySet()) {
+            ServerList serverList = serverListMap.get(category);
+            if (serverList != null) {
+                result.put(
+                        category,
+                        serverList.diff(categories.getServerListMap().get(
+                                category)));
             }
         }
-
         return result;
     }
 

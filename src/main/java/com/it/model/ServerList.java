@@ -45,6 +45,24 @@ public class ServerList {
         return null;
     }
 
+    public boolean contains(Server server) {
+        if (findServer(server.getHost(), server.getPort()) == null)
+            return false;
+
+        return true;
+    }
+
+    public ServerList diff(ServerList serverList) {
+        ServerList result = new ServerList();
+
+        for (Server server : getServers()) {
+            if (serverList == null || !serverList.contains(server)) {
+                result.addServer(server);
+            }
+        }
+        return result;
+    }
+
     public void addServer(Server server) {
         servers.add(server);
     }

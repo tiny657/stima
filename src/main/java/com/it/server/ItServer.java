@@ -1,7 +1,5 @@
 package com.it.server;
 
-import java.util.concurrent.ExecutorService;
-
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -16,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.it.common.Config;
 
-public class ItServer implements Runnable {
+public class ItServer extends Thread {
     private static final Logger logger = LoggerFactory
             .getLogger(ItServer.class);
     private String host;

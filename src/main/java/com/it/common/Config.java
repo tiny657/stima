@@ -11,6 +11,7 @@ import joptsimple.OptionSet;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,14 +92,35 @@ public class Config {
     }
 
     public void addServer(String category, String hostPort) {
-        if (!AllServer.getInstance().getCategories().getServerListMap().containsKey(category)) {
+        if (!ArrayUtils.contains(getCategories(), category)) {
             config.addProperty(CATEGORY, category);
         }
-        config.addProperty(CATEGORY + "." + category, hostPort);
+        config.addProperty(getSubCategory(category), hostPort);
     }
 
-    public void removeServer(String category, String hostPort) {
-        // TODO :: how to remove server
+    @SuppressWarnings("unchecked")
+    public List<String> getServer(String category) {
+        return config.getList(getSubCategory(category));
+    }
+
+    public void removeServer(String category, String removedHostPort) {
+        // TODO :: remove category in properties file.
+        List<String> hostPorts = getServer(category);
+        config.clearProperty(getSubCategory(category));
+        for (String hostPort : hostPorts) {
+            if (removedHostPort.equals(hostPort)) {
+                hostPorts.remove(hostPort);
+                break;
+            }
+        }
+
+        for (String hostPort : hostPorts) {
+            config.addProperty(getSubCategory(category), hostPort);
+        }
+    }
+
+    public String[] getCategories() {
+        return config.getStringArray(CATEGORY);
     }
 
     public List<Server> getServers() {
@@ -111,6 +133,10 @@ public class Config {
         }
 
         return servers;
+    }
+
+    private String getSubCategory(String category) {
+        return CATEGORY + "." + category;
     }
 
     private boolean validate() {
@@ -145,14 +171,12 @@ public class Config {
         setAutoSpread(config.getBoolean(AUTO_SPREAD));
 
         // add category
-        AllServer.getInstance().addCategory(config.getStringArray(CATEGORY));
+        AllServer.getInstance().addCategory(getCategories());
 
         // add server
         for (String category : AllServer.getInstance().getCategories()
                 .getServerListMap().keySet()) {
-            String[] hostPorts = config.getStringArray(CATEGORY + "."
-                    + category);
-            for (String hostPort : hostPorts) {
+            for (String hostPort : getServer(category)) {
                 String[] splitedHostPort = StringUtils.split(hostPort, ":");
                 AllServer.getInstance().addServer(category,
                         new Server(splitedHostPort[0], splitedHostPort[1]));
