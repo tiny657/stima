@@ -15,10 +15,6 @@ public class ServerList {
     public ServerList() {
     }
 
-    public ServerList(Set<Server> servers) {
-        this.servers.addAll(servers);
-    }
-
     public Set<Server> getServers() {
         return servers;
     }
@@ -35,6 +31,30 @@ public class ServerList {
         return runningServers.get(random.nextInt(runningServers.size()));
     }
 
+    public boolean setStatus(String host, int port, boolean isRunning) {
+        Server server = findServer(host, port);
+        if (server == null) {
+            return false;
+        }
+
+        boolean oldRunning = server.isRunning();
+        server.setRunning(isRunning);
+        if (oldRunning == false && isRunning == true) {
+            addRunningServer(server);
+        } else if (oldRunning == true && isRunning == false) {
+            removeRunningServer(server);
+        }
+
+        return true;
+    }
+
+    public boolean contains(Server server) {
+        if (findServer(server.getHost(), server.getPort()) == null)
+            return false;
+
+        return true;
+    }
+
     public Server findServer(String host, int port) {
         for (Server server : servers) {
             if (server.equals(host, port)) {
@@ -43,13 +63,6 @@ public class ServerList {
         }
 
         return null;
-    }
-
-    public boolean contains(Server server) {
-        if (findServer(server.getHost(), server.getPort()) == null)
-            return false;
-
-        return true;
     }
 
     public ServerList diff(ServerList serverList) {

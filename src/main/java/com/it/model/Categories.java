@@ -10,12 +10,6 @@ import com.google.common.collect.Maps;
 public class Categories {
     private Map<String, ServerList> serverListMap = Maps.newHashMap();
 
-    public void addCategory(String[] categoryNames) {
-        for (String categoryName : categoryNames) {
-            add(categoryName);
-        }
-    }
-
     public void add(String categoryName) {
         if (!serverListMap.containsKey(categoryName)) {
             serverListMap.put(categoryName, new ServerList());
@@ -54,15 +48,8 @@ public class Categories {
 
     public void setStatus(String host, int port, boolean isRunning) {
         for (Entry<String, ServerList> entry : serverListMap.entrySet()) {
-            Server server = entry.getValue().findServer(host, port);
-            if (server != null) {
-                boolean oldRunning = server.isRunning();
-                server.setRunning(isRunning);
-                if (oldRunning == false && isRunning == true) {
-                    entry.getValue().addRunningServer(server);
-                } else if (oldRunning == true && isRunning == false) {
-                    entry.getValue().removeRunningServer(server);
-                }
+            ServerList serverList = entry.getValue();
+            if (serverList.setStatus(host, port, isRunning)) {
                 break;
             }
         }
