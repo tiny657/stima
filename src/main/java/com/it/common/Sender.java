@@ -16,7 +16,7 @@ public class Sender {
         ByteBuf byteBuf = Unpooled.buffer(msg.length());
         byteBuf.writeBytes(msg.getBytes());
         for (Server server : AllServer.getInstance()
-                .getCategory(targetCategory).getRunningServers()) {
+                .getServerListIn(targetCategory).getRunningServers()) {
             AllServer.getInstance().getServerInfo().getChannelFuture(server)
                     .channel().writeAndFlush(byteBuf);
         }
@@ -27,7 +27,7 @@ public class Sender {
     public static boolean sendAnycast(String targetCategory, String msg) {
         ByteBuf byteBuf = Unpooled.buffer(msg.length());
         byteBuf.writeBytes(msg.getBytes());
-        Server server = AllServer.getInstance().getCategory(targetCategory)
+        Server server = AllServer.getInstance().getServerListIn(targetCategory)
                 .randomRunningServer();
         if (server != null) {
             AllServer.getInstance().getServerInfo().getChannelFuture(server)

@@ -17,33 +17,38 @@ public class Categories {
     }
 
     public void remove(String categoryName) {
-        if (serverListMap.containsKey(categoryName)) {
-            serverListMap.remove(categoryName);
-        }
+        serverListMap.remove(categoryName);
     }
 
     public void add(String categoryName, Server server) {
-        serverListMap.get(categoryName).addServer(server);
+        ServerList serverList = serverListMap.get(categoryName);
+        if (serverList == null) {
+            add(categoryName);
+        }
+        serverList.addServer(server);
     }
 
     public void remove(String categoryName, Server server) {
-        serverListMap.get(categoryName).removeServer(server);
+        ServerList serverList = serverListMap.get(categoryName);
+        if (serverList != null) {
+            serverList.removeServer(server);
+        }
     }
 
-    public Map<String, ServerList> getServerListMap() {
-        return serverListMap;
+    public Set<String> getCategoryNames() {
+        return serverListMap.keySet();
     }
 
-    public ServerList getCategory(String category) {
+    public ServerList getServerListIn(String category) {
         return serverListMap.get(category);
     }
 
-    public Set<Server> getServers(String category) {
-        return serverListMap.get(category).getServers();
-    }
-
-    public Server getRandomServer(String category) {
-        return serverListMap.get(category).randomRunningServer();
+    public Server randomRunningServer(String category) {
+        ServerList serverList = serverListMap.get(category);
+        if (serverList != null) {
+            return serverList.randomRunningServer();
+        }
+        return null;
     }
 
     public void setStatus(String host, int port, boolean isRunning) {
@@ -56,20 +61,20 @@ public class Categories {
     }
 
     public boolean equals(Categories categories) {
-        if (serverListMap.size() != categories.getServerListMap().size()) {
+        if (serverListMap.size() != categories.getCategoryNames().size()) {
             return false;
         }
 
         for (String category : serverListMap.keySet()) {
-            if (serverListMap.get(category).getServers().size() != categories
-                    .getServerListMap().get(category).getServers().size()) {
+            if (getServerListIn(category).getServers().size() != categories
+                    .getServerListIn(category).getServers().size()) {
                 return false;
             }
 
-            Iterator<Server> iterator = serverListMap.get(category)
+            Iterator<Server> iterator = getServerListIn(category).getServers()
+                    .iterator();
+            Iterator<Server> iterator2 = categories.getServerListIn(category)
                     .getServers().iterator();
-            Iterator<Server> iterator2 = categories.getServerListMap()
-                    .get(category).getServers().iterator();
             while (iterator.hasNext()) {
                 Server server = iterator.next();
                 Server server2 = iterator2.next();
@@ -86,10 +91,8 @@ public class Categories {
         for (String category : serverListMap.keySet()) {
             ServerList serverList = serverListMap.get(category);
             if (serverList != null) {
-                result.put(
-                        category,
-                        serverList.diff(categories.getServerListMap().get(
-                                category)));
+                result.put(category,
+                        serverList.diff(categories.getServerListIn(category)));
             }
         }
         return result;

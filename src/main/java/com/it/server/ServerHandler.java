@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
 import com.it.client.ItClient;
 import com.it.common.Config;
 import com.it.common.JsonUtils;
@@ -70,7 +71,6 @@ public class ServerHandler extends ChannelHandlerAdapter {
     }
 
     private void checkServersToRemove(Categories categories) {
-        System.out.println(categories.toString());
         Map<String, ServerList> removedServer = AllServer.getInstance()
                 .getCategories().diff(categories);
         logger.info("removed server: " + removedServer.toString());
@@ -88,9 +88,9 @@ public class ServerHandler extends ChannelHandlerAdapter {
                 Config.getInstance().removeServer(category,
                         server.getHost() + ":" + server.getPort());
             }
-            
+
             // remove category
-            if (AllServer.getInstance().getCategory(category).getServers()
+            if (AllServer.getInstance().getServerListIn(category).getServers()
                     .size() == 0) {
                 AllServer.getInstance().removeCategory(category);
             }

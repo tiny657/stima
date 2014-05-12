@@ -1,7 +1,5 @@
 package com.it.common;
 
-import java.io.IOException;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
@@ -46,19 +43,10 @@ public class JsonUtils {
     }
 
     public static String toJson(Object obj) {
-        if (obj == null) {
-            return new JsonObject().toString();
-        }
-        try {
-            return MAPPER.writeValueAsString(obj);
-        } catch (IOException e) {
-            return new JsonObject().toString();
-        }
-
+        return GSON.toJson(obj);
     }
 
-    public static <T> T fromJson(String content, Class<T> classOfT)
-            throws IllegalArgumentException {
+    public static <T> T fromJson(String content, Class<T> classOfT) {
         return GSON.fromJson(content, classOfT);
     }
 

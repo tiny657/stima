@@ -1,7 +1,5 @@
 package com.it.model;
 
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 public class AllServer {
@@ -39,18 +37,17 @@ public class AllServer {
         return categories;
     }
 
-    public ServerList getCategory(String category) {
-        return categories.getCategory(category);
+    public ServerList getServerListIn(String category) {
+        return categories.getServerListIn(category);
     }
 
     public Set<Server> getServers(String category) {
-        return categories.getCategory(category).getServers();
+        return categories.getServerListIn(category).getServers();
     }
 
     public Server getServer(String host, int port) {
-        Map<String, ServerList> serverListMap = categories.getServerListMap();
-        for (Entry<String, ServerList> entry : serverListMap.entrySet()) {
-            Server server = entry.getValue().findServer(host, port);
+        for (String categoryName : categories.getCategoryNames()) {
+            Server server = categories.getServerListIn(categoryName).findServer(host, port);
             if (server != null) {
                 return server;
             }
@@ -60,7 +57,7 @@ public class AllServer {
     }
 
     public Server getRandomServer(String category) {
-        return categories.getCategory(category).randomRunningServer();
+        return categories.getServerListIn(category).randomRunningServer();
     }
 
     public void setStatus(String host, int port, boolean isRunning) {

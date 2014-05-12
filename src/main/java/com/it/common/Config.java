@@ -3,7 +3,6 @@ package com.it.common;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map.Entry;
 
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
@@ -18,8 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.it.model.AllServer;
+import com.it.model.Categories;
 import com.it.model.Server;
-import com.it.model.ServerList;
 
 public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
@@ -125,13 +124,13 @@ public class Config {
 
     public List<Server> getServers() {
         List<Server> servers = Lists.newArrayList();
-        for (Entry<String, ServerList> entry : AllServer.getInstance()
-                .getCategories().getServerListMap().entrySet()) {
-            for (Server server : entry.getValue().getServers()) {
+        Categories categories = AllServer.getInstance().getCategories();
+        for (String categoryName : categories.getCategoryNames()) {
+            for (Server server : categories.getServerListIn(categoryName)
+                    .getServers()) {
                 servers.add(server);
             }
         }
-
         return servers;
     }
 
@@ -175,7 +174,7 @@ public class Config {
 
         // add server
         for (String category : AllServer.getInstance().getCategories()
-                .getServerListMap().keySet()) {
+                .getCategoryNames()) {
             for (String hostPort : getServer(category)) {
                 String[] splitedHostPort = StringUtils.split(hostPort, ":");
                 AllServer.getInstance().addServer(category,
