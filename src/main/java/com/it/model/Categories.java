@@ -21,15 +21,16 @@ public class Categories {
     }
 
     public void add(String categoryName, Server server) {
-        ServerList serverList = serverListMap.get(categoryName);
+        ServerList serverList = getServerListIn(categoryName);
         if (serverList == null) {
             add(categoryName);
+            serverList = getServerListIn(categoryName);
         }
         serverList.addServer(server);
     }
 
     public void remove(String categoryName, Server server) {
-        ServerList serverList = serverListMap.get(categoryName);
+        ServerList serverList = getServerListIn(categoryName);
         if (serverList != null) {
             serverList.removeServer(server);
         }
@@ -44,20 +45,21 @@ public class Categories {
     }
 
     public Server randomRunningServer(String category) {
-        ServerList serverList = serverListMap.get(category);
+        ServerList serverList = getServerListIn(category);
         if (serverList != null) {
             return serverList.randomRunningServer();
         }
         return null;
     }
 
-    public void setStatus(String host, int port, boolean isRunning) {
+    public boolean setStatus(String host, int port, boolean isRunning) {
         for (Entry<String, ServerList> entry : serverListMap.entrySet()) {
             ServerList serverList = entry.getValue();
             if (serverList.setStatus(host, port, isRunning)) {
-                break;
+                return true;
             }
         }
+        return false;
     }
 
     public boolean equals(Categories categories) {
@@ -65,7 +67,7 @@ public class Categories {
             return false;
         }
 
-        for (String category : serverListMap.keySet()) {
+        for (String category : getCategoryNames()) {
             if (getServerListIn(category).getServers().size() != categories
                     .getServerListIn(category).getServers().size()) {
                 return false;
@@ -88,8 +90,8 @@ public class Categories {
 
     public Map<String, ServerList> diff(Categories categories) {
         Map<String, ServerList> result = Maps.newHashMap();
-        for (String category : serverListMap.keySet()) {
-            ServerList serverList = serverListMap.get(category);
+        for (String category : getCategoryNames()) {
+            ServerList serverList = getServerListIn(category);
             if (serverList != null) {
                 result.put(category,
                         serverList.diff(categories.getServerListIn(category)));
