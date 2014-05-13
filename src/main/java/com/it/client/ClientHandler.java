@@ -32,8 +32,8 @@ public class ClientHandler extends ChannelHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         try {
             ByteBuf in = (ByteBuf) msg;
-            logger.info("server received: {}",
-                    in.toString(io.netty.util.CharsetUtil.US_ASCII));
+            String received = in.toString(io.netty.util.CharsetUtil.US_ASCII);
+            logger.info("server received: {}", received);
         } finally {
             ReferenceCountUtil.release(msg);
         }

@@ -37,8 +37,8 @@ public class ServerHandler extends ChannelHandlerAdapter {
                 logger.info("server properties is same.");
             } else {
                 logger.info("server properties is different.");
-                checkServersToRemove(categories);
-                checkServersToAdd(categories);
+                removeServers(categories);
+                addServers(categories);
             }
 
             logger.info("server received: {}", categories.toString());
@@ -47,29 +47,7 @@ public class ServerHandler extends ChannelHandlerAdapter {
         }
     }
 
-    private void checkServersToAdd(Categories categories) {
-        Map<String, ServerList> addedServer = categories.diff(AllServer
-                .getInstance().getCategories());
-        logger.info("added server: " + addedServer.toString());
-
-        for (String category : addedServer.keySet()) {
-            AllServer.getInstance().addCategory(category);
-            for (Server server : addedServer.get(category).getServers()) {
-                // start client thread
-                ItClient itClient = new ItClient(server.getHost(),
-                        server.getPort());
-                itClient.start();
-
-                // add client data
-                AllServer.getInstance().addServer(category, server);
-                AllServer.getInstance().getServerInfo().add(server, itClient);
-                Config.getInstance().addServer(category,
-                        server.getHost() + ":" + server.getPort());
-            }
-        }
-    }
-
-    private void checkServersToRemove(Categories categories) {
+    private void removeServers(Categories categories) {
         Map<String, ServerList> removedServer = AllServer.getInstance()
                 .getCategories().diff(categories);
         logger.info("removed server: " + removedServer.toString());
@@ -77,21 +55,38 @@ public class ServerHandler extends ChannelHandlerAdapter {
         for (String category : removedServer.keySet()) {
             for (Server server : removedServer.get(category).getServers()) {
                 // stop client thread
-                ItClient itClient = AllServer.getInstance().getServerInfo()
-                        .getItClient(server);
-                itClient.interrupt();
+                AllServer.getInstance().getServerInfos().getItClient(server)
+                        .interrupt();
 
-                // remove client data
+                // remove client and client info
                 AllServer.getInstance().removeServer(category, server);
-                AllServer.getInstance().getServerInfo().remove(server);
-                Config.getInstance().removeServer(category,
-                        server.getHost() + ":" + server.getPort());
+                AllServer.getInstance().getServerInfos().removeInfo(server);
+                Config.getInstance().removeServer(category, server);
             }
 
             // remove category
-            if (AllServer.getInstance().getServerListIn(category).getServers()
-                    .size() == 0) {
+            if (!AllServer.getInstance().getServerListIn(category).hasServers()) {
                 AllServer.getInstance().removeCategory(category);
+            }
+        }
+    }
+
+    private void addServers(Categories categories) {
+        Map<String, ServerList> addedServer = categories.diff(AllServer
+                .getInstance().getCategories());
+        logger.info("added server: " + addedServer.toString());
+
+        for (String category : addedServer.keySet()) {
+            AllServer.getInstance().addCategory(category);
+            for (Server server : addedServer.get(category).getServers()) {
+                // start client
+                ItClient itClient = new ItClient(server);
+                itClient.start();
+
+                // add client data
+                AllServer.getInstance().addServer(category, server);
+                AllServer.getInstance().getServerInfos().put(server, itClient);
+                Config.getInstance().addServer(category, server);
             }
         }
     }

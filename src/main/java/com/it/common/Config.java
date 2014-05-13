@@ -90,11 +90,13 @@ public class Config {
         this.isAutoSpread = isAutoSpread;
     }
 
-    public void addServer(String category, String hostPort) {
+    public void addServer(String category, Server server) {
         if (!ArrayUtils.contains(getCategories(), category)) {
             config.addProperty(CATEGORY, category);
         }
-        config.addProperty(getSubCategory(category), hostPort);
+
+        config.addProperty(getSubCategory(category), server.getHost() + ":"
+                + server.getPort());
     }
 
     @SuppressWarnings("unchecked")
@@ -102,12 +104,13 @@ public class Config {
         return config.getList(getSubCategory(category));
     }
 
-    public void removeServer(String category, String removedHostPort) {
+    public void removeServer(String category, Server server) {
         // TODO :: remove category in properties file.
         List<String> hostPorts = getServer(category);
         config.clearProperty(getSubCategory(category));
+        String removedHostPort = server.getHost() + ":" + server.getPort();
         for (String hostPort : hostPorts) {
-            if (removedHostPort.equals(hostPort)) {
+            if (StringUtils.equals(removedHostPort, hostPort)) {
                 hostPorts.remove(hostPort);
                 break;
             }

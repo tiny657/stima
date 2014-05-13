@@ -52,10 +52,10 @@ public class Categories {
         return null;
     }
 
-    public boolean setStatus(String host, int port, boolean isRunning) {
+    public boolean setStatus(Server server, boolean isRunning) {
         for (Entry<String, ServerList> entry : serverListMap.entrySet()) {
             ServerList serverList = entry.getValue();
-            if (serverList.setStatus(host, port, isRunning)) {
+            if (serverList.setStatus(server.getHost(), server.getPort(), isRunning)) {
                 return true;
             }
         }

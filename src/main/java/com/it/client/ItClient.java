@@ -20,14 +20,15 @@ public class ItClient extends Thread {
             .getLogger(ItClient.class);
 
     private String profile;
+    private Server server;
 
-    private String serverHost;
-    private int serverPort;
+    public ItClient(Server server) {
+        this(server.getHost(), server.getPort());
+    }
 
-    public ItClient(String serverHost, int serverPort) {
-        this.profile = "me" + serverPort;
-        this.serverHost = serverHost;
-        this.serverPort = serverPort;
+    public ItClient(String host, int port) {
+        this.profile = "me" + port;
+        server = new Server(host, port);
     }
 
     @Override
@@ -48,46 +49,54 @@ public class ItClient extends Thread {
             });
 
             while (true) {
-                logger.info("Connecting to {}:{}", serverHost, serverPort);
-
                 ChannelFuture channelFuture = awaitConnection(bootstrap);
-                AllServer.getInstance().setStatus(serverHost, serverPort, true);
-                Server server = AllServer.getInstance().getServer(serverHost,
-                        serverPort);
-                if (server != null) {
-                    AllServer.getInstance().getServerInfo()
-                            .add(server, channelFuture);
-                }
 
-                logger.info("Connection({}:{}) is established.", serverHost, serverPort);
+                // update server and serverInfo.
+                Server connectedServer = AllServer.getInstance().getServer(
+                        server);
+                AllServer.getInstance().getServerInfos()
+                        .put(connectedServer, channelFuture, this);
+
+                logger.info("Connection({}:{}) is established.",
+                        server.getHost(), server.getPort());
                 logger.info(AllServer.getInstance().toString());
 
-                AllServer.getInstance().getServerInfo().add(server, this);
-
-                // wait until closed.
-                channelFuture.channel().closeFuture().sync();
-                AllServer.getInstance()
-                        .setStatus(serverHost, serverPort, false);
-
-                logger.info("Connection({}:{}) is closed.", serverHost,
-                        serverPort);
-                logger.info(AllServer.getInstance().toString());
+                awaitDisconnection(channelFuture);
             }
         } catch (InterruptedException e) {
-            logger.info("Connection({}:{}) is closed.", serverHost, serverPort);
+            logger.info("Connection({}:{}) is closed.", server.getHost(),
+                    server.getPort());
         } finally {
             workerGroup.shutdownGracefully();
         }
     }
 
-    public ChannelFuture awaitConnection(Bootstrap bootstrap)
+    private ChannelFuture awaitConnection(Bootstrap bootstrap)
             throws InterruptedException {
+        logger.info("Connecting to {}:{}", server.getHost(), server.getPort());
+
         ChannelFuture channelFuture;
         do {
-            channelFuture = bootstrap.connect(serverHost, serverPort).await();
+            channelFuture = bootstrap.connect(server.getHost(),
+                    server.getPort()).await();
             Thread.sleep(1000);
         } while (!channelFuture.isSuccess());
 
+        // From standby to running.
+        AllServer.getInstance().setStatus(server, true);
+
         return channelFuture;
+    }
+
+    private void awaitDisconnection(ChannelFuture channelFuture)
+            throws InterruptedException {
+        channelFuture.channel().closeFuture().sync();
+
+        // From running to standby.
+        AllServer.getInstance().setStatus(server, false);
+
+        logger.info("Connection({}:{}) is closed.", server.getHost(),
+                server.getPort());
+        logger.info(AllServer.getInstance().toString());
     }
 }

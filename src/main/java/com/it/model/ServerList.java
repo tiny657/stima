@@ -15,6 +15,10 @@ public class ServerList {
     public ServerList() {
     }
 
+    public boolean hasServers() {
+        return servers.size() > 0;
+    }
+
     public Set<Server> getServers() {
         return servers;
     }

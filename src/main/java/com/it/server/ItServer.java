@@ -13,24 +13,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.it.common.Config;
+import com.it.model.AllServer;
+import com.it.model.Server;
 
 public class ItServer extends Thread {
     private static final Logger logger = LoggerFactory
             .getLogger(ItServer.class);
-    private String host;
-    private int port;
+    private Server myServer;
 
     public ItServer() {
-        this.host = Config.getInstance().getHost();
-        this.port = Config.getInstance().getPort();
+        myServer = new Server(Config.getInstance().getHost(), Config
+                .getInstance().getPort());
     }
 
     public String getHost() {
-        return host;
+        return myServer.getHost();
     }
 
     public int getPort() {
-        return port;
+        return myServer.getPort();
     }
 
     @Override
@@ -38,27 +39,40 @@ public class ItServer extends Thread {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap
+                    .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        public void initChannel(SocketChannel ch)
+                        public void initChannel(SocketChannel socketChannel)
                                 throws Exception {
-                            ch.pipeline().addLast(new ServerHandler());
+                            socketChannel.pipeline().addLast(
+                                    new ServerHandler());
                         }
                     }).option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            ChannelFuture f = b.bind(port).sync();
-            logger.info("server started ({}:{})", host, port);
+            ChannelFuture channelFuture = bootstrap.bind(myServer.getPort())
+                    .sync();
+            logger.info("server started ({}:{})", myServer.getHost(),
+                    myServer.getPort());
 
-            f.channel().closeFuture().sync();
-            logger.info("server closed ({}:{})", host, port);
+            // From standby to running
+            AllServer.getInstance().setStatus(myServer, true);
+
+            awaitDisconnection(channelFuture);
         } catch (InterruptedException e) {
         } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
+    }
+
+    private void awaitDisconnection(ChannelFuture channelFuture)
+            throws InterruptedException {
+        channelFuture.channel().closeFuture().sync();
+        logger.info("server closed ({}:{})", myServer.getHost(),
+                myServer.getPort());
     }
 }

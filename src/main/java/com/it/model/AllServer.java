@@ -5,7 +5,7 @@ import java.util.Set;
 public class AllServer {
     public static AllServer instance = new AllServer();
     private Categories categories = new Categories();
-    private ServerInfo serverInfo = new ServerInfo();
+    private ServerInfos serverInfos = new ServerInfos();
 
     public static AllServer getInstance() {
         return instance;
@@ -44,6 +44,10 @@ public class AllServer {
     public Set<Server> getServers(String category) {
         return categories.getServerListIn(category).getServers();
     }
+    
+    public Server getServer(Server server) {
+        return getServer(server.getHost(), server.getPort());
+    }
 
     public Server getServer(String host, int port) {
         for (String categoryName : categories.getCategoryNames()) {
@@ -60,12 +64,12 @@ public class AllServer {
         return categories.getServerListIn(category).randomRunningServer();
     }
 
-    public void setStatus(String host, int port, boolean isRunning) {
-        categories.setStatus(host, port, isRunning);
+    public void setStatus(Server server, boolean isRunning) {
+        categories.setStatus(server, isRunning);
     }
     
-    public ServerInfo getServerInfo() {
-        return serverInfo;
+    public ServerInfos getServerInfos() {
+        return serverInfos;
     }
 
     @Override

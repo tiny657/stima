@@ -17,7 +17,7 @@ public class Sender {
         byteBuf.writeBytes(msg.getBytes());
         for (Server server : AllServer.getInstance()
                 .getServerListIn(targetCategory).getRunningServers()) {
-            AllServer.getInstance().getServerInfo().getChannelFuture(server)
+            AllServer.getInstance().getServerInfos().getChannelFuture(server)
                     .channel().writeAndFlush(byteBuf);
         }
 
@@ -30,7 +30,7 @@ public class Sender {
         Server server = AllServer.getInstance().getServerListIn(targetCategory)
                 .randomRunningServer();
         if (server != null) {
-            AllServer.getInstance().getServerInfo().getChannelFuture(server)
+            AllServer.getInstance().getServerInfos().getChannelFuture(server)
                     .channel().writeAndFlush(byteBuf);
         } else {
             logger.info("No server in category({})", targetCategory);
@@ -46,7 +46,7 @@ public class Sender {
         Server server = AllServer.getInstance().getServer(targetHost,
                 targetPort);
         if (server != null) {
-            AllServer.getInstance().getServerInfo().getChannelFuture(server)
+            AllServer.getInstance().getServerInfos().getChannelFuture(server)
                     .channel().writeAndFlush(byteBuf);
         }
 

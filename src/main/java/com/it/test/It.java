@@ -19,7 +19,7 @@ public class It {
         for (Server server : Config.getInstance().getServers()) {
             if (!server.equals(itServer.getHost(), itServer.getPort())) {
                 ItClient itClient = new ItClient(server.getHost(), server.getPort());
-                AllServer.getInstance().getServerInfo().add(server, itClient);
+                AllServer.getInstance().getServerInfos().put(server, itClient);
                 itClient.start();
             }
         }

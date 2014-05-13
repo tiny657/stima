@@ -41,7 +41,7 @@ public class CategoriesTest {
         // Then
         assertThat(size, is(2));
     }
-    
+
     @Test
     public void addServer() {
         // Given
@@ -53,11 +53,11 @@ public class CategoriesTest {
 
         // When
         int size = categories.getCategoryNames().size();
-        
+
         // Then
         assertThat(size, is(2));
     }
-    
+
     @Test
     public void setStatus() {
         // Given
@@ -66,14 +66,14 @@ public class CategoriesTest {
         categories.add("category1", new Server("host", 1002));
         categories.add("category2", new Server("host", 1003));
         categories.add("category2", new Server("host", 1004));
-        
+
         // When
-        boolean result1 = categories.setStatus("host", 1001, true);
-        boolean result2 = categories.setStatus("host", 1001, true);
-        boolean result3 = categories.setStatus("host", 1001, false);
-        boolean result4 = categories.setStatus("host", 1004, true);
-        boolean result5 = categories.setStatus("host", 1005, true);
-        
+        boolean result1 = categories.setStatus(new Server("host", 1001), true);
+        boolean result2 = categories.setStatus(new Server("host", 1001), true);
+        boolean result3 = categories.setStatus(new Server("host", 1001), false);
+        boolean result4 = categories.setStatus(new Server("host", 1004), true);
+        boolean result5 = categories.setStatus(new Server("host", 1005), true);
+
         // Then
         assertThat(result1, is(true));
         assertThat(result2, is(true));
@@ -95,7 +95,7 @@ public class CategoriesTest {
 
         // When
         boolean equals = categories1.equals(categories2);
-        
+
         // Then
         assertThat(equals, is(false));
     }
@@ -113,7 +113,7 @@ public class CategoriesTest {
 
         // When
         boolean equals = categories1.equals(categories2);
-        
+
         // Then
         assertThat(equals, is(false));
     }
@@ -132,7 +132,7 @@ public class CategoriesTest {
 
         // When
         boolean equals = categories1.equals(categories2);
-        
+
         // Then
         assertThat(equals, is(false));
     }
@@ -151,7 +151,7 @@ public class CategoriesTest {
 
         // When
         boolean equals = categories1.equals(categories2);
-        
+
         // Then
         assertThat(equals, is(false));
     }
@@ -170,11 +170,11 @@ public class CategoriesTest {
 
         // When
         boolean equals = categories1.equals(categories2);
-        
+
         // Then
         assertThat(equals, is(true));
     }
-    
+
     @Test
     public void diffCategory() {
         // Given
@@ -186,7 +186,7 @@ public class CategoriesTest {
         Categories categories2 = new Categories();
         categories2.add("category1", new Server("host", 1001));
         categories2.add("category1", new Server("host", 1002));
-        
+
         // When
         Map<String, ServerList> diff = categories1.diff(categories2);
 
@@ -207,7 +207,7 @@ public class CategoriesTest {
         categories2.add("category1", new Server("host", 1002));
         categories2.add("category1", new Server("host", 1003));
         categories2.add("category2", new Server("host", 1004));
-        
+
         // When
         Map<String, ServerList> diff = categories1.diff(categories2);
 
