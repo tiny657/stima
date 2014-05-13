@@ -11,15 +11,18 @@ public class It {
     It(String[] args) throws Exception {
         Config.getInstance().init(args);
 
+        // server
+        ItServer itServer = new ItServer();
+        itServer.start();
+
         // clients
         for (Server server : Config.getInstance().getServers()) {
-            ItClient itClient = new ItClient(server.getHost(), server.getPort());
-            AllServer.getInstance().getServerInfo().add(server, itClient);
-            itClient.start();
+            if (!server.equals(itServer.getHost(), itServer.getPort())) {
+                ItClient itClient = new ItClient(server.getHost(), server.getPort());
+                AllServer.getInstance().getServerInfo().add(server, itClient);
+                itClient.start();
+            }
         }
-
-        // server
-        new ItServer().start();
     }
 
     public void sendBroadcast(String targetCategory, String message) {

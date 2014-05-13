@@ -25,6 +25,14 @@ public class ItServer extends Thread {
         this.port = Config.getInstance().getPort();
     }
 
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
     @Override
     public void run() {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
