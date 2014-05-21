@@ -33,15 +33,20 @@ public class ServerHandler extends ChannelHandlerAdapter {
             String content = in.toString(io.netty.util.CharsetUtil.US_ASCII);
             Categories categories = JsonUtils.fromJson(content,
                     Categories.class);
-            if (AllServer.getInstance().getCategories().equals(categories)) {
-                logger.info("server properties is same.");
-            } else {
-                logger.info("server properties is different.");
-                removeServers(categories);
-                addServers(categories);
-            }
+            if (AllServer.getInstance().getCategories().getBootupTime()
+                    .compareTo(categories.getBootupTime()) < 0) {
+                if (AllServer.getInstance().getCategories().equals(categories)) {
+                    logger.info("server properties is same.");
+                } else {
+                    logger.info("server properties is different.");
+                    removeServers(categories);
+                    addServers(categories);
+                }
 
-            logger.info("server received: {}", categories.toString());
+                logger.info("server received: {}", categories.toString());
+            } else {
+                logger.info("ignore the received server list.");
+            }
         } finally {
             ReferenceCountUtil.release(msg);
         }
@@ -50,9 +55,17 @@ public class ServerHandler extends ChannelHandlerAdapter {
     private void removeServers(Categories categories) {
         Map<String, ServerList> removedServer = AllServer.getInstance()
                 .getCategories().diff(categories);
-        logger.info("removed server: " + removedServer.toString());
+        logger.info("removed server: {}", removedServer.toString());
 
         for (String category : removedServer.keySet()) {
+            // remove category
+            if (AllServer.getInstance().getServerListIn(category).size() == removedServer
+                    .get(category).size()) {
+                logger.info("removed category: {}", category);
+                AllServer.getInstance().removeCategory(category);
+                Config.getInstance().removeCategory(category);
+            }
+
             for (Server server : removedServer.get(category).getServers()) {
                 // stop client thread
                 AllServer.getInstance().getServerInfos().getItClient(server)
@@ -62,11 +75,6 @@ public class ServerHandler extends ChannelHandlerAdapter {
                 AllServer.getInstance().removeServer(category, server);
                 AllServer.getInstance().getServerInfos().removeInfo(server);
                 Config.getInstance().removeServer(category, server);
-            }
-
-            // remove category
-            if (!AllServer.getInstance().getServerListIn(category).hasServers()) {
-                AllServer.getInstance().removeCategory(category);
             }
         }
     }

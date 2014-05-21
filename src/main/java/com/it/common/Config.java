@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.it.model.AllServer;
 import com.it.model.Categories;
@@ -60,6 +61,8 @@ public class Config {
         loadProperties();
 
         if (!validate()) {
+            logger.error("My server info is {}:{}\n", host, port);
+            logger.error(AllServer.getInstance().getCategories().toString());
             throw new Exception(host + ":" + port + " isn't valid.");
         }
 
@@ -91,12 +94,11 @@ public class Config {
     }
 
     public void addServer(String category, Server server) {
-        if (!ArrayUtils.contains(getCategories(), category)) {
+        if (!ArrayUtils.contains(getCategoriesArray(), category)) {
             config.addProperty(CATEGORY, category);
         }
 
-        config.addProperty(getSubCategory(category), server.getHost() + ":"
-                + server.getPort());
+        config.addProperty(getSubCategory(category), server.getHostPort());
     }
 
     @SuppressWarnings("unchecked")
@@ -104,11 +106,22 @@ public class Config {
         return config.getList(getSubCategory(category));
     }
 
+    public void removeCategory(String removedCategory) {
+        List<String> categories = getCategoriesList();
+
+        for (int i = 0; i < categories.size(); i++) {
+            if (StringUtils.equals(categories.get(i), removedCategory)) {
+                categories.remove(i);
+            }
+        }
+
+        config.setProperty(CATEGORY, Joiner.on(",").join(categories));
+    }
+
     public void removeServer(String category, Server server) {
-        // TODO :: remove category in properties file.
         List<String> hostPorts = getServer(category);
         config.clearProperty(getSubCategory(category));
-        String removedHostPort = server.getHost() + ":" + server.getPort();
+        String removedHostPort = server.getHostPort();
         for (String hostPort : hostPorts) {
             if (StringUtils.equals(removedHostPort, hostPort)) {
                 hostPorts.remove(hostPort);
@@ -121,8 +134,13 @@ public class Config {
         }
     }
 
-    public String[] getCategories() {
+    public String[] getCategoriesArray() {
         return config.getStringArray(CATEGORY);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> getCategoriesList() {
+        return config.getList(CATEGORY);
     }
 
     public List<Server> getServers() {
@@ -173,7 +191,7 @@ public class Config {
         setAutoSpread(config.getBoolean(AUTO_SPREAD));
 
         // add category
-        AllServer.getInstance().addCategory(getCategories());
+        AllServer.getInstance().addCategory(getCategoriesArray());
 
         // add server
         for (String category : AllServer.getInstance().getCategories()

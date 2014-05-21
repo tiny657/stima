@@ -1,5 +1,6 @@
 package com.it.model;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,7 +9,12 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 
 public class Categories {
+    private Date bootupTime = new Date();
     private Map<String, ServerList> serverListMap = Maps.newHashMap();
+
+    public Date getBootupTime() {
+        return bootupTime;
+    }
 
     public void add(String categoryName) {
         if (!serverListMap.containsKey(categoryName)) {
@@ -55,7 +61,8 @@ public class Categories {
     public boolean setStatus(Server server, boolean isRunning) {
         for (Entry<String, ServerList> entry : serverListMap.entrySet()) {
             ServerList serverList = entry.getValue();
-            if (serverList.setStatus(server.getHost(), server.getPort(), isRunning)) {
+            if (serverList.setStatus(server.getHost(), server.getPort(),
+                    isRunning)) {
                 return true;
             }
         }

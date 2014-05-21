@@ -57,15 +57,14 @@ public class ItClient extends Thread {
                 AllServer.getInstance().getServerInfos()
                         .put(connectedServer, channelFuture, this);
 
-                logger.info("Connection({}:{}) is established.",
-                        server.getHost(), server.getPort());
+                logger.info("Connection({}) is established.",
+                        server.getHostPort());
                 logger.info(AllServer.getInstance().toString());
 
                 awaitDisconnection(channelFuture);
             }
         } catch (InterruptedException e) {
-            logger.info("Connection({}:{}) is closed.", server.getHost(),
-                    server.getPort());
+            logger.info("Connection({}) is closed.", server.getHostPort());
         } finally {
             workerGroup.shutdownGracefully();
         }
@@ -73,7 +72,7 @@ public class ItClient extends Thread {
 
     private ChannelFuture awaitConnection(Bootstrap bootstrap)
             throws InterruptedException {
-        logger.info("Connecting to {}:{}", server.getHost(), server.getPort());
+        logger.info("Connecting to {}", server.getHostPort());
 
         ChannelFuture channelFuture;
         do {
@@ -95,8 +94,7 @@ public class ItClient extends Thread {
         // From running to standby.
         AllServer.getInstance().setStatus(server, false);
 
-        logger.info("Connection({}:{}) is closed.", server.getHost(),
-                server.getPort());
+        logger.info("Connection({}) is closed.", server.getHostPort());
         logger.info(AllServer.getInstance().toString());
     }
 }

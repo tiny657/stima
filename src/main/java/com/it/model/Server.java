@@ -35,6 +35,10 @@ public class Server implements Comparable<Server> {
         this.port = Integer.valueOf(port);
     }
 
+    public String getHostPort() {
+        return host + ":" + port;
+    }
+
     public boolean isRunning() {
         return isRunning;
     }
