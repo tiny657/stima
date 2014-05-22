@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.it.common.Config;
-import com.it.model.AllServer;
 import com.it.model.Server;
 
 public class ItServer extends Thread {
@@ -56,9 +55,6 @@ public class ItServer extends Thread {
             ChannelFuture channelFuture = bootstrap.bind(myServer.getPort())
                     .sync();
             logger.info("server started ({}:{})", myServer.getHostPort());
-
-            // From standby to running
-            AllServer.getInstance().setStatus(myServer, true);
 
             awaitDisconnection(channelFuture);
         } catch (InterruptedException e) {

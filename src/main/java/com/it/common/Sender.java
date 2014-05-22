@@ -16,7 +16,7 @@ public class Sender {
     public static boolean sendBroadcast(String targetCategory, String msg) {
         ServerList serverList = AllServer.getInstance().getCategories()
                 .getServerListIn(targetCategory);
-        if (serverList.hasServers()) {
+        if (serverList.hasRunningServers()) {
             logger.error("Send fail.  Because there is no server in {}",
                     targetCategory);
             return false;
@@ -35,7 +35,7 @@ public class Sender {
     public static boolean sendAnycast(String targetCategory, String msg) {
         ServerList serverList = AllServer.getInstance().getCategories()
                 .getServerListIn(targetCategory);
-        if (!serverList.hasServers()) {
+        if (!serverList.hasRunningServers()) {
             logger.error("Send fail.  Because there is no server in {}",
                     targetCategory);
             return false;
@@ -44,6 +44,7 @@ public class Sender {
         ByteBuf byteBuf = Unpooled.buffer(msg.length());
         byteBuf.writeBytes(msg.getBytes());
         Server server = serverList.randomRunningServer();
+
         AllServer.getInstance().getServerInfos().getChannelFuture(server)
                 .channel().writeAndFlush(byteBuf);
 

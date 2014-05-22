@@ -28,24 +28,33 @@ public class ServerHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        ByteBuf in = (ByteBuf) msg;
         try {
-            ByteBuf in = (ByteBuf) msg;
             String content = in.toString(io.netty.util.CharsetUtil.US_ASCII);
-            Categories categories = JsonUtils.fromJson(content,
-                    Categories.class);
-            if (AllServer.getInstance().getCategories().getBootupTime()
-                    .compareTo(categories.getBootupTime()) < 0) {
-                if (AllServer.getInstance().getCategories().equals(categories)) {
-                    logger.info("server properties is same.");
-                } else {
-                    logger.info("server properties is different.");
-                    removeServers(categories);
-                    addServers(categories);
-                }
+            try {
+                // control packet
+                Categories categories = JsonUtils.fromJson(content,
+                        Categories.class);
+                if (AllServer.getInstance().getCategories().getBootupTime()
+                        .compareTo(categories.getBootupTime()) < 0) {
+                    if (AllServer.getInstance().getCategories()
+                            .equals(categories)) {
+                        logger.info("server properties is same.");
+                    } else {
+                        logger.info("server properties is different.");
+                        removeServers(categories);
+                        addServers(categories);
+                    }
 
-                logger.info("server received: {}", categories.toString());
-            } else {
-                logger.info("ignore the received server list.");
+                    logger.info("server received: {}", categories.toString());
+                } else {
+                    logger.info("ignore the received server properties because this server is started up late.");
+                }
+            } catch (Exception e) {
+                // data
+                String received = in
+                        .toString(io.netty.util.CharsetUtil.US_ASCII);
+                logger.info("data received: {}", received);
             }
         } finally {
             ReferenceCountUtil.release(msg);

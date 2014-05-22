@@ -12,6 +12,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.it.common.Sender;
 import com.it.model.AllServer;
 import com.it.model.Server;
 
@@ -60,7 +61,7 @@ public class ItClient extends Thread {
                 logger.info("Connection({}) is established.",
                         server.getHostPort());
                 logger.info(AllServer.getInstance().toString());
-
+                
                 awaitDisconnection(channelFuture);
             }
         } catch (InterruptedException e) {

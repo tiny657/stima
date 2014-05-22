@@ -18,7 +18,11 @@ public class ServerList {
     public boolean hasServers() {
         return servers.size() > 0;
     }
-    
+
+    public boolean hasRunningServers() {
+        return runningServers.size() > 0;
+    }
+
     public int size() {
         return servers.size();
     }

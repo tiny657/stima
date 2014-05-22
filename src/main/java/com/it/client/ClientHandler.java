@@ -33,7 +33,7 @@ public class ClientHandler extends ChannelHandlerAdapter {
         try {
             ByteBuf in = (ByteBuf) msg;
             String received = in.toString(io.netty.util.CharsetUtil.US_ASCII);
-            logger.info("server received: {}", received);
+            logger.info("data received: {}", received);
         } finally {
             ReferenceCountUtil.release(msg);
         }
