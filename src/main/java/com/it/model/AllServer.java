@@ -1,6 +1,5 @@
 package com.it.model;
 
-import java.util.Date;
 import java.util.Set;
 
 public class AllServer {
@@ -22,12 +21,12 @@ public class AllServer {
         categories.add(categoryName);
     }
 
-    public void removeCategory(String categoryName) {
-        categories.remove(categoryName);
-    }
-
     public void addServer(String categoryName, Server server) {
         categories.add(categoryName, server);
+    }
+
+    public void removeCategory(String categoryName) {
+        categories.remove(categoryName);
     }
 
     public void removeServer(String categoryName, Server server) {

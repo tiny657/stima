@@ -11,6 +11,7 @@ import com.google.common.collect.Maps;
 public class Categories {
     private Date bootupTime = new Date();
     private Map<String, ServerList> serverListMap = Maps.newHashMap();
+    private static final ServerList EMPTY_SERVERLIST = new ServerList();
 
     public Date getBootupTime() {
         return bootupTime;
@@ -28,7 +29,7 @@ public class Categories {
 
     public void add(String categoryName, Server server) {
         ServerList serverList = getServerListIn(categoryName);
-        if (serverList == null) {
+        if (serverList == EMPTY_SERVERLIST) {
             add(categoryName);
             serverList = getServerListIn(categoryName);
         }
@@ -37,7 +38,7 @@ public class Categories {
 
     public void remove(String categoryName, Server server) {
         ServerList serverList = getServerListIn(categoryName);
-        if (serverList != null) {
+        if (serverList.hasServers()) {
             serverList.removeServer(server);
         }
     }
@@ -47,12 +48,16 @@ public class Categories {
     }
 
     public ServerList getServerListIn(String category) {
-        return serverListMap.get(category);
+        ServerList serverList = serverListMap.get(category);
+        if (serverList == null) {
+            return EMPTY_SERVERLIST;
+        }
+        return serverList;
     }
 
     public Server randomRunningServer(String category) {
         ServerList serverList = getServerListIn(category);
-        if (serverList != null) {
+        if (serverList.hasServers()) {
             return serverList.randomRunningServer();
         }
         return null;
@@ -99,7 +104,7 @@ public class Categories {
         Map<String, ServerList> result = Maps.newHashMap();
         for (String category : getCategoryNames()) {
             ServerList serverList = getServerListIn(category);
-            if (serverList != null) {
+            if (serverList != EMPTY_SERVERLIST) {
                 result.put(category,
                         serverList.diff(categories.getServerListIn(category)));
             }

@@ -1,7 +1,5 @@
 package com.it.server;
 
-import java.util.Date;
-
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -57,8 +55,7 @@ public class ItServer extends Thread {
 
             ChannelFuture channelFuture = bootstrap.bind(myServer.getPort())
                     .sync();
-            logger.info("server started ({}:{})", myServer.getHost(),
-                    myServer.getPort());
+            logger.info("server started ({}:{})", myServer.getHostPort());
 
             // From standby to running
             AllServer.getInstance().setStatus(myServer, true);
