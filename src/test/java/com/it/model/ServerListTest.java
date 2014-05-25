@@ -27,7 +27,7 @@ public class ServerListTest {
         // When
         Set<Server> randomServers = Sets.newHashSet();
         for (int i = 0; i < count * 100; i++) {
-            Server randomRunningServer = serverList.randomRunningServer();
+            Server randomRunningServer = serverList.nextRunningServer();
             randomServers.add(randomRunningServer);
         }
 

@@ -55,12 +55,9 @@ public class Categories {
         return serverList;
     }
 
-    public Server randomRunningServer(String category) {
+    public Server nextRunningServer(String category) {
         ServerList serverList = getServerListIn(category);
-        if (serverList.hasServers()) {
-            return serverList.randomRunningServer();
-        }
-        return null;
+        return serverList.nextRunningServer();
     }
 
     public boolean setStatus(Server server, boolean isRunning) {

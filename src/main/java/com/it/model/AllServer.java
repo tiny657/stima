@@ -1,5 +1,6 @@
 package com.it.model;
 
+import java.util.List;
 import java.util.Set;
 
 public class AllServer {
@@ -41,7 +42,7 @@ public class AllServer {
         return categories.getServerListIn(category);
     }
 
-    public Set<Server> getServers(String category) {
+    public List<Server> getServers(String category) {
         return categories.getServerListIn(category).getServers();
     }
 
@@ -62,7 +63,7 @@ public class AllServer {
     }
 
     public Server getRandomServer(String category) {
-        return categories.getServerListIn(category).randomRunningServer();
+        return categories.getServerListIn(category).nextRunningServer();
     }
 
     public void setStatus(Server server, boolean isRunning) {
