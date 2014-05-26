@@ -8,11 +8,13 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.common.Sender;
 import com.it.model.AllServer;
 import com.it.model.Server;
 
@@ -45,7 +47,10 @@ public class ItClient extends Thread {
                 @Override
                 public void initChannel(SocketChannel socketChannel)
                         throws Exception {
-                    socketChannel.pipeline().addLast(new ClientHandler());
+                    socketChannel.pipeline().addLast(
+                            new ObjectEncoder(),
+                            new ObjectDecoder(ClassResolvers
+                                    .cacheDisabled(null)), new ClientHandler());
                 }
             });
 
@@ -61,7 +66,7 @@ public class ItClient extends Thread {
                 logger.info("Connection({}) is established.",
                         server.getHostPort());
                 logger.info(AllServer.getInstance().toString());
-                
+
                 awaitDisconnection(channelFuture);
             }
         } catch (InterruptedException e) {

@@ -1,6 +1,5 @@
 package com.it.server;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import com.it.client.ItClient;
 import com.it.common.Config;
-import com.it.common.JsonUtils;
 import com.it.model.AllServer;
 import com.it.model.Categories;
 import com.it.model.Server;
@@ -28,37 +26,37 @@ public class ServerHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        ByteBuf in = (ByteBuf) msg;
-        try {
-            String content = in.toString(io.netty.util.CharsetUtil.US_ASCII);
+        if (msg instanceof Categories) {
+            // control packet
             try {
-                // control packet
-                Categories categories = JsonUtils.fromJson(content,
-                        Categories.class);
+                Categories categories = (Categories) msg;
                 if (AllServer.getInstance().getCategories().getBootupTime()
                         .compareTo(categories.getBootupTime()) < 0) {
                     if (AllServer.getInstance().getCategories()
                             .equals(categories)) {
-                        logger.info("server properties is same.");
+                        logger.info("properties is same.");
                     } else {
-                        logger.info("server properties is different.");
+                        logger.info("properties is different.");
                         removeServers(categories);
                         addServers(categories);
                     }
 
                     logger.info("server received: {}", categories.toString());
                 } else {
-                    logger.info("ignore the received server properties because this server is started up late.");
+                    logger.info("ignore the received properties because this server is started up late.");
                 }
-            } catch (Exception e) {
-                // data
-                String received = in
-                        .toString(io.netty.util.CharsetUtil.US_ASCII);
-                logger.info("data received: {}", received);
+            } finally {
+                ReferenceCountUtil.release(msg);
             }
-        } finally {
-            ReferenceCountUtil.release(msg);
+        } else {
+            // data packet
+            logger.info("data received: {}", msg);
         }
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        ctx.flush();
     }
 
     private void removeServers(Categories categories) {

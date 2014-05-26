@@ -1,12 +1,15 @@
 package com.it.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
-public class ServerList {
+public class ServerList implements Serializable {
+    private static final long serialVersionUID = 307182214967241367L;
+
     private List<Server> servers = Lists.newArrayList();
-    private int index = 0;
+    transient private int index = 0;
 
     public ServerList() {
     }

@@ -1,8 +1,12 @@
 package com.it.model;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.StringUtils;
 
-public class Server implements Comparable<Server> {
+public class Server implements Comparable<Server>, Serializable {
+    private static final long serialVersionUID = -6870770836608106922L;
+
     private String host;
     private int port;
     private boolean isRunning = false;

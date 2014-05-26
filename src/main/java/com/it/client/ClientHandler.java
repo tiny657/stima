@@ -1,7 +1,6 @@
 package com.it.client;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
@@ -10,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.it.common.Config;
-import com.it.common.JsonUtils;
 import com.it.model.AllServer;
 
 public class ClientHandler extends ChannelHandlerAdapter {
@@ -20,11 +18,8 @@ public class ClientHandler extends ChannelHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         if (Config.getInstance().isAutoSpread()) {
-            String json = JsonUtils.toJson(AllServer.getInstance()
-                    .getCategories());
-            ByteBuf byteBuf = Unpooled.buffer(json.length());
-            byteBuf.writeBytes(json.getBytes());
-            ctx.channel().writeAndFlush(byteBuf);
+            ctx.channel()
+                    .writeAndFlush(AllServer.getInstance().getCategories());
         }
     }
 
@@ -37,6 +32,11 @@ public class ClientHandler extends ChannelHandlerAdapter {
         } finally {
             ReferenceCountUtil.release(msg);
         }
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        ctx.flush();
     }
 
     @Override

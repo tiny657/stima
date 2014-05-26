@@ -1,5 +1,6 @@
 package com.it.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -8,10 +9,12 @@ import java.util.Set;
 
 import com.google.common.collect.Maps;
 
-public class Categories {
+public class Categories implements Serializable {
+    private static final long serialVersionUID = 3688785685416855060L;
+
     private Date bootupTime = new Date();
     private Map<String, ServerList> serverListMap = Maps.newHashMap();
-    private static final ServerList EMPTY_SERVERLIST = new ServerList();
+    transient private static final ServerList EMPTY_SERVERLIST = new ServerList();
 
     public Date getBootupTime() {
         return bootupTime;

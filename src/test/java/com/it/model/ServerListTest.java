@@ -130,7 +130,7 @@ public class ServerListTest {
         ServerList diff3 = serverList3.diff(serverList1);
         ServerList diff4 = serverList1.diff(serverList3);
         ServerList diff5 = serverList1.diff(null);
-        
+
         // Then
         assertThat(diff1.getServers().size(), is(2));
         assertThat(diff2.getServers().size(), is(1));
