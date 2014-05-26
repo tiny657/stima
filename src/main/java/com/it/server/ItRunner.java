@@ -2,8 +2,8 @@ package com.it.server;
 
 import com.it.client.ItClient;
 import com.it.common.Config;
-import com.it.model.AllServer;
-import com.it.model.Server;
+import com.it.model.AllMember;
+import com.it.model.Member;
 
 public class ItRunner {
     public static void main(String[] args) {
@@ -15,12 +15,12 @@ public class ItRunner {
             itServer.start();
 
             // clients
-            for (Server server : Config.getInstance().getServers()) {
-                if (!server.equals(itServer.getHost(), itServer.getPort())) {
-                    ItClient itClient = new ItClient(server.getHost(),
-                            server.getPort());
-                    AllServer.getInstance().getServerInfos()
-                            .put(server, itClient);
+            for (Member member : Config.getInstance().getMembers()) {
+                if (!member.equals(itServer.getHost(), itServer.getPort())) {
+                    ItClient itClient = new ItClient(member.getHost(),
+                            member.getPort());
+                    AllMember.getInstance().getMemberInfos()
+                            .put(member, itClient);
                     itClient.start();
                 }
             }

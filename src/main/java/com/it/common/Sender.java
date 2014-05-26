@@ -6,21 +6,21 @@ import io.netty.buffer.Unpooled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.model.AllServer;
-import com.it.model.Server;
-import com.it.model.ServerList;
+import com.it.model.AllMember;
+import com.it.model.Member;
+import com.it.model.MemberList;
 
 public class Sender {
     private static final Logger logger = LoggerFactory.getLogger(Sender.class);
 
     public static boolean sendBroadcast(String targetCategory, String msg) {
-        ServerList serverList = AllServer.getInstance().getCategories()
-                .getServerListIn(targetCategory);
+        MemberList memberList = AllMember.getInstance().getCategories()
+                .getMemberListIn(targetCategory);
 
         ByteBuf byteBuf = Unpooled.buffer(msg.length());
         byteBuf.writeBytes(msg.getBytes());
-        for (Server server : serverList.getRunningServers()) {
-            AllServer.getInstance().getServerInfos().getChannelFuture(server)
+        for (Member member : memberList.getRunningMembers()) {
+            AllMember.getInstance().getMemberInfos().getChannelFuture(member)
                     .channel().writeAndFlush(byteBuf);
         }
 
@@ -28,18 +28,18 @@ public class Sender {
     }
 
     public static boolean sendAnycast(String targetCategory, String msg) {
-        ServerList serverList = AllServer.getInstance().getCategories()
-                .getServerListIn(targetCategory);
+        MemberList memberList = AllMember.getInstance().getCategories()
+                .getMemberListIn(targetCategory);
         ByteBuf byteBuf = Unpooled.buffer(msg.length());
         byteBuf.writeBytes(msg.getBytes());
-        Server server = serverList.nextRunningServer();
+        Member member = memberList.nextRunningMember();
 
-        if (server == null) {
-            logger.error("Send fail.  Because there is no server in {}",
+        if (member == null) {
+            logger.error("Send fail.  Because there is no member in {}",
                     targetCategory);
             return false;
         } else {
-            AllServer.getInstance().getServerInfos().getChannelFuture(server)
+            AllMember.getInstance().getMemberInfos().getChannelFuture(member)
                     .channel().writeAndFlush(byteBuf);
         }
 
@@ -48,17 +48,17 @@ public class Sender {
 
     public static boolean sendUnicast(String targetHost, int targetPort,
             String msg) {
-        Server server = AllServer.getInstance().getServer(targetHost,
+        Member member = AllMember.getInstance().getMember(targetHost,
                 targetPort);
-        if (server == null) {
-            logger.error("Send fail because server({}:{}) is not found.",
+        if (member == null) {
+            logger.error("Send fail because member({}:{}) is not found.",
                     targetHost, targetPort);
             return false;
         }
 
         ByteBuf byteBuf = Unpooled.buffer(msg.length());
         byteBuf.writeBytes(msg.getBytes());
-        AllServer.getInstance().getServerInfos().getChannelFuture(server)
+        AllMember.getInstance().getMemberInfos().getChannelFuture(member)
                 .channel().writeAndFlush(byteBuf);
 
         return true;

@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.it.common.Config;
-import com.it.model.AllServer;
+import com.it.model.AllMember;
 
 public class ClientHandler extends ChannelHandlerAdapter {
     private static final Logger logger = LoggerFactory
@@ -19,7 +19,7 @@ public class ClientHandler extends ChannelHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) {
         if (Config.getInstance().isAutoSpread()) {
             ctx.channel()
-                    .writeAndFlush(AllServer.getInstance().getCategories());
+                    .writeAndFlush(AllMember.getInstance().getCategories());
         }
     }
 

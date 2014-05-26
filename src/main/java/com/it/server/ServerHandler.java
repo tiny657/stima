@@ -11,10 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import com.it.client.ItClient;
 import com.it.common.Config;
-import com.it.model.AllServer;
+import com.it.model.AllMember;
 import com.it.model.Categories;
-import com.it.model.Server;
-import com.it.model.ServerList;
+import com.it.model.Member;
+import com.it.model.MemberList;
 
 public class ServerHandler extends ChannelHandlerAdapter {
     private static final Logger logger = LoggerFactory
@@ -30,15 +30,15 @@ public class ServerHandler extends ChannelHandlerAdapter {
             // control packet
             try {
                 Categories categories = (Categories) msg;
-                if (AllServer.getInstance().getCategories().getBootupTime()
+                if (AllMember.getInstance().getCategories().getBootupTime()
                         .compareTo(categories.getBootupTime()) < 0) {
-                    if (AllServer.getInstance().getCategories()
+                    if (AllMember.getInstance().getCategories()
                             .equals(categories)) {
                         logger.info("properties is same.");
                     } else {
                         logger.info("properties is different.");
-                        removeServers(categories);
-                        addServers(categories);
+                        removeMembers(categories);
+                        addMembers(categories);
                     }
 
                     logger.info("server received: {}", categories.toString());
@@ -59,49 +59,49 @@ public class ServerHandler extends ChannelHandlerAdapter {
         ctx.flush();
     }
 
-    private void removeServers(Categories categories) {
-        Map<String, ServerList> removedServer = AllServer.getInstance()
+    private void removeMembers(Categories categories) {
+        Map<String, MemberList> removedmember = AllMember.getInstance()
                 .getCategories().diff(categories);
-        logger.info("removed server: {}", removedServer.toString());
+        logger.info("removed member : {}", removedmember.toString());
 
-        for (String category : removedServer.keySet()) {
+        for (String category : removedmember.keySet()) {
             // remove category
-            if (AllServer.getInstance().getServerListIn(category).size() == removedServer
+            if (AllMember.getInstance().getMemberListIn(category).size() == removedmember
                     .get(category).size()) {
                 logger.info("removed category: {}", category);
-                AllServer.getInstance().removeCategory(category);
+                AllMember.getInstance().removeCategory(category);
                 Config.getInstance().removeCategory(category);
             }
 
-            for (Server server : removedServer.get(category).getServers()) {
+            for (Member member : removedmember.get(category).getMembers()) {
                 // stop client thread
-                AllServer.getInstance().getServerInfos().getItClient(server)
+                AllMember.getInstance().getMemberInfos().getItClient(member)
                         .interrupt();
 
                 // remove client and client info
-                AllServer.getInstance().removeServer(category, server);
-                AllServer.getInstance().getServerInfos().removeInfo(server);
-                Config.getInstance().removeServer(category, server);
+                AllMember.getInstance().removeMember(category, member);
+                AllMember.getInstance().getMemberInfos().removeInfo(member);
+                Config.getInstance().removeMember(category, member);
             }
         }
     }
 
-    private void addServers(Categories categories) {
-        Map<String, ServerList> addedServer = categories.diff(AllServer
+    private void addMembers(Categories categories) {
+        Map<String, MemberList> addedMember = categories.diff(AllMember
                 .getInstance().getCategories());
-        logger.info("added server: " + addedServer.toString());
+        logger.info("added member : " + addedMember.toString());
 
-        for (String category : addedServer.keySet()) {
-            AllServer.getInstance().addCategory(category);
-            for (Server server : addedServer.get(category).getServers()) {
+        for (String category : addedMember.keySet()) {
+            AllMember.getInstance().addCategory(category);
+            for (Member member : addedMember.get(category).getMembers()) {
                 // start client
-                ItClient itClient = new ItClient(server);
+                ItClient itClient = new ItClient(member);
                 itClient.start();
 
                 // add client data
-                AllServer.getInstance().addServer(category, server);
-                AllServer.getInstance().getServerInfos().put(server, itClient);
-                Config.getInstance().addServer(category, server);
+                AllMember.getInstance().addMember(category, member);
+                AllMember.getInstance().getMemberInfos().put(member, itClient);
+                Config.getInstance().addMember(category, member);
             }
         }
     }

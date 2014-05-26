@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.it.model.AllServer;
+import com.it.model.AllMember;
 import com.it.model.Categories;
-import com.it.model.Server;
+import com.it.model.Member;
 
 public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
@@ -62,11 +62,11 @@ public class Config {
 
         if (!validate()) {
             logger.error("My server info is {}:{}\n", host, port);
-            logger.error(AllServer.getInstance().getCategories().toString());
+            logger.error(AllMember.getInstance().getCategories().toString());
             throw new Exception(host + ":" + port + " isn't valid.");
         }
 
-        logger.info(AllServer.getInstance().toString());
+        logger.info(AllMember.getInstance().toString());
     }
 
     public String getHost() {
@@ -93,16 +93,16 @@ public class Config {
         this.isAutoSpread = isAutoSpread;
     }
 
-    public void addServer(String category, Server server) {
+    public void addMember(String category, Member member) {
         if (!ArrayUtils.contains(getCategoriesArray(), category)) {
             config.addProperty(CATEGORY, category);
         }
 
-        config.addProperty(getSubCategory(category), server.getHostPort());
+        config.addProperty(getSubCategory(category), member.getHostPort());
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getServer(String category) {
+    public List<String> getMember(String category) {
         return config.getList(getSubCategory(category));
     }
 
@@ -118,10 +118,10 @@ public class Config {
         config.setProperty(CATEGORY, Joiner.on(",").join(categories));
     }
 
-    public void removeServer(String category, Server server) {
-        List<String> hostPorts = getServer(category);
+    public void removeMember(String category, Member member) {
+        List<String> hostPorts = getMember(category);
         config.clearProperty(getSubCategory(category));
-        String removedHostPort = server.getHostPort();
+        String removedHostPort = member.getHostPort();
         for (String hostPort : hostPorts) {
             if (StringUtils.equals(removedHostPort, hostPort)) {
                 hostPorts.remove(hostPort);
@@ -143,16 +143,16 @@ public class Config {
         return config.getList(CATEGORY);
     }
 
-    public List<Server> getServers() {
-        List<Server> servers = Lists.newArrayList();
-        Categories categories = AllServer.getInstance().getCategories();
+    public List<Member> getMembers() {
+        List<Member> members = Lists.newArrayList();
+        Categories categories = AllMember.getInstance().getCategories();
         for (String categoryName : categories.getCategoryNames()) {
-            for (Server server : categories.getServerListIn(categoryName)
-                    .getServers()) {
-                servers.add(server);
+            for (Member member : categories.getMemberListIn(categoryName)
+                    .getMembers()) {
+                members.add(member);
             }
         }
-        return servers;
+        return members;
     }
 
     private String getSubCategory(String category) {
@@ -160,8 +160,8 @@ public class Config {
     }
 
     private boolean validate() {
-        for (Server server : getServers()) {
-            if (server.getHost().equals(host) && server.getPort() == port) {
+        for (Member member : getMembers()) {
+            if (member.getHost().equals(host) && member.getPort() == port) {
                 return true;
             }
         }
@@ -191,15 +191,15 @@ public class Config {
         setAutoSpread(config.getBoolean(AUTO_SPREAD));
 
         // add category
-        AllServer.getInstance().addCategory(getCategoriesArray());
+        AllMember.getInstance().addCategory(getCategoriesArray());
 
-        // add server
-        for (String category : AllServer.getInstance().getCategories()
+        // add member
+        for (String category : AllMember.getInstance().getCategories()
                 .getCategoryNames()) {
-            for (String hostPort : getServer(category)) {
+            for (String hostPort : getMember(category)) {
                 String[] splitedHostPort = StringUtils.split(hostPort, ":");
-                AllServer.getInstance().addServer(category,
-                        new Server(splitedHostPort[0], splitedHostPort[1], getHost(), getPort()));
+                AllMember.getInstance().addMember(category,
+                        new Member(splitedHostPort[0], splitedHostPort[1], getHost(), getPort()));
             }
         }
     }

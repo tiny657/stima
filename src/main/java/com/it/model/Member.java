@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class Server implements Comparable<Server>, Serializable {
+public class Member implements Comparable<Member>, Serializable {
     private static final long serialVersionUID = -6870770836608106922L;
 
     private String host;
@@ -12,25 +12,25 @@ public class Server implements Comparable<Server>, Serializable {
     private boolean isRunning = false;
     transient private boolean me = false;
 
-    public Server() {
+    public Member() {
     }
 
-    public Server(String host, String port, String myHost, int myPort) {
+    public Member(String host, String port, String myHost, int myPort) {
         this(host, Integer.valueOf(port), myHost, myPort);
     }
 
-    public Server(String host, String port) {
+    public Member(String host, String port) {
         this(host, Integer.valueOf(port));
     }
 
-    public Server(String host, int port, String myHost, int myPort) {
+    public Member(String host, int port, String myHost, int myPort) {
         this(host, port);
         if (host.equals(myHost) && port == myPort) {
             me = true;
         }
     }
 
-    public Server(String host, int port) {
+    public Member(String host, int port) {
         this.host = host;
         this.port = port;
     }
@@ -63,8 +63,8 @@ public class Server implements Comparable<Server>, Serializable {
         this.isRunning = isRunning;
     }
 
-    public boolean equals(Server server) {
-        return equals(server.host, server.port);
+    public boolean equals(Member member) {
+        return equals(member.host, member.port);
     }
 
     public boolean equals(String host, int port) {
@@ -75,11 +75,11 @@ public class Server implements Comparable<Server>, Serializable {
     }
 
     @Override
-    public int compareTo(Server server) {
-        if (host.compareTo(server.getHost()) == 0) {
-            return port - server.getPort();
+    public int compareTo(Member member) {
+        if (host.compareTo(member.getHost()) == 0) {
+            return port - member.getPort();
         } else {
-            return host.compareTo(server.getHost());
+            return host.compareTo(member.getHost());
         }
     }
 

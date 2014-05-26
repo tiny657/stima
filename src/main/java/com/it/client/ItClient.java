@@ -15,23 +15,23 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.model.AllServer;
-import com.it.model.Server;
+import com.it.model.AllMember;
+import com.it.model.Member;
 
 public class ItClient extends Thread {
     private static final Logger logger = LoggerFactory
             .getLogger(ItClient.class);
 
     private String profile;
-    private Server server;
+    private Member member;
 
-    public ItClient(Server server) {
-        this(server.getHost(), server.getPort());
+    public ItClient(Member member) {
+        this(member.getHost(), member.getPort());
     }
 
     public ItClient(String host, int port) {
         this.profile = "me" + port;
-        server = new Server(host, port);
+        member = new Member(host, port);
     }
 
     @Override
@@ -57,20 +57,20 @@ public class ItClient extends Thread {
             while (true) {
                 ChannelFuture channelFuture = awaitConnection(bootstrap);
 
-                // update server and serverInfo.
-                Server connectedServer = AllServer.getInstance().getServer(
-                        server);
-                AllServer.getInstance().getServerInfos()
-                        .put(connectedServer, channelFuture, this);
+                // update member and memberInfo.
+                Member connectedMember = AllMember.getInstance().getMember(
+                        member);
+                AllMember.getInstance().getMemberInfos()
+                        .put(connectedMember, channelFuture, this);
 
                 logger.info("Connection({}) is established.",
-                        server.getHostPort());
-                logger.info(AllServer.getInstance().toString());
+                        member.getHostPort());
+                logger.info(AllMember.getInstance().toString());
 
                 awaitDisconnection(channelFuture);
             }
         } catch (InterruptedException e) {
-            logger.info("Connection({}) is closed.", server.getHostPort());
+            logger.info("Connection({}) is closed.", member.getHostPort());
         } finally {
             workerGroup.shutdownGracefully();
         }
@@ -78,17 +78,17 @@ public class ItClient extends Thread {
 
     private ChannelFuture awaitConnection(Bootstrap bootstrap)
             throws InterruptedException {
-        logger.info("Connecting to {}", server.getHostPort());
+        logger.info("Connecting to {}", member.getHostPort());
 
         ChannelFuture channelFuture;
         do {
-            channelFuture = bootstrap.connect(server.getHost(),
-                    server.getPort()).await();
+            channelFuture = bootstrap.connect(member.getHost(),
+                    member.getPort()).await();
             Thread.sleep(1000);
         } while (!channelFuture.isSuccess());
 
         // From standby to running.
-        AllServer.getInstance().setStatus(server, true);
+        AllMember.getInstance().setStatus(member, true);
 
         return channelFuture;
     }
@@ -98,9 +98,9 @@ public class ItClient extends Thread {
         channelFuture.channel().closeFuture().sync();
 
         // From running to standby.
-        AllServer.getInstance().setStatus(server, false);
+        AllMember.getInstance().setStatus(member, false);
 
-        logger.info("Connection({}) is closed.", server.getHostPort());
-        logger.info(AllServer.getInstance().toString());
+        logger.info("Connection({}) is closed.", member.getHostPort());
+        logger.info(AllMember.getInstance().toString());
     }
 }

@@ -13,60 +13,60 @@ public class Categories implements Serializable {
     private static final long serialVersionUID = 3688785685416855060L;
 
     private Date bootupTime = new Date();
-    private Map<String, ServerList> serverListMap = Maps.newHashMap();
-    transient private static final ServerList EMPTY_SERVERLIST = new ServerList();
+    private Map<String, MemberList> memberListMap = Maps.newHashMap();
+    transient private static final MemberList EMPTY_MEMBERLIST = new MemberList();
 
     public Date getBootupTime() {
         return bootupTime;
     }
 
     public void add(String categoryName) {
-        if (!serverListMap.containsKey(categoryName)) {
-            serverListMap.put(categoryName, new ServerList());
+        if (!memberListMap.containsKey(categoryName)) {
+            memberListMap.put(categoryName, new MemberList());
         }
     }
 
     public void remove(String categoryName) {
-        serverListMap.remove(categoryName);
+        memberListMap.remove(categoryName);
     }
 
-    public void add(String categoryName, Server server) {
-        ServerList serverList = getServerListIn(categoryName);
-        if (serverList == EMPTY_SERVERLIST) {
+    public void add(String categoryName, Member member) {
+        MemberList memberList = getMemberListIn(categoryName);
+        if (memberList == EMPTY_MEMBERLIST) {
             add(categoryName);
-            serverList = getServerListIn(categoryName);
+            memberList = getMemberListIn(categoryName);
         }
-        serverList.addServer(server);
+        memberList.addMember(member);
     }
 
-    public void remove(String categoryName, Server server) {
-        ServerList serverList = getServerListIn(categoryName);
-        if (serverList.hasServers()) {
-            serverList.removeServer(server);
+    public void remove(String categoryName, Member member) {
+        MemberList memberList = getMemberListIn(categoryName);
+        if (memberList.hasMembers()) {
+            memberList.removeMember(member);
         }
     }
 
     public Set<String> getCategoryNames() {
-        return serverListMap.keySet();
+        return memberListMap.keySet();
     }
 
-    public ServerList getServerListIn(String category) {
-        ServerList serverList = serverListMap.get(category);
-        if (serverList == null) {
-            return EMPTY_SERVERLIST;
+    public MemberList getMemberListIn(String category) {
+        MemberList memberList = memberListMap.get(category);
+        if (memberList == null) {
+            return EMPTY_MEMBERLIST;
         }
-        return serverList;
+        return memberList;
     }
 
-    public Server nextRunningServer(String category) {
-        ServerList serverList = getServerListIn(category);
-        return serverList.nextRunningServer();
+    public Member nextRunningMember(String category) {
+        MemberList memberList = getMemberListIn(category);
+        return memberList.nextRunningMember();
     }
 
-    public boolean setStatus(Server server, boolean isRunning) {
-        for (Entry<String, ServerList> entry : serverListMap.entrySet()) {
-            ServerList serverList = entry.getValue();
-            if (serverList.setStatus(server.getHost(), server.getPort(),
+    public boolean setStatus(Member member, boolean isRunning) {
+        for (Entry<String, MemberList> entry : memberListMap.entrySet()) {
+            MemberList memberList = entry.getValue();
+            if (memberList.setStatus(member.getHost(), member.getPort(),
                     isRunning)) {
                 return true;
             }
@@ -75,24 +75,24 @@ public class Categories implements Serializable {
     }
 
     public boolean equals(Categories categories) {
-        if (serverListMap.size() != categories.getCategoryNames().size()) {
+        if (memberListMap.size() != categories.getCategoryNames().size()) {
             return false;
         }
 
         for (String category : getCategoryNames()) {
-            if (getServerListIn(category).getServers().size() != categories
-                    .getServerListIn(category).getServers().size()) {
+            if (getMemberListIn(category).getMembers().size() != categories
+                    .getMemberListIn(category).getMembers().size()) {
                 return false;
             }
 
-            Iterator<Server> iterator = getServerListIn(category).getServers()
+            Iterator<Member> iterator = getMemberListIn(category).getMembers()
                     .iterator();
-            Iterator<Server> iterator2 = categories.getServerListIn(category)
-                    .getServers().iterator();
+            Iterator<Member> iterator2 = categories.getMemberListIn(category)
+                    .getMembers().iterator();
             while (iterator.hasNext()) {
-                Server server = iterator.next();
-                Server server2 = iterator2.next();
-                if (!server.equals(server2)) {
+                Member member = iterator.next();
+                Member member2 = iterator2.next();
+                if (!member.equals(member2)) {
                     return false;
                 }
             }
@@ -100,13 +100,13 @@ public class Categories implements Serializable {
         return true;
     }
 
-    public Map<String, ServerList> diff(Categories categories) {
-        Map<String, ServerList> result = Maps.newHashMap();
+    public Map<String, MemberList> diff(Categories categories) {
+        Map<String, MemberList> result = Maps.newHashMap();
         for (String category : getCategoryNames()) {
-            ServerList serverList = getServerListIn(category);
-            if (serverList != EMPTY_SERVERLIST) {
+            MemberList memberList = getMemberListIn(category);
+            if (memberList != EMPTY_MEMBERLIST) {
                 result.put(category,
-                        serverList.diff(categories.getServerListIn(category)));
+                        memberList.diff(categories.getMemberListIn(category)));
             }
         }
         return result;
@@ -114,10 +114,10 @@ public class Categories implements Serializable {
 
     @Override
     public String toString() {
-        StringBuffer result = new StringBuffer("\n* server list\n");
-        for (String category : serverListMap.keySet()) {
-            result.append("category: ").append(category).append(", servers: ")
-                    .append(serverListMap.get(category).toString())
+        StringBuffer result = new StringBuffer("\n* member list\n");
+        for (String category : memberListMap.keySet()) {
+            result.append("category: ").append(category).append(", members: ")
+                    .append(memberListMap.get(category).toString())
                     .append("\n");
         }
 

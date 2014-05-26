@@ -16,15 +16,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.it.common.Config;
-import com.it.model.Server;
+import com.it.model.Member;
 
 public class ItServer extends Thread {
     private static final Logger logger = LoggerFactory
             .getLogger(ItServer.class);
-    private Server myServer;
+    private Member myServer;
 
     public ItServer() {
-        myServer = new Server(Config.getInstance().getHost(), Config
+        myServer = new Member(Config.getInstance().getHost(), Config
                 .getInstance().getPort());
     }
 
