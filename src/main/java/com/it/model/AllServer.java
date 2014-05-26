@@ -1,7 +1,6 @@
 package com.it.model;
 
 import java.util.List;
-import java.util.Set;
 
 public class AllServer {
     public static AllServer instance = new AllServer();

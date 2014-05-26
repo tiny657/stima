@@ -33,7 +33,7 @@ public class Config {
 
     private OptionParser parser = new OptionParser();
     private ArgumentAcceptingOptionSpec<String> propertiesOpt = parser
-            .accepts("properties", "properties file").withOptionalArg()
+            .accepts("prop", "properties file").withOptionalArg()
             .ofType(String.class).defaultsTo(DEFAULT_PROPERTIES_NAME);
     private ArgumentAcceptingOptionSpec<String> hostOpt = parser
             .accepts("host", "this server's host").withOptionalArg()
@@ -199,7 +199,7 @@ public class Config {
             for (String hostPort : getServer(category)) {
                 String[] splitedHostPort = StringUtils.split(hostPort, ":");
                 AllServer.getInstance().addServer(category,
-                        new Server(splitedHostPort[0], splitedHostPort[1]));
+                        new Server(splitedHostPort[0], splitedHostPort[1], getHost(), getPort()));
             }
         }
     }

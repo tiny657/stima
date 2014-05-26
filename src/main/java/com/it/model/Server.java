@@ -10,12 +10,24 @@ public class Server implements Comparable<Server>, Serializable {
     private String host;
     private int port;
     private boolean isRunning = false;
+    transient private boolean me = false;
 
     public Server() {
     }
 
+    public Server(String host, String port, String myHost, int myPort) {
+        this(host, Integer.valueOf(port), myHost, myPort);
+    }
+
     public Server(String host, String port) {
         this(host, Integer.valueOf(port));
+    }
+
+    public Server(String host, int port, String myHost, int myPort) {
+        this(host, port);
+        if (host.equals(myHost) && port == myPort) {
+            me = true;
+        }
     }
 
     public Server(String host, int port) {
@@ -73,7 +85,15 @@ public class Server implements Comparable<Server>, Serializable {
 
     @Override
     public String toString() {
-        return host + ":" + port + "("
-                + (isRunning == true ? "running" : "standby") + ")";
+        String status;
+        if (me) {
+            status = "me";
+        } else if (isRunning) {
+            status = "running";
+        } else {
+            status = "standby";
+        }
+
+        return host + ":" + port + "(" + status + ")";
     }
 }
