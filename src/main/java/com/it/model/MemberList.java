@@ -37,15 +37,20 @@ public class MemberList implements Serializable {
     }
 
     public Member nextRunningMember() {
-        Member next = null;
+        Member result = null;
         for (int i = 0; i < members.size(); i++) {
-            Member member = members.get(index);
+            Member member = members.get(next());
             if (member.isRunning()) {
-                next = member;
+                result = member;
                 break;
             }
         }
-        return next;
+        return result;
+    }
+
+    public int next() {
+        index = (index + 1) % members.size();
+        return index;
     }
 
     public boolean setStatus(String host, int port, boolean isRunning) {

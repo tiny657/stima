@@ -21,14 +21,15 @@ import com.it.model.Member;
 public class Client extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
 
-    private Member member;
+    private Member targetServer;
+    private ClientHandlerAdapter clientHandlerAdapter;
 
     public Client(Member member) {
-        this(member.getHost(), member.getPort());
+        targetServer = member;
     }
 
-    public Client(String host, int port) {
-        member = new Member(host, port);
+    public void setClientHandler(ClientHandlerAdapter clientHandlerAdapter) {
+        this.clientHandlerAdapter = clientHandlerAdapter;
     }
 
     @Override
@@ -44,10 +45,12 @@ public class Client extends Thread {
                 @Override
                 public void initChannel(SocketChannel socketChannel)
                         throws Exception {
-                    socketChannel.pipeline().addLast(
-                            new ObjectEncoder(),
-                            new ObjectDecoder(ClassResolvers
-                                    .cacheDisabled(null)), new ClientHandler());
+                    socketChannel.pipeline()
+                            .addLast(
+                                    new ObjectEncoder(),
+                                    new ObjectDecoder(ClassResolvers
+                                            .cacheDisabled(null)),
+                                    clientHandlerAdapter);
                 }
             });
 
@@ -56,18 +59,18 @@ public class Client extends Thread {
 
                 // update member and memberInfo.
                 Member connectedMember = AllMember.getInstance().getMember(
-                        member);
+                        targetServer);
                 AllMember.getInstance().getMemberInfos()
                         .put(connectedMember, channelFuture, this);
 
                 logger.info("Connection({}) is established.",
-                        member.getHostPort());
+                        targetServer.getHostPort());
                 logger.info(AllMember.getInstance().toString());
 
                 awaitDisconnection(channelFuture);
             }
         } catch (InterruptedException e) {
-            logger.info("Connection({}) is closed.", member.getHostPort());
+            logger.info("Connection({}) is closed.", targetServer.getHostPort());
         } finally {
             workerGroup.shutdownGracefully();
         }
@@ -75,17 +78,17 @@ public class Client extends Thread {
 
     private ChannelFuture awaitConnection(Bootstrap bootstrap)
             throws InterruptedException {
-        logger.info("Connecting to {}", member.getHostPort());
+        logger.info("Connecting to {}", targetServer.getHostPort());
 
         ChannelFuture channelFuture;
         do {
-            channelFuture = bootstrap.connect(member.getHost(),
-                    member.getPort()).await();
+            channelFuture = bootstrap.connect(targetServer.getHost(),
+                    targetServer.getPort()).await();
             Thread.sleep(1000);
         } while (!channelFuture.isSuccess());
 
         // From standby to running.
-        AllMember.getInstance().setStatus(member, true);
+        AllMember.getInstance().setStatus(targetServer, true);
 
         return channelFuture;
     }
@@ -95,9 +98,9 @@ public class Client extends Thread {
         channelFuture.channel().closeFuture().sync();
 
         // From running to standby.
-        AllMember.getInstance().setStatus(member, false);
+        AllMember.getInstance().setStatus(targetServer, false);
 
-        logger.info("Connection({}) is closed.", member.getHostPort());
+        logger.info("Connection({}) is closed.", targetServer.getHostPort());
         logger.info(AllMember.getInstance().toString());
     }
 }

@@ -14,11 +14,11 @@ public class Sender {
     private static final Logger logger = LoggerFactory.getLogger(Sender.class);
 
     public static boolean sendBroadcast(String targetCluster, String msg) {
+        ByteBuf byteBuf = Unpooled.buffer(msg.length());
+        byteBuf.writeBytes(msg.getBytes());
         MemberList memberList = AllMember.getInstance().getClusters()
                 .getMemberListIn(targetCluster);
 
-        ByteBuf byteBuf = Unpooled.buffer(msg.length());
-        byteBuf.writeBytes(msg.getBytes());
         for (Member member : memberList.getRunningMembers()) {
             AllMember.getInstance().getMemberInfos().getChannelFuture(member)
                     .channel().writeAndFlush(byteBuf);
@@ -27,18 +27,32 @@ public class Sender {
         return true;
     }
 
-    public static boolean sendAnycast(String targetCluster, String msg) {
-        MemberList memberList = AllMember.getInstance().getClusters()
-                .getMemberListIn(targetCluster);
-        ByteBuf byteBuf = Unpooled.buffer(msg.length());
-        byteBuf.writeBytes(msg.getBytes());
-        Member member = memberList.nextRunningMember();
+    public static boolean sendAnycast(String targetCluster, Object msg) {
+        Member member = AllMember.getInstance().getClusters()
+                .getMemberListIn(targetCluster).nextRunningMember();
 
         if (member == null) {
             logger.error("Send fail.  Because there is no member in {}",
                     targetCluster);
             return false;
         } else {
+            AllMember.getInstance().getMemberInfos().getChannelFuture(member)
+                    .channel().writeAndFlush(msg);
+        }
+
+        return true;
+    }
+
+    public static boolean sendAnycast(String targetCluster, String msg) {
+        Member member = AllMember.getInstance().getClusters()
+                .getMemberListIn(targetCluster).nextRunningMember();
+        if (member == null) {
+            logger.error("Send fail.  Because there is no member in {}",
+                    targetCluster);
+            return false;
+        } else {
+            ByteBuf byteBuf = Unpooled.buffer(msg.length());
+            byteBuf.writeBytes(msg.getBytes());
             AllMember.getInstance().getMemberInfos().getChannelFuture(member)
                     .channel().writeAndFlush(byteBuf);
         }

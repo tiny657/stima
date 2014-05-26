@@ -19,21 +19,25 @@ import com.it.common.Config;
 import com.it.model.Member;
 
 public class Server extends Thread {
-    private static final Logger logger = LoggerFactory
-            .getLogger(Server.class);
-    private Member myServer;
+    private static final Logger logger = LoggerFactory.getLogger(Server.class);
+    private Member myInfo;
+    private ServerHandlerAdapter serverHandlerAdapter;
 
     public Server() {
-        myServer = new Member(Config.getInstance().getHost(), Config
+        myInfo = new Member(Config.getInstance().getHost(), Config
                 .getInstance().getPort());
     }
 
+    public void setServerHandler(ServerHandlerAdapter serverHandlerAdapter) {
+        this.serverHandlerAdapter = serverHandlerAdapter;
+    }
+
     public String getHost() {
-        return myServer.getHost();
+        return myInfo.getHost();
     }
 
     public int getPort() {
-        return myServer.getPort();
+        return myInfo.getPort();
     }
 
     @Override
@@ -53,14 +57,14 @@ public class Server extends Thread {
                                     new ObjectEncoder(),
                                     new ObjectDecoder(ClassResolvers
                                             .cacheDisabled(null)),
-                                    new ServerHandler());
+                                    serverHandlerAdapter);
                         }
                     }).option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            ChannelFuture channelFuture = bootstrap.bind(myServer.getPort())
+            ChannelFuture channelFuture = bootstrap.bind(myInfo.getPort())
                     .sync();
-            logger.info("server started ({}:{})", myServer.getHostPort());
+            logger.info("server started ({}:{})", myInfo.getHostPort());
 
             awaitDisconnection(channelFuture);
         } catch (InterruptedException e) {
@@ -73,7 +77,6 @@ public class Server extends Thread {
     private void awaitDisconnection(ChannelFuture channelFuture)
             throws InterruptedException {
         channelFuture.channel().closeFuture().sync();
-        logger.info("server closed ({}:{})", myServer.getHost(),
-                myServer.getPort());
+        logger.info("server closed ({}:{})", myInfo.getHost(), myInfo.getPort());
     }
 }

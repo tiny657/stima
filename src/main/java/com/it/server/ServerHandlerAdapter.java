@@ -11,14 +11,15 @@ import org.slf4j.LoggerFactory;
 
 import com.it.client.Client;
 import com.it.common.Config;
+import com.it.main.ClientHandler;
 import com.it.model.AllMember;
 import com.it.model.Clusters;
 import com.it.model.Member;
 import com.it.model.MemberList;
 
-public class ServerHandler extends ChannelHandlerAdapter {
+public class ServerHandlerAdapter extends ChannelHandlerAdapter {
     private static final Logger logger = LoggerFactory
-            .getLogger(Server.class);
+            .getLogger(ServerHandlerAdapter.class);
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -28,35 +29,34 @@ public class ServerHandler extends ChannelHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof Clusters) {
             // control packet
-            try {
-                Clusters categories = (Clusters) msg;
-                if (AllMember.getInstance().getClusters().getBootupTime()
-                        .compareTo(categories.getBootupTime()) < 0) {
-                    if (AllMember.getInstance().getClusters()
-                            .equals(categories)) {
-                        logger.info("properties is same.");
-                    } else {
-                        logger.info("properties is different.");
-                        removeMembers(categories);
-                        addMembers(categories);
-                    }
-
-                    logger.info("server received: {}", categories.toString());
+            Clusters categories = (Clusters) msg;
+            if (AllMember.getInstance().getClusters().getBootupTime()
+                    .compareTo(categories.getBootupTime()) < 0) {
+                if (AllMember.getInstance().getClusters().equals(categories)) {
+                    logger.info("properties is same.");
                 } else {
-                    logger.info("ignore the received properties because this server is started up late.");
+                    logger.info("properties is different.");
+                    removeMembers(categories);
+                    addMembers(categories);
                 }
-            } finally {
-                ReferenceCountUtil.release(msg);
+
+                logger.info("server received: {}", categories.toString());
+            } else {
+                logger.info("ignore the received properties because this server is started up late.");
             }
-        } else {
-            // data packet
-            logger.info("data received: {}", msg);
+            ReferenceCountUtil.release(msg);
         }
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         ctx.flush();
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
+        ctx.close();
     }
 
     private void removeMembers(Clusters categories) {
@@ -96,6 +96,7 @@ public class ServerHandler extends ChannelHandlerAdapter {
             for (Member member : addedMember.get(cluster).getMembers()) {
                 // start client
                 Client client = new Client(member);
+                client.setClientHandler(new ClientHandler());
                 client.start();
 
                 // add client data
@@ -104,11 +105,5 @@ public class ServerHandler extends ChannelHandlerAdapter {
                 Config.getInstance().addMember(cluster, member);
             }
         }
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
     }
 }
