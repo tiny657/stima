@@ -18,18 +18,18 @@ import org.slf4j.LoggerFactory;
 import com.it.model.AllMember;
 import com.it.model.Member;
 
-public class ItClient extends Thread {
+public class Client extends Thread {
     private static final Logger logger = LoggerFactory
-            .getLogger(ItClient.class);
+            .getLogger(Client.class);
 
     private String profile;
     private Member member;
 
-    public ItClient(Member member) {
+    public Client(Member member) {
         this(member.getHost(), member.getPort());
     }
 
-    public ItClient(String host, int port) {
+    public Client(String host, int port) {
         this.profile = "me" + port;
         member = new Member(host, port);
     }

@@ -18,12 +18,12 @@ import org.slf4j.LoggerFactory;
 import com.it.common.Config;
 import com.it.model.Member;
 
-public class ItServer extends Thread {
+public class Server extends Thread {
     private static final Logger logger = LoggerFactory
-            .getLogger(ItServer.class);
+            .getLogger(Server.class);
     private Member myServer;
 
-    public ItServer() {
+    public Server() {
         myServer = new Member(Config.getInstance().getHost(), Config
                 .getInstance().getPort());
     }

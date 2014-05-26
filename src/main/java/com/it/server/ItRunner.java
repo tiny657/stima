@@ -1,6 +1,6 @@
 package com.it.server;
 
-import com.it.client.ItClient;
+import com.it.client.Client;
 import com.it.common.Config;
 import com.it.model.AllMember;
 import com.it.model.Member;
@@ -11,17 +11,17 @@ public class ItRunner {
             Config.getInstance().init(args);
 
             // server
-            ItServer itServer = new ItServer();
-            itServer.start();
+            Server server = new Server();
+            server.start();
 
             // clients
             for (Member member : Config.getInstance().getMembers()) {
-                if (!member.equals(itServer.getHost(), itServer.getPort())) {
-                    ItClient itClient = new ItClient(member.getHost(),
+                if (!member.equals(server.getHost(), server.getPort())) {
+                    Client client = new Client(member.getHost(),
                             member.getPort());
                     AllMember.getInstance().getMemberInfos()
-                            .put(member, itClient);
-                    itClient.start();
+                            .put(member, client);
+                    client.start();
                 }
             }
         } catch (Exception e) {

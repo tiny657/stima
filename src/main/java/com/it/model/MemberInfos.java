@@ -5,25 +5,25 @@ import io.netty.channel.ChannelFuture;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-import com.it.client.ItClient;
+import com.it.client.Client;
 
 public class MemberInfos {
     private Map<Member, ChannelFuture> channelFutureMap;
-    private Map<Member, ItClient> itClientMap;
+    private Map<Member, Client> clientMap;
 
     public MemberInfos() {
         channelFutureMap = Maps.newHashMap();
-        itClientMap = Maps.newHashMap();
+        clientMap = Maps.newHashMap();
     }
 
     public void put(Member member, ChannelFuture channelFuture,
-            ItClient itClient) {
+            Client client) {
         if (member == null) {
             return;
         }
 
         put(member, channelFuture);
-        put(member, itClient);
+        put(member, client);
     }
 
     public ChannelFuture getChannelFuture(Member member) {
@@ -34,16 +34,16 @@ public class MemberInfos {
         channelFutureMap.put(member, channelFuture);
     }
 
-    public ItClient getItClient(Member member) {
-        return itClientMap.get(member);
+    public Client getClient(Member member) {
+        return clientMap.get(member);
     }
 
-    public void put(Member member, ItClient itClient) {
-        itClientMap.put(member, itClient);
+    public void put(Member member, Client client) {
+        clientMap.put(member, client);
     }
 
     public void removeInfo(Member member) {
         channelFutureMap.remove(member);
-        itClientMap.remove(member);
+        clientMap.remove(member);
     }
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.client.ItClient;
+import com.it.client.Client;
 import com.it.common.Config;
 import com.it.model.AllMember;
 import com.it.model.Categories;
@@ -18,7 +18,7 @@ import com.it.model.MemberList;
 
 public class ServerHandler extends ChannelHandlerAdapter {
     private static final Logger logger = LoggerFactory
-            .getLogger(ItServer.class);
+            .getLogger(Server.class);
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -75,7 +75,7 @@ public class ServerHandler extends ChannelHandlerAdapter {
 
             for (Member member : removedmember.get(category).getMembers()) {
                 // stop client thread
-                AllMember.getInstance().getMemberInfos().getItClient(member)
+                AllMember.getInstance().getMemberInfos().getClient(member)
                         .interrupt();
 
                 // remove client and client info
@@ -95,12 +95,12 @@ public class ServerHandler extends ChannelHandlerAdapter {
             AllMember.getInstance().addCategory(category);
             for (Member member : addedMember.get(category).getMembers()) {
                 // start client
-                ItClient itClient = new ItClient(member);
-                itClient.start();
+                Client client = new Client(member);
+                client.start();
 
                 // add client data
                 AllMember.getInstance().addMember(category, member);
-                AllMember.getInstance().getMemberInfos().put(member, itClient);
+                AllMember.getInstance().getMemberInfos().put(member, client);
                 Config.getInstance().addMember(category, member);
             }
         }

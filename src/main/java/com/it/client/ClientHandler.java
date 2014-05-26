@@ -13,7 +13,7 @@ import com.it.model.AllMember;
 
 public class ClientHandler extends ChannelHandlerAdapter {
     private static final Logger logger = LoggerFactory
-            .getLogger(ItClient.class);
+            .getLogger(Client.class);
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
