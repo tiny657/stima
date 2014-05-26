@@ -4,45 +4,45 @@ import java.util.List;
 
 public class AllMember {
     public static AllMember instance = new AllMember();
-    private Categories categories = new Categories();
+    private Clusters clusters = new Clusters();
     private MemberInfos memberInfos = new MemberInfos();
 
     public static AllMember getInstance() {
         return instance;
     }
 
-    public void addCategory(String[] categoryNames) {
-        for (String categoryName : categoryNames) {
-            addCategory(categoryName);
+    public void addCluster(String[] clusterNames) {
+        for (String clusterName : clusterNames) {
+            addCluster(clusterName);
         }
     }
 
-    public void addCategory(String categoryName) {
-        categories.add(categoryName);
+    public void addCluster(String clusterName) {
+        clusters.add(clusterName);
     }
 
-    public void addMember(String categoryName, Member member) {
-        categories.add(categoryName, member);
+    public void addMember(String clusterName, Member member) {
+        clusters.add(clusterName, member);
     }
 
-    public void removeCategory(String categoryName) {
-        categories.remove(categoryName);
+    public void removeCluster(String clusterName) {
+        clusters.remove(clusterName);
     }
 
-    public void removeMember(String categoryName, Member member) {
-        categories.remove(categoryName, member);
+    public void removeMember(String clusterName, Member member) {
+        clusters.remove(clusterName, member);
     }
 
-    public Categories getCategories() {
-        return categories;
+    public Clusters getClusters() {
+        return clusters;
     }
 
-    public MemberList getMemberListIn(String category) {
-        return categories.getMemberListIn(category);
+    public MemberList getMemberListIn(String cluster) {
+        return clusters.getMemberListIn(cluster);
     }
 
-    public List<Member> getMembers(String category) {
-        return categories.getMemberListIn(category).getMembers();
+    public List<Member> getMembers(String cluster) {
+        return clusters.getMemberListIn(cluster).getMembers();
     }
 
     public Member getMember(Member member) {
@@ -50,9 +50,9 @@ public class AllMember {
     }
 
     public Member getMember(String host, int port) {
-        for (String categoryName : categories.getCategoryNames()) {
-            Member member = categories.getMemberListIn(categoryName)
-                    .findMember(host, port);
+        for (String clusterName : clusters.getClusterNames()) {
+            Member member = clusters.getMemberListIn(clusterName).findMember(
+                    host, port);
             if (member != null) {
                 return member;
             }
@@ -62,7 +62,7 @@ public class AllMember {
     }
 
     public void setStatus(Member member, boolean isRunning) {
-        categories.setStatus(member, isRunning);
+        clusters.setStatus(member, isRunning);
     }
 
     public MemberInfos getMemberInfos() {
@@ -71,6 +71,6 @@ public class AllMember {
 
     @Override
     public String toString() {
-        return categories.toString();
+        return clusters.toString();
     }
 }

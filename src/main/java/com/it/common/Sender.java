@@ -13,9 +13,9 @@ import com.it.model.MemberList;
 public class Sender {
     private static final Logger logger = LoggerFactory.getLogger(Sender.class);
 
-    public static boolean sendBroadcast(String targetCategory, String msg) {
-        MemberList memberList = AllMember.getInstance().getCategories()
-                .getMemberListIn(targetCategory);
+    public static boolean sendBroadcast(String targetCluster, String msg) {
+        MemberList memberList = AllMember.getInstance().getClusters()
+                .getMemberListIn(targetCluster);
 
         ByteBuf byteBuf = Unpooled.buffer(msg.length());
         byteBuf.writeBytes(msg.getBytes());
@@ -27,16 +27,16 @@ public class Sender {
         return true;
     }
 
-    public static boolean sendAnycast(String targetCategory, String msg) {
-        MemberList memberList = AllMember.getInstance().getCategories()
-                .getMemberListIn(targetCategory);
+    public static boolean sendAnycast(String targetCluster, String msg) {
+        MemberList memberList = AllMember.getInstance().getClusters()
+                .getMemberListIn(targetCluster);
         ByteBuf byteBuf = Unpooled.buffer(msg.length());
         byteBuf.writeBytes(msg.getBytes());
         Member member = memberList.nextRunningMember();
 
         if (member == null) {
             logger.error("Send fail.  Because there is no member in {}",
-                    targetCategory);
+                    targetCluster);
             return false;
         } else {
             AllMember.getInstance().getMemberInfos().getChannelFuture(member)

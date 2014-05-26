@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.it.client.Client;
 import com.it.common.Config;
 import com.it.model.AllMember;
-import com.it.model.Categories;
+import com.it.model.Clusters;
 import com.it.model.Member;
 import com.it.model.MemberList;
 
@@ -26,13 +26,13 @@ public class ServerHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        if (msg instanceof Categories) {
+        if (msg instanceof Clusters) {
             // control packet
             try {
-                Categories categories = (Categories) msg;
-                if (AllMember.getInstance().getCategories().getBootupTime()
+                Clusters categories = (Clusters) msg;
+                if (AllMember.getInstance().getClusters().getBootupTime()
                         .compareTo(categories.getBootupTime()) < 0) {
-                    if (AllMember.getInstance().getCategories()
+                    if (AllMember.getInstance().getClusters()
                             .equals(categories)) {
                         logger.info("properties is same.");
                     } else {
@@ -59,49 +59,49 @@ public class ServerHandler extends ChannelHandlerAdapter {
         ctx.flush();
     }
 
-    private void removeMembers(Categories categories) {
+    private void removeMembers(Clusters categories) {
         Map<String, MemberList> removedmember = AllMember.getInstance()
-                .getCategories().diff(categories);
+                .getClusters().diff(categories);
         logger.info("removed member : {}", removedmember.toString());
 
-        for (String category : removedmember.keySet()) {
-            // remove category
-            if (AllMember.getInstance().getMemberListIn(category).size() == removedmember
-                    .get(category).size()) {
-                logger.info("removed category: {}", category);
-                AllMember.getInstance().removeCategory(category);
-                Config.getInstance().removeCategory(category);
+        for (String cluster : removedmember.keySet()) {
+            // remove clister
+            if (AllMember.getInstance().getMemberListIn(cluster).size() == removedmember
+                    .get(cluster).size()) {
+                logger.info("removed cluster: {}", cluster);
+                AllMember.getInstance().removeCluster(cluster);
+                Config.getInstance().removeCluster(cluster);
             }
 
-            for (Member member : removedmember.get(category).getMembers()) {
+            for (Member member : removedmember.get(cluster).getMembers()) {
                 // stop client thread
                 AllMember.getInstance().getMemberInfos().getClient(member)
                         .interrupt();
 
                 // remove client and client info
-                AllMember.getInstance().removeMember(category, member);
+                AllMember.getInstance().removeMember(cluster, member);
                 AllMember.getInstance().getMemberInfos().removeInfo(member);
-                Config.getInstance().removeMember(category, member);
+                Config.getInstance().removeMember(cluster, member);
             }
         }
     }
 
-    private void addMembers(Categories categories) {
+    private void addMembers(Clusters categories) {
         Map<String, MemberList> addedMember = categories.diff(AllMember
-                .getInstance().getCategories());
+                .getInstance().getClusters());
         logger.info("added member : " + addedMember.toString());
 
-        for (String category : addedMember.keySet()) {
-            AllMember.getInstance().addCategory(category);
-            for (Member member : addedMember.get(category).getMembers()) {
+        for (String cluster : addedMember.keySet()) {
+            AllMember.getInstance().addCluster(cluster);
+            for (Member member : addedMember.get(cluster).getMembers()) {
                 // start client
                 Client client = new Client(member);
                 client.start();
 
                 // add client data
-                AllMember.getInstance().addMember(category, member);
+                AllMember.getInstance().addMember(cluster, member);
                 AllMember.getInstance().getMemberInfos().put(member, client);
-                Config.getInstance().addMember(category, member);
+                Config.getInstance().addMember(cluster, member);
             }
         }
     }

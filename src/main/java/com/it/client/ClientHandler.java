@@ -19,7 +19,7 @@ public class ClientHandler extends ChannelHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) {
         if (Config.getInstance().isAutoSpread()) {
             ctx.channel()
-                    .writeAndFlush(AllMember.getInstance().getCategories());
+                    .writeAndFlush(AllMember.getInstance().getClusters());
         }
     }
 

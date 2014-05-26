@@ -9,7 +9,7 @@ import java.util.Set;
 
 import com.google.common.collect.Maps;
 
-public class Categories implements Serializable {
+public class Clusters implements Serializable {
     private static final long serialVersionUID = 3688785685416855060L;
 
     private Date bootupTime = new Date();
@@ -20,46 +20,46 @@ public class Categories implements Serializable {
         return bootupTime;
     }
 
-    public void add(String categoryName) {
-        if (!memberListMap.containsKey(categoryName)) {
-            memberListMap.put(categoryName, new MemberList());
+    public void add(String clusterName) {
+        if (!memberListMap.containsKey(clusterName)) {
+            memberListMap.put(clusterName, new MemberList());
         }
     }
 
-    public void remove(String categoryName) {
-        memberListMap.remove(categoryName);
+    public void remove(String clusterName) {
+        memberListMap.remove(clusterName);
     }
 
-    public void add(String categoryName, Member member) {
-        MemberList memberList = getMemberListIn(categoryName);
+    public void add(String clusterName, Member member) {
+        MemberList memberList = getMemberListIn(clusterName);
         if (memberList == EMPTY_MEMBERLIST) {
-            add(categoryName);
-            memberList = getMemberListIn(categoryName);
+            add(clusterName);
+            memberList = getMemberListIn(clusterName);
         }
         memberList.addMember(member);
     }
 
-    public void remove(String categoryName, Member member) {
-        MemberList memberList = getMemberListIn(categoryName);
+    public void remove(String clusterName, Member member) {
+        MemberList memberList = getMemberListIn(clusterName);
         if (memberList.hasMembers()) {
             memberList.removeMember(member);
         }
     }
 
-    public Set<String> getCategoryNames() {
+    public Set<String> getClusterNames() {
         return memberListMap.keySet();
     }
 
-    public MemberList getMemberListIn(String category) {
-        MemberList memberList = memberListMap.get(category);
+    public MemberList getMemberListIn(String cluster) {
+        MemberList memberList = memberListMap.get(cluster);
         if (memberList == null) {
             return EMPTY_MEMBERLIST;
         }
         return memberList;
     }
 
-    public Member nextRunningMember(String category) {
-        MemberList memberList = getMemberListIn(category);
+    public Member nextRunningMember(String cluster) {
+        MemberList memberList = getMemberListIn(cluster);
         return memberList.nextRunningMember();
     }
 
@@ -74,20 +74,20 @@ public class Categories implements Serializable {
         return false;
     }
 
-    public boolean equals(Categories categories) {
-        if (memberListMap.size() != categories.getCategoryNames().size()) {
+    public boolean equals(Clusters clusters) {
+        if (memberListMap.size() != clusters.getClusterNames().size()) {
             return false;
         }
 
-        for (String category : getCategoryNames()) {
-            if (getMemberListIn(category).getMembers().size() != categories
-                    .getMemberListIn(category).getMembers().size()) {
+        for (String cluster : getClusterNames()) {
+            if (getMemberListIn(cluster).getMembers().size() != clusters
+                    .getMemberListIn(cluster).getMembers().size()) {
                 return false;
             }
 
-            Iterator<Member> iterator = getMemberListIn(category).getMembers()
+            Iterator<Member> iterator = getMemberListIn(cluster).getMembers()
                     .iterator();
-            Iterator<Member> iterator2 = categories.getMemberListIn(category)
+            Iterator<Member> iterator2 = clusters.getMemberListIn(cluster)
                     .getMembers().iterator();
             while (iterator.hasNext()) {
                 Member member = iterator.next();
@@ -100,13 +100,13 @@ public class Categories implements Serializable {
         return true;
     }
 
-    public Map<String, MemberList> diff(Categories categories) {
+    public Map<String, MemberList> diff(Clusters categories) {
         Map<String, MemberList> result = Maps.newHashMap();
-        for (String category : getCategoryNames()) {
-            MemberList memberList = getMemberListIn(category);
+        for (String cluster : getClusterNames()) {
+            MemberList memberList = getMemberListIn(cluster);
             if (memberList != EMPTY_MEMBERLIST) {
-                result.put(category,
-                        memberList.diff(categories.getMemberListIn(category)));
+                result.put(cluster,
+                        memberList.diff(categories.getMemberListIn(cluster)));
             }
         }
         return result;
@@ -115,9 +115,9 @@ public class Categories implements Serializable {
     @Override
     public String toString() {
         StringBuffer result = new StringBuffer("\n* member list\n");
-        for (String category : memberListMap.keySet()) {
-            result.append("category: ").append(category).append(", members: ")
-                    .append(memberListMap.get(category).toString())
+        for (String cluster : memberListMap.keySet()) {
+            result.append("cluster: ").append(cluster).append(", members: ")
+                    .append(memberListMap.get(cluster).toString())
                     .append("\n");
         }
 

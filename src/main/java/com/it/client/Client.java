@@ -19,10 +19,8 @@ import com.it.model.AllMember;
 import com.it.model.Member;
 
 public class Client extends Thread {
-    private static final Logger logger = LoggerFactory
-            .getLogger(Client.class);
+    private static final Logger logger = LoggerFactory.getLogger(Client.class);
 
-    private String profile;
     private Member member;
 
     public Client(Member member) {
@@ -30,7 +28,6 @@ public class Client extends Thread {
     }
 
     public Client(String host, int port) {
-        this.profile = "me" + port;
         member = new Member(host, port);
     }
 
