@@ -1,6 +1,7 @@
 package com.it.model;
 
 import java.util.List;
+import java.util.Map;
 
 public class AllMember {
     public static AllMember instance = new AllMember();
@@ -37,6 +38,10 @@ public class AllMember {
         return clusters;
     }
 
+    public Map<String, MemberList> getMemberListMap() {
+        return clusters.getMemberListMap();
+    }
+
     public MemberList getMemberListIn(String cluster) {
         return clusters.getMemberListIn(cluster);
     }
@@ -61,8 +66,8 @@ public class AllMember {
         return null;
     }
 
-    public void setStatus(Member member, boolean isRunning) {
-        clusters.setStatus(member, isRunning);
+    public void setStatus(Member member, Status status) {
+        clusters.setStatus(member, status);
     }
 
     public MemberInfos getMemberInfos() {

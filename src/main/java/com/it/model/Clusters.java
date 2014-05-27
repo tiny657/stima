@@ -60,6 +60,10 @@ public class Clusters implements Serializable {
         return memberListMap.keySet();
     }
 
+    public Map<String, MemberList> getMemberListMap() {
+        return memberListMap;
+    }
+
     public MemberList getMemberListIn(String cluster) {
         MemberList memberList = memberListMap.get(cluster);
         if (memberList == null) {
@@ -73,11 +77,11 @@ public class Clusters implements Serializable {
         return memberList.nextRunningMember();
     }
 
-    public boolean setStatus(Member member, boolean isRunning) {
+    public boolean setStatus(Member member, Status status) {
         for (Entry<String, MemberList> entry : memberListMap.entrySet()) {
             MemberList memberList = entry.getValue();
-            if (memberList.setStatus(member.getHost(), member.getPort(),
-                    isRunning)) {
+            if (memberList
+                    .setStatus(member.getHost(), member.getPort(), status)) {
                 return true;
             }
         }

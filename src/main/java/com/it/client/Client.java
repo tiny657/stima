@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.it.model.AllMember;
 import com.it.model.Member;
+import com.it.model.Status;
 
 public class Client extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
@@ -83,8 +84,7 @@ public class Client extends Thread {
         channelFuture = bootstrap.connect(targetServer.getHost(),
                 targetServer.getPort()).await();
 
-        // From standby to running.
-        AllMember.getInstance().setStatus(targetServer, true);
+        AllMember.getInstance().setStatus(targetServer, Status.STANDBY);
 
         return channelFuture;
     }
@@ -93,8 +93,7 @@ public class Client extends Thread {
             throws InterruptedException {
         channelFuture.channel().closeFuture().sync();
 
-        // From running to standby.
-        AllMember.getInstance().setStatus(targetServer, false);
+        AllMember.getInstance().setStatus(targetServer, Status.SHUTDOWN);
 
         logger.info("Connection({}) is closed.", targetServer.getHostPort());
         logger.info(AllMember.getInstance().toString());

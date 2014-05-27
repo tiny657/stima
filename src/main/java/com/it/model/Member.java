@@ -9,7 +9,7 @@ public class Member implements Comparable<Member>, Serializable {
 
     private String host;
     private int port;
-    private boolean isRunning = false;
+    private Status status = Status.SHUTDOWN;
     private boolean me = false;
 
     public Member() {
@@ -60,11 +60,18 @@ public class Member implements Comparable<Member>, Serializable {
     }
 
     public boolean isRunning() {
-        return isRunning;
+        if (status == Status.RUNNING) {
+            return true;
+        }
+        return false;
     }
 
-    public void setRunning(boolean isRunning) {
-        this.isRunning = isRunning;
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public boolean equals(Member member) {
@@ -92,10 +99,8 @@ public class Member implements Comparable<Member>, Serializable {
         String status;
         if (me) {
             status = "me";
-        } else if (isRunning) {
-            status = "running";
         } else {
-            status = "standby";
+            status = this.status.toString();
         }
 
         return host + ":" + port + "(" + status + ")";

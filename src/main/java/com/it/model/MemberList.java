@@ -62,12 +62,12 @@ public class MemberList implements Serializable {
         return index;
     }
 
-    public boolean setStatus(String host, int port, boolean isRunning) {
+    public boolean setStatus(String host, int port, Status status) {
         Member member = findMember(host, port);
         if (member == null) {
             return false;
         }
-        member.setRunning(isRunning);
+        member.setStatus(status);
 
         return true;
     }

@@ -18,6 +18,7 @@ import com.it.model.AllMember;
 import com.it.model.Clusters;
 import com.it.model.Member;
 import com.it.model.MemberList;
+import com.it.model.Status;
 
 public class ServerHandlerAdapter extends ChannelHandlerAdapter {
     private static final Logger logger = LoggerFactory
@@ -34,7 +35,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
 
             // client start
             Member member = clusters.findMe();
-            if (!AllMember.getInstance().getMember(member).isRunning()) {
+            if (AllMember.getInstance().getMember(member).getStatus() == Status.SHUTDOWN) {
                 Client client = new Client(member);
                 client.setClientHandler(ItRunner.getInstance()
                         .getClientHandlerAdapter());

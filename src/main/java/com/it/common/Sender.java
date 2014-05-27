@@ -1,7 +1,6 @@
 package com.it.common;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +12,29 @@ import com.it.model.MemberList;
 public class Sender {
     private static final Logger logger = LoggerFactory.getLogger(Sender.class);
 
-    public static boolean sendBroadcast(String targetCluster, String msg) {
-        ByteBuf byteBuf = Unpooled.buffer(msg.length());
-        byteBuf.writeBytes(msg.getBytes());
-        MemberList memberList = AllMember.getInstance().getClusters()
-                .getMemberListIn(targetCluster);
+//    public static boolean sendBroadcast(String targetCluster, String msg) {
+//        ByteBuf byteBuf = Unpooled.buffer(msg.length());
+//        byteBuf.writeBytes(msg.getBytes());
+//        MemberList memberList = AllMember.getInstance().getClusters()
+//                .getMemberListIn(targetCluster);
+//
+//        for (Member member : memberList.getRunningMembers()) {
+//            AllMember.getInstance().getMemberInfos().getChannelFuture(member)
+//                    .channel().writeAndFlush(byteBuf);
+//        }
+//
+//        return true;
+//    }
 
-        for (Member member : memberList.getRunningMembers()) {
-            AllMember.getInstance().getMemberInfos().getChannelFuture(member)
-                    .channel().writeAndFlush(byteBuf);
+    public static boolean sendBroadcast(Object msg) {
+        for (Entry<String, MemberList> entry : AllMember.getInstance()
+                .getClusters().getMemberListMap().entrySet()) {
+            for (Member member : entry.getValue().getMembers()) {
+                logger.info("data sent: {} to {}", msg.toString(),
+                        member.toString());
+                AllMember.getInstance().getMemberInfos()
+                        .getChannelFuture(member).channel().writeAndFlush(msg);
+            }
         }
 
         return true;
@@ -36,7 +49,8 @@ public class Sender {
                     targetCluster);
             return false;
         } else {
-            logger.info("data sent: {}.", msg.toString());
+            logger.info("data sent: {} to {}.", msg.toString(),
+                    member.toString());
             AllMember.getInstance().getMemberInfos().getChannelFuture(member)
                     .channel().writeAndFlush(msg);
         }
@@ -61,21 +75,21 @@ public class Sender {
     // return true;
     // }
 
-    public static boolean sendUnicast(String targetHost, int targetPort,
-            String msg) {
-        Member member = AllMember.getInstance().getMember(targetHost,
-                targetPort);
-        if (member == null) {
-            logger.error("Send fail because member({}:{}) is not found.",
-                    targetHost, targetPort);
-            return false;
-        }
-
-        ByteBuf byteBuf = Unpooled.buffer(msg.length());
-        byteBuf.writeBytes(msg.getBytes());
-        AllMember.getInstance().getMemberInfos().getChannelFuture(member)
-                .channel().writeAndFlush(byteBuf);
-
-        return true;
-    }
+    // public static boolean sendUnicast(String targetHost, int targetPort,
+    // String msg) {
+    // Member member = AllMember.getInstance().getMember(targetHost,
+    // targetPort);
+    // if (member == null) {
+    // logger.error("Send fail because member({}:{}) is not found.",
+    // targetHost, targetPort);
+    // return false;
+    // }
+    //
+    // ByteBuf byteBuf = Unpooled.buffer(msg.length());
+    // byteBuf.writeBytes(msg.getBytes());
+    // AllMember.getInstance().getMemberInfos().getChannelFuture(member)
+    // .channel().writeAndFlush(byteBuf);
+    //
+    // return true;
+    // }
 }
