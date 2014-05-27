@@ -20,6 +20,16 @@ public class Clusters implements Serializable {
         return bootupTime;
     }
 
+    public Member findMe() {
+        for (Entry<String, MemberList> entry : memberListMap.entrySet()) {
+            Member member = entry.getValue().findMe();
+            if (member != null) {
+                return member;
+            }
+        }
+        return null;
+    }
+
     public void add(String clusterName) {
         if (!memberListMap.containsKey(clusterName)) {
             memberListMap.put(clusterName, new MemberList());
@@ -100,13 +110,13 @@ public class Clusters implements Serializable {
         return true;
     }
 
-    public Map<String, MemberList> diff(Clusters categories) {
+    public Map<String, MemberList> diff(Clusters clusters) {
         Map<String, MemberList> result = Maps.newHashMap();
         for (String cluster : getClusterNames()) {
             MemberList memberList = getMemberListIn(cluster);
             if (memberList != EMPTY_MEMBERLIST) {
                 result.put(cluster,
-                        memberList.diff(categories.getMemberListIn(cluster)));
+                        memberList.diff(clusters.getMemberListIn(cluster)));
             }
         }
         return result;
@@ -117,8 +127,7 @@ public class Clusters implements Serializable {
         StringBuffer result = new StringBuffer("\n* member list\n");
         for (String cluster : memberListMap.keySet()) {
             result.append("cluster: ").append(cluster).append(", members: ")
-                    .append(memberListMap.get(cluster).toString())
-                    .append("\n");
+                    .append(memberListMap.get(cluster).toString()).append("\n");
         }
 
         return result.toString();

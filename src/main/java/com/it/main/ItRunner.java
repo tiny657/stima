@@ -9,8 +9,27 @@ import com.it.server.Server;
 import com.it.server.ServerHandlerAdapter;
 
 public class ItRunner {
-    public static void execute(ServerHandlerAdapter serverHandlerAdapter,
+    public static ItRunner instance = new ItRunner();
+    private ServerHandlerAdapter serverHandlerAdapter;
+    private ClientHandlerAdapter clientHandlerAdapter;
+
+    public static ItRunner getInstance() {
+        return instance;
+    }
+
+    public ServerHandlerAdapter getServerHandlerAdapter() {
+        return serverHandlerAdapter;
+    }
+
+    public ClientHandlerAdapter getClientHandlerAdapter() {
+        return clientHandlerAdapter;
+    }
+
+    public void execute(ServerHandlerAdapter serverHandlerAdapter,
             ClientHandlerAdapter clientHandlerAdapter, String[] args) {
+        this.serverHandlerAdapter = serverHandlerAdapter;
+        this.clientHandlerAdapter = clientHandlerAdapter;
+
         try {
             Config.getInstance().init(args);
 
@@ -34,7 +53,7 @@ public class ItRunner {
         }
     }
 
-    private static void shutdownNow() {
+    private void shutdownNow() {
         Runtime.getRuntime().exit(-1);
     }
 }

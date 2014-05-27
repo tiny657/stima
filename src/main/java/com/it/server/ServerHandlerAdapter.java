@@ -10,8 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.it.client.Client;
+import com.it.client.ClientHandlerAdapter;
 import com.it.common.Config;
 import com.it.main.ClientHandler;
+import com.it.main.ItRunner;
 import com.it.model.AllMember;
 import com.it.model.Clusters;
 import com.it.model.Member;
@@ -28,19 +30,30 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof Clusters) {
+            Clusters clusters = (Clusters) msg;
+
+            // client start
+            Member member = clusters.findMe();
+            if (!AllMember.getInstance().getMember(member).isRunning()) {
+                Client client = new Client(member);
+                client.setClientHandler(ItRunner.getInstance()
+                        .getClientHandlerAdapter());
+                AllMember.getInstance().getMemberInfos().put(member, client);
+                client.start();
+            }
+
             // control packet
-            Clusters categories = (Clusters) msg;
             if (AllMember.getInstance().getClusters().getBootupTime()
-                    .compareTo(categories.getBootupTime()) < 0) {
-                if (AllMember.getInstance().getClusters().equals(categories)) {
+                    .compareTo(clusters.getBootupTime()) < 0) {
+                if (AllMember.getInstance().getClusters().equals(clusters)) {
                     logger.info("properties is same.");
                 } else {
                     logger.info("properties is different.");
-                    removeMembers(categories);
-                    addMembers(categories);
+                    removeMembers(clusters);
+                    addMembers(clusters);
                 }
 
-                logger.info("server received: {}", categories.toString());
+                logger.info("server received: {}", clusters.toString());
             } else {
                 logger.info("ignore the received properties because this server is started up late.");
             }
@@ -59,9 +72,9 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
         ctx.close();
     }
 
-    private void removeMembers(Clusters categories) {
+    private void removeMembers(Clusters clusters) {
         Map<String, MemberList> removedmember = AllMember.getInstance()
-                .getClusters().diff(categories);
+                .getClusters().diff(clusters);
         logger.info("removed member : {}", removedmember.toString());
 
         for (String cluster : removedmember.keySet()) {
@@ -86,8 +99,8 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
         }
     }
 
-    private void addMembers(Clusters categories) {
-        Map<String, MemberList> addedMember = categories.diff(AllMember
+    private void addMembers(Clusters clusters) {
+        Map<String, MemberList> addedMember = clusters.diff(AllMember
                 .getInstance().getClusters());
         logger.info("added member : " + addedMember.toString());
 

@@ -22,6 +22,15 @@ public class MemberList implements Serializable {
         return members.size();
     }
 
+    public Member findMe() {
+        for (Member member : members) {
+            if (member.isMe()) {
+                return member;
+            }
+        }
+        return null;
+    }
+
     public List<Member> getMembers() {
         return members;
     }

@@ -10,7 +10,7 @@ public class Member implements Comparable<Member>, Serializable {
     private String host;
     private int port;
     private boolean isRunning = false;
-    transient private boolean me = false;
+    private boolean me = false;
 
     public Member() {
     }
@@ -33,6 +33,10 @@ public class Member implements Comparable<Member>, Serializable {
     public Member(String host, int port) {
         this.host = host;
         this.port = port;
+    }
+
+    public boolean isMe() {
+        return me;
     }
 
     public String getHost() {
