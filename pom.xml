@@ -183,7 +183,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.it.main.ItRunner</mainClass>
+                            <mainClass>com.it.main.Sample</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
@@ -239,7 +239,7 @@
                     </appendAssemblyId>
                     <archive>
                         <manifest>
-                            <mainClass>com.it.main.ItRunner</mainClass>
+                            <mainClass>com.it.main.Sample</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

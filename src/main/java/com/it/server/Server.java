@@ -64,7 +64,7 @@ public class Server extends Thread {
 
             ChannelFuture channelFuture = bootstrap.bind(myInfo.getPort())
                     .sync();
-            logger.info("server started ({}:{})", myInfo.getHostPort());
+            logger.info("server started ({})", myInfo.getHostPort());
 
             awaitDisconnection(channelFuture);
         } catch (InterruptedException e) {
@@ -77,6 +77,6 @@ public class Server extends Thread {
     private void awaitDisconnection(ChannelFuture channelFuture)
             throws InterruptedException {
         channelFuture.channel().closeFuture().sync();
-        logger.info("server closed ({}:{})", myInfo.getHost(), myInfo.getPort());
+        logger.info("server closed ({})", myInfo.getHostPort());
     }
 }

@@ -54,9 +54,9 @@ public class Client extends Thread {
                 }
             });
 
-            while (true) {
-                ChannelFuture channelFuture = awaitConnection(bootstrap);
+            ChannelFuture channelFuture = connect(bootstrap);
 
+            if (channelFuture.isSuccess()) {
                 // update member and memberInfo.
                 Member connectedMember = AllMember.getInstance().getMember(
                         targetServer);
@@ -66,9 +66,8 @@ public class Client extends Thread {
                 logger.info("Connection({}) is established.",
                         targetServer.getHostPort());
                 logger.info(AllMember.getInstance().toString());
-
-                awaitDisconnection(channelFuture);
             }
+            awaitDisconnection(channelFuture);
         } catch (InterruptedException e) {
             logger.info("Connection({}) is closed.", targetServer.getHostPort());
         } finally {
@@ -76,16 +75,13 @@ public class Client extends Thread {
         }
     }
 
-    private ChannelFuture awaitConnection(Bootstrap bootstrap)
+    private ChannelFuture connect(Bootstrap bootstrap)
             throws InterruptedException {
         logger.info("Connecting to {}", targetServer.getHostPort());
 
         ChannelFuture channelFuture;
-        do {
-            channelFuture = bootstrap.connect(targetServer.getHost(),
-                    targetServer.getPort()).await();
-            Thread.sleep(1000);
-        } while (!channelFuture.isSuccess());
+        channelFuture = bootstrap.connect(targetServer.getHost(),
+                targetServer.getPort()).await();
 
         // From standby to running.
         AllMember.getInstance().setStatus(targetServer, true);
