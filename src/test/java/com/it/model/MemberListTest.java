@@ -21,9 +21,9 @@ public class MemberListTest {
         for (int i = 0; i < count; i++) {
             members.add(new Member("host", i));
             memberList.addMember(members.get(i));
-            memberList.setStatus("host", i, true);
+            memberList.setStatus("host", i, Status.RUNNING);
         }
-        
+
         // When
         Set<Member> nextMembers = Sets.newHashSet();
         for (int i = 0; i < count * 100; i++) {
@@ -34,16 +34,16 @@ public class MemberListTest {
         // Then
         assertThat(members.size(), is(3));
     }
-    
+
     @Test
     public void setStatusWhenNotExists() {
         // Given
         MemberList memberList = new MemberList();
         memberList.addMember(new Member("host", 1));
-        
+
         // When
-        boolean status = memberList.setStatus("host", 2, true);
-        
+        boolean status = memberList.setStatus("host", 2, Status.RUNNING);
+
         // Then
         assertThat(status, is(false));
         assertThat(memberList.getRunningMembers().size(), is(0));
@@ -54,25 +54,25 @@ public class MemberListTest {
         // Given
         MemberList memberList = new MemberList();
         memberList.addMember(new Member("host", 1));
-        
+
         // When
-        boolean status = memberList.setStatus("host", 1, true);
-        
+        boolean status = memberList.setStatus("host", 1, Status.RUNNING);
+
         // Then
         assertThat(status, is(true));
         assertThat(memberList.getRunningMembers().size(), is(1));
     }
-    
+
     @Test
     public void setStatusToNotRunning() {
         // Given
         MemberList memberList = new MemberList();
         memberList.addMember(new Member("host", 1));
-        memberList.setStatus("host", 1, true);
-        
+        memberList.setStatus("host", 1, Status.RUNNING);
+
         // When
-        boolean status = memberList.setStatus("host", 1, false);
-        
+        boolean status = memberList.setStatus("host", 1, Status.SHUTDOWN);
+
         // Then
         assertThat(status, is(true));
         assertThat(memberList.getRunningMembers().size(), is(0));
@@ -83,7 +83,7 @@ public class MemberListTest {
         // Given
         MemberList memberList = new MemberList();
         memberList.addMember(new Member("host", 1));
-        
+
         // When
         Member findMember = memberList.findMember("host", 1);
         Member findMember2 = memberList.findMember("host", 2);
@@ -99,7 +99,7 @@ public class MemberListTest {
         Member member = new Member("host", 1);
         MemberList memberList = new MemberList();
         memberList.addMember(member);
-        
+
         // When
         boolean contains1 = memberList.contains(member);
         Member testMember = new Member("host", 2);
@@ -109,7 +109,7 @@ public class MemberListTest {
         assertThat(contains1, is(true));
         assertThat(contains2, is(false));
     }
-    
+
     @Test
     public void diff() {
         // Given
@@ -121,9 +121,9 @@ public class MemberListTest {
         MemberList memberList2 = new MemberList();
         memberList2.addMember(new Member("host", 3));
         memberList2.addMember(new Member("host", 4));
-        
+
         MemberList memberList3 = new MemberList();
-        
+
         // When
         MemberList diff1 = memberList1.diff(memberList2);
         MemberList diff2 = memberList2.diff(memberList1);

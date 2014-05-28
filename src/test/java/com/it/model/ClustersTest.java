@@ -68,11 +68,11 @@ public class ClustersTest {
         clusters.add("cluster2", new Member("host", 1004));
 
         // When
-        boolean result1 = clusters.setStatus(new Member("host", 1001), true);
-        boolean result2 = clusters.setStatus(new Member("host", 1001), true);
-        boolean result3 = clusters.setStatus(new Member("host", 1001), false);
-        boolean result4 = clusters.setStatus(new Member("host", 1004), true);
-        boolean result5 = clusters.setStatus(new Member("host", 1005), true);
+        boolean result1 = clusters.setStatus(new Member("host", 1001), Status.RUNNING);
+        boolean result2 = clusters.setStatus(new Member("host", 1001), Status.RUNNING);
+        boolean result3 = clusters.setStatus(new Member("host", 1001), Status.RUNNING);
+        boolean result4 = clusters.setStatus(new Member("host", 1004), Status.RUNNING);
+        boolean result5 = clusters.setStatus(new Member("host", 1005), Status.RUNNING);
 
         // Then
         assertThat(result1, is(true));

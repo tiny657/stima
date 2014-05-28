@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 public class MemberList implements Serializable {
-    private static final long serialVersionUID = 307182214967241367L;
+    private static final long serialVersionUID = -4214424024062575985L;
 
     private List<Member> members = Lists.newArrayList();
     transient private int index = 0;

@@ -3,7 +3,7 @@ package com.it.main;
 import java.io.Serializable;
 
 public class Command implements Serializable {
-    private static final long serialVersionUID = -6340576352497070080L;
+    private static final long serialVersionUID = 8126181783372339107L;
 
     private int number;
     private String desc;

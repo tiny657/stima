@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.apache.commons.lang3.StringUtils;
 
 public class Member implements Comparable<Member>, Serializable {
-    private static final long serialVersionUID = -6870770836608106922L;
+    private static final long serialVersionUID = -3329506897816445518L;
 
     private String host;
     private int port;

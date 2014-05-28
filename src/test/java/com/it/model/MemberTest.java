@@ -10,15 +10,15 @@ public class MemberTest {
     public void equals() {
         // Given
         Member member1 = new Member("host", 1001);
-        member1.setRunning(true);
+        member1.setStatus(Status.RUNNING);
         Member member2 = new Member("host", 1001);
-        member1.setRunning(false);
+        member1.setStatus(Status.SHUTDOWN);
 
         // When
         boolean equals = member1.equals(member2);
 
         // Then
-		assertThat(equals, is(true));
+        assertThat(equals, is(true));
     }
 
     @Test
@@ -31,9 +31,9 @@ public class MemberTest {
         boolean equals = member1.equals(member2);
 
         // Then
-		assertThat(equals, is(false));
+        assertThat(equals, is(false));
     }
-    
+
     @Test
     public void comparePort() {
         // Given
@@ -45,8 +45,8 @@ public class MemberTest {
         int compare2 = member2.compareTo(member1);
 
         // Then
-		assertThat(compare1, lessThan(0));
-		assertThat(compare2, greaterThan(0));
+        assertThat(compare1, lessThan(0));
+        assertThat(compare2, greaterThan(0));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class MemberTest {
         int compare2 = member2.compareTo(member1);
 
         // Then
-		assertThat(compare1, lessThan(0));
-		assertThat(compare2, greaterThan(0));
+        assertThat(compare1, lessThan(0));
+        assertThat(compare2, greaterThan(0));
     }
 }
