@@ -16,6 +16,10 @@ public class Clusters implements Serializable {
     private Map<String, MemberList> memberListMap = Maps.newHashMap();
     transient private static final MemberList EMPTY_MEMBERLIST = new MemberList();
 
+    public boolean isEarlier(Date date) {
+        return bootupTime.compareTo(date) < 0;
+    }
+
     public Date getBootupTime() {
         return bootupTime;
     }
@@ -23,6 +27,16 @@ public class Clusters implements Serializable {
     public Member findMe() {
         for (Entry<String, MemberList> entry : memberListMap.entrySet()) {
             Member member = entry.getValue().findMe();
+            if (member != null) {
+                return member;
+            }
+        }
+        return null;
+    }
+
+    public Member findMember(String host, int port) {
+        for (Entry<String, MemberList> entry : memberListMap.entrySet()) {
+            Member member = entry.getValue().findMember(host, port);
             if (member != null) {
                 return member;
             }
@@ -78,14 +92,8 @@ public class Clusters implements Serializable {
     }
 
     public boolean setStatus(Member member, Status status) {
-        for (Entry<String, MemberList> entry : memberListMap.entrySet()) {
-            MemberList memberList = entry.getValue();
-            if (memberList
-                    .setStatus(member.getHost(), member.getPort(), status)) {
-                return true;
-            }
-        }
-        return false;
+        member.setStatus(status);
+        return true;
     }
 
     public boolean equals(Clusters clusters) {

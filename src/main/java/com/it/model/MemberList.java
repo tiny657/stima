@@ -62,6 +62,11 @@ public class MemberList implements Serializable {
         return index;
     }
 
+    public boolean setStatus(Member member, Status status) {
+        member.setStatus(status);
+        return true;
+    }
+
     public boolean setStatus(String host, int port, Status status) {
         Member member = findMember(host, port);
         if (member == null) {

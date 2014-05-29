@@ -15,21 +15,26 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.common.Config;
+import com.it.model.AllMember;
 import com.it.model.Member;
+import com.it.model.Status;
 
 public class Server extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
     private Member myInfo;
     private ServerHandlerAdapter serverHandlerAdapter;
+    private boolean isStartup = false;
 
     public Server() {
-        myInfo = new Member(Config.getInstance().getHost(), Config
-                .getInstance().getPort());
+        myInfo = AllMember.getInstance().getClusters().findMe();
     }
 
     public void setServerHandler(ServerHandlerAdapter serverHandlerAdapter) {
         this.serverHandlerAdapter = serverHandlerAdapter;
+    }
+
+    public Member getMyInfo() {
+        return myInfo;
     }
 
     public String getHost() {
@@ -64,13 +69,26 @@ public class Server extends Thread {
 
             ChannelFuture channelFuture = bootstrap.bind(myInfo.getPort())
                     .sync();
-            logger.info("server started ({})", myInfo.getHostPort());
+
+            myInfo.setStatus(Status.STANDBY);
+            isStartup = true;
+            logger.info("server started ({})", myInfo.toString());
 
             awaitDisconnection(channelFuture);
         } catch (InterruptedException e) {
         } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
+        }
+    }
+
+    public void await() {
+        while (!isStartup) {
+            logger.info("await that server is started.");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
         }
     }
 

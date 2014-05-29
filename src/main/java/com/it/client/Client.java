@@ -25,6 +25,8 @@ public class Client extends Thread {
     private Member targetServer;
     private ClientHandlerAdapter clientHandlerAdapter;
 
+    private boolean isStartup = false;
+
     public Client(Member member) {
         targetServer = member;
     }
@@ -64,15 +66,29 @@ public class Client extends Thread {
                 AllMember.getInstance().getMemberInfos()
                         .put(connectedMember, channelFuture, this);
 
+                AllMember.getInstance().setStatus(targetServer, Status.STANDBY);
                 logger.info("Connection({}) is established.",
                         targetServer.getHostPort());
                 logger.info(AllMember.getInstance().toString());
             }
+
+            isStartup = true;
             awaitDisconnection(channelFuture);
         } catch (InterruptedException e) {
             logger.info("Connection({}) is closed.", targetServer.getHostPort());
         } finally {
             workerGroup.shutdownGracefully();
+        }
+    }
+
+    public void await() {
+        while (!isStartup) {
+            logger.info("await client startup.");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -83,8 +99,6 @@ public class Client extends Thread {
         ChannelFuture channelFuture;
         channelFuture = bootstrap.connect(targetServer.getHost(),
                 targetServer.getPort()).await();
-
-        AllMember.getInstance().setStatus(targetServer, Status.STANDBY);
 
         return channelFuture;
     }

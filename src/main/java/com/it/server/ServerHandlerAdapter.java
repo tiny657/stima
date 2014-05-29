@@ -10,7 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.it.client.Client;
-import com.it.client.ClientHandlerAdapter;
+import com.it.command.Command;
+import com.it.command.InfoCommand;
+import com.it.command.StartCommand;
+import com.it.command.StopCommand;
 import com.it.common.Config;
 import com.it.main.ClientHandler;
 import com.it.main.ItRunner;
@@ -30,36 +33,63 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        if (msg instanceof Clusters) {
-            Clusters clusters = (Clusters) msg;
+        if (msg instanceof Command) {
+            if (msg instanceof StartCommand) {
+                StartCommand cmd = (StartCommand) msg;
+                Member member = AllMember.getInstance().getMember(
+                        cmd.getSrcHost(), cmd.getSrcPort());
+                member.setStatus(Status.RUNNING);
+                logger.info("data received: {}", cmd.toString());
+                ReferenceCountUtil.release(msg);
+            } else if (msg instanceof StopCommand) {
+                StartCommand cmd = (StartCommand) msg;
+                Member member = AllMember.getInstance().getMember(
+                        cmd.getSrcHost(), cmd.getSrcPort());
+                member.setStatus(Status.STANDBY);
+                logger.info("data received: {}", cmd.toString());
+                ReferenceCountUtil.release(msg);
+            } else if (msg instanceof InfoCommand) {
+                InfoCommand cmd = (InfoCommand) msg;
+                Clusters clusters = cmd.getClusters();
 
-            // client start
-            Member member = clusters.findMe();
-            if (AllMember.getInstance().getMember(member).getStatus() == Status.SHUTDOWN) {
-                Client client = new Client(member);
-                client.setClientHandler(ItRunner.getInstance()
-                        .getClientHandlerAdapter());
-                AllMember.getInstance().getMemberInfos().put(member, client);
-                client.start();
-            }
-
-            // control packet
-            if (AllMember.getInstance().getClusters().getBootupTime()
-                    .compareTo(clusters.getBootupTime()) < 0) {
-                if (AllMember.getInstance().getClusters().equals(clusters)) {
-                    logger.info("properties is same.");
-                } else {
-                    logger.info("properties is different.");
-                    removeMembers(clusters);
-                    addMembers(clusters);
+                // client start
+                Member member = clusters.findMe();
+                Status status = AllMember.getInstance().getMember(member)
+                        .getStatus();
+                if (status == Status.SHUTDOWN) {
+                    Client client = new Client(member);
+                    client.setClientHandler(ItRunner.getInstance()
+                            .getClientHandlerAdapter());
+                    AllMember.getInstance().getMemberInfos()
+                            .put(member, client);
+                    client.start();
+                    client.await();
                 }
 
-                logger.info("server received: {}", clusters.toString());
-            } else {
-                logger.info("ignore the received properties because this server is started up late.");
+                // compare the received properties.
+                if (AllMember.getInstance().getClusters()
+                        .isEarlier(clusters.getBootupTime())) {
+                    if (AllMember.getInstance().getClusters().equals(clusters)) {
+                        logger.info("properties is same.");
+                    } else {
+                        logger.info("properties is different.");
+                        removeMembers(clusters);
+                        addMembers(clusters);
+                    }
+
+                    logger.info("server received: {}", clusters.toString());
+                } else {
+                    logger.info("ignore the received properties because this server is started up late.");
+                }
+
+                // update the status of the sender.
+                AllMember.getInstance().getMember(member)
+                        .setStatus(member.getStatus());
+
+                ReferenceCountUtil.release(msg);
             }
-            ReferenceCountUtil.release(msg);
         }
+        logger.info(AllMember.getInstance().toString());
     }
 
     @Override

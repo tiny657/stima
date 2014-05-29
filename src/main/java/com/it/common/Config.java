@@ -66,6 +66,7 @@ public class Config {
             throw new Exception(host + ":" + port + " isn't valid.");
         }
 
+        logger.info(" * Config");
         logger.info(AllMember.getInstance().toString());
     }
 
@@ -102,7 +103,7 @@ public class Config {
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getMember(String cluster) {
+    public List<String> getMembers(String cluster) {
         return config.getList(getSubCluster(cluster));
     }
 
@@ -119,7 +120,7 @@ public class Config {
     }
 
     public void removeMember(String cluster, Member member) {
-        List<String> hostPorts = getMember(cluster);
+        List<String> hostPorts = getMembers(cluster);
         config.clearProperty(getSubCluster(cluster));
         String removedHostPort = member.getHostPort();
         for (String hostPort : hostPorts) {
@@ -153,6 +154,10 @@ public class Config {
             }
         }
         return members;
+    }
+
+    public Member findMember(String host, int port) {
+        return AllMember.getInstance().getClusters().findMember(host, port);
     }
 
     private String getSubCluster(String cluster) {
@@ -196,10 +201,12 @@ public class Config {
         // add member
         for (String cluster : AllMember.getInstance().getClusters()
                 .getClusterNames()) {
-            for (String hostPort : getMember(cluster)) {
+            for (String hostPort : getMembers(cluster)) {
                 String[] splitedHostPort = StringUtils.split(hostPort, ":");
-                AllMember.getInstance().addMember(cluster,
-                        new Member(splitedHostPort[0], splitedHostPort[1], getHost(), getPort()));
+                AllMember.getInstance().addMember(
+                        cluster,
+                        new Member(splitedHostPort[0], splitedHostPort[1],
+                                getHost(), getPort()));
             }
         }
     }

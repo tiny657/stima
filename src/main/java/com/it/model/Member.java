@@ -96,11 +96,9 @@ public class Member implements Comparable<Member>, Serializable {
 
     @Override
     public String toString() {
-        String status;
+        String status = this.status.toString();
         if (me) {
-            status = "me";
-        } else {
-            status = this.status.toString();
+            status += ", me";
         }
 
         return host + ":" + port + "(" + status + ")";

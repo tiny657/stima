@@ -12,28 +12,31 @@ import com.it.model.MemberList;
 public class Sender {
     private static final Logger logger = LoggerFactory.getLogger(Sender.class);
 
-//    public static boolean sendBroadcast(String targetCluster, String msg) {
-//        ByteBuf byteBuf = Unpooled.buffer(msg.length());
-//        byteBuf.writeBytes(msg.getBytes());
-//        MemberList memberList = AllMember.getInstance().getClusters()
-//                .getMemberListIn(targetCluster);
-//
-//        for (Member member : memberList.getRunningMembers()) {
-//            AllMember.getInstance().getMemberInfos().getChannelFuture(member)
-//                    .channel().writeAndFlush(byteBuf);
-//        }
-//
-//        return true;
-//    }
+    // public static boolean sendBroadcast(String targetCluster, String msg) {
+    // ByteBuf byteBuf = Unpooled.buffer(msg.length());
+    // byteBuf.writeBytes(msg.getBytes());
+    // MemberList memberList = AllMember.getInstance().getClusters()
+    // .getMemberListIn(targetCluster);
+    //
+    // for (Member member : memberList.getRunningMembers()) {
+    // AllMember.getInstance().getMemberInfos().getChannelFuture(member)
+    // .channel().writeAndFlush(byteBuf);
+    // }
+    //
+    // return true;
+    // }
 
     public static boolean sendBroadcast(Object msg) {
         for (Entry<String, MemberList> entry : AllMember.getInstance()
                 .getClusters().getMemberListMap().entrySet()) {
             for (Member member : entry.getValue().getMembers()) {
-                logger.info("data sent: {} to {}", msg.toString(),
-                        member.toString());
-                AllMember.getInstance().getMemberInfos()
-                        .getChannelFuture(member).channel().writeAndFlush(msg);
+                if (member.isRunning() && !member.isMe()) {
+                    logger.info("data sent: {} to {}", msg.toString(),
+                            member.toString());
+                    AllMember.getInstance().getMemberInfos()
+                            .getChannelFuture(member).channel()
+                            .writeAndFlush(msg);
+                }
             }
         }
 
