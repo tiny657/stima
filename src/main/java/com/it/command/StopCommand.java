@@ -6,7 +6,7 @@ public class StopCommand extends Command {
     public StopCommand() {
     }
 
-    public StopCommand(String host, int port) {
-        super(host, port);
+    public StopCommand(String srcHost, int srcPort) {
+        super(srcHost, srcPort);
     }
 }

@@ -91,9 +91,8 @@ public class Clusters implements Serializable {
         return memberList.nextRunningMember();
     }
 
-    public boolean setStatus(Member member, Status status) {
+    public void setStatus(Member member, Status status) {
         member.setStatus(status);
-        return true;
     }
 
     public boolean equals(Clusters clusters) {

@@ -61,10 +61,8 @@ public class Client extends Thread {
 
             if (channelFuture.isSuccess()) {
                 // update member and memberInfo.
-                Member connectedMember = AllMember.getInstance().getMember(
-                        targetServer);
                 AllMember.getInstance().getMemberInfos()
-                        .put(connectedMember, channelFuture, this);
+                        .put(targetServer, channelFuture, this);
 
                 AllMember.getInstance().setStatus(targetServer, Status.STANDBY);
                 logger.info("Connection({}) is established.",

@@ -59,30 +59,6 @@ public class ClustersTest {
     }
 
     @Test
-    public void setStatus() {
-        // Given
-        Clusters clusters = new Clusters();
-        clusters.add("cluster1", new Member("host", 1001));
-        clusters.add("cluster1", new Member("host", 1002));
-        clusters.add("cluster2", new Member("host", 1003));
-        clusters.add("cluster2", new Member("host", 1004));
-
-        // When
-        boolean result1 = clusters.setStatus(new Member("host", 1001), Status.RUNNING);
-        boolean result2 = clusters.setStatus(new Member("host", 1001), Status.RUNNING);
-        boolean result3 = clusters.setStatus(new Member("host", 1001), Status.RUNNING);
-        boolean result4 = clusters.setStatus(new Member("host", 1004), Status.RUNNING);
-        boolean result5 = clusters.setStatus(new Member("host", 1005), Status.RUNNING);
-
-        // Then
-        assertThat(result1, is(true));
-        assertThat(result2, is(true));
-        assertThat(result3, is(true));
-        assertThat(result4, is(true));
-        assertThat(result5, is(false));
-    }
-
-    @Test
     public void notEqualsToClusterCount() {
         // Given
         Clusters clusters1 = new Clusters();

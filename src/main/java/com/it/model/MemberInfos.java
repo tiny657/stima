@@ -8,16 +8,15 @@ import com.google.common.collect.Maps;
 import com.it.client.Client;
 
 public class MemberInfos {
-    private Map<Member, ChannelFuture> channelFutureMap;
-    private Map<Member, Client> clientMap;
+    private Map<String, ChannelFuture> channelFutureMap;
+    private Map<String, Client> clientMap;
 
     public MemberInfos() {
         channelFutureMap = Maps.newHashMap();
         clientMap = Maps.newHashMap();
     }
 
-    public void put(Member member, ChannelFuture channelFuture,
-            Client client) {
+    public void put(Member member, ChannelFuture channelFuture, Client client) {
         if (member == null) {
             return;
         }
@@ -31,15 +30,15 @@ public class MemberInfos {
     }
 
     public void put(Member member, ChannelFuture channelFuture) {
-        channelFutureMap.put(member, channelFuture);
+        channelFutureMap.put(member.getHostPort(), channelFuture);
     }
 
     public Client getClient(Member member) {
-        return clientMap.get(member);
+        return clientMap.get(member.getHostPort());
     }
 
     public void put(Member member, Client client) {
-        clientMap.put(member, client);
+        clientMap.put(member.getHostPort(), client);
     }
 
     public void removeInfo(Member member) {

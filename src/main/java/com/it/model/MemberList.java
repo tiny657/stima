@@ -49,7 +49,7 @@ public class MemberList implements Serializable {
         Member result = null;
         for (int i = 0; i < members.size(); i++) {
             Member member = members.get(next());
-            if (member.isRunning()) {
+            if (member.isRunning() && !member.isMe()) {
                 result = member;
                 break;
             }

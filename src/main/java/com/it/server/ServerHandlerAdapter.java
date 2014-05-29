@@ -42,7 +42,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                 logger.info("data received: {}", cmd.toString());
                 ReferenceCountUtil.release(msg);
             } else if (msg instanceof StopCommand) {
-                StartCommand cmd = (StartCommand) msg;
+                StopCommand cmd = (StopCommand) msg;
                 Member member = AllMember.getInstance().getMember(
                         cmd.getSrcHost(), cmd.getSrcPort());
                 member.setStatus(Status.STANDBY);
@@ -54,14 +54,10 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
 
                 // client start
                 Member member = clusters.findMe();
-                Status status = AllMember.getInstance().getMember(member)
-                        .getStatus();
-                if (status == Status.SHUTDOWN) {
+                if (AllMember.getInstance().getMemberInfos().getClient(member) == null) {
                     Client client = new Client(member);
                     client.setClientHandler(ItRunner.getInstance()
                             .getClientHandlerAdapter());
-                    AllMember.getInstance().getMemberInfos()
-                            .put(member, client);
                     client.start();
                     client.await();
                 }

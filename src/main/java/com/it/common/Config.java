@@ -16,9 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.it.model.AllMember;
-import com.it.model.Clusters;
 import com.it.model.Member;
 
 public class Config {
@@ -60,12 +58,6 @@ public class Config {
         loadJoptOptions(args);
         loadProperties();
 
-        if (!validate()) {
-            logger.error("My server info is {}:{}\n", host, port);
-            logger.error(AllMember.getInstance().getClusters().toString());
-            throw new Exception(host + ":" + port + " isn't valid.");
-        }
-
         logger.info(" * Config");
         logger.info(AllMember.getInstance().toString());
     }
@@ -102,11 +94,6 @@ public class Config {
         config.addProperty(getSubCluster(cluster), member.getHostPort());
     }
 
-    @SuppressWarnings("unchecked")
-    public List<String> getMembers(String cluster) {
-        return config.getList(getSubCluster(cluster));
-    }
-
     public void removeCluster(String removedCluster) {
         List<String> clusters = getClustersList();
 
@@ -135,43 +122,22 @@ public class Config {
         }
     }
 
-    public String[] getClustersArray() {
+    @SuppressWarnings("unchecked")
+    public List<String> getMembers(String cluster) {
+        return config.getList(getSubCluster(cluster));
+    }
+
+    private String[] getClustersArray() {
         return config.getStringArray(CLUSTER);
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getClustersList() {
+    private List<String> getClustersList() {
         return config.getList(CLUSTER);
-    }
-
-    public List<Member> getMembers() {
-        List<Member> members = Lists.newArrayList();
-        Clusters clusters = AllMember.getInstance().getClusters();
-        for (String clusterName : clusters.getClusterNames()) {
-            for (Member member : clusters.getMemberListIn(clusterName)
-                    .getMembers()) {
-                members.add(member);
-            }
-        }
-        return members;
-    }
-
-    public Member findMember(String host, int port) {
-        return AllMember.getInstance().getClusters().findMember(host, port);
     }
 
     private String getSubCluster(String cluster) {
         return CLUSTER + "." + cluster;
-    }
-
-    private boolean validate() {
-        for (Member member : getMembers()) {
-            if (member.getHost().equals(host) && member.getPort() == port) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private void loadJoptOptions(String[] args) {
