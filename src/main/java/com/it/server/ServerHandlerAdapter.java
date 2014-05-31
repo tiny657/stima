@@ -40,14 +40,15 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                 Member member = AllMember.getInstance().getMember(
                         cmd.getSrcHost(), cmd.getSrcPort());
                 member.setStatus(Status.RUNNING);
-                logger.info("data received: {}", cmd.toString());
+                logger.info("StartCommand was received from {}.",
+                        cmd.toString());
                 ReferenceCountUtil.release(msg);
             } else if (msg instanceof StopCommand) {
                 StopCommand cmd = (StopCommand) msg;
                 Member member = AllMember.getInstance().getMember(
                         cmd.getSrcHost(), cmd.getSrcPort());
                 member.setStatus(Status.STANDBY);
-                logger.info("data received: {}", cmd.toString());
+                logger.info("StopCommand was received from {}.", cmd.toString());
                 ReferenceCountUtil.release(msg);
             } else if (msg instanceof InfoCommand) {
                 InfoCommand cmd = (InfoCommand) msg;
@@ -74,9 +75,10 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                         addMembers(clusters);
                     }
 
-                    logger.info("server received: {}", clusters.toString());
+                    logger.info("InfoCommand was received. {}.",
+                            clusters.toString());
                 } else {
-                    logger.info("ignore the received properties because this server is started up late.");
+                    logger.info("ignore the received InfoCommand because this server was started up late.");
                 }
 
                 // update the status of the sender.
@@ -85,10 +87,10 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
 
                 ReferenceCountUtil.release(msg);
             }
+            logger.info(AllMember.getInstance().toString());
         } else if (msg instanceof TestCommand) {
-            logger.info("server received: TestCommand");
+            logger.info("TestCommand was received.");
         }
-        logger.info(AllMember.getInstance().toString());
     }
 
     @Override

@@ -31,7 +31,7 @@ public class Sender {
                 .getClusters().getMemberListMap().entrySet()) {
             for (Member member : entry.getValue().getMembers()) {
                 if (member.isRunning() && !member.isMe()) {
-                    logger.info("data sent: {} to {}", msg.toString(),
+                    logger.info("({}) was sent to {}.", msg.toString(),
                             member.toString());
                     AllMember.getInstance().getMemberInfos()
                             .getChannelFuture(member).channel()
@@ -52,7 +52,7 @@ public class Sender {
                     targetCluster);
             return false;
         } else {
-            logger.info("data sent: {} to {}.", msg.toString(),
+            logger.info("({}) was sent to {}.", msg.toString(),
                     member.toString());
             AllMember.getInstance().getMemberInfos().getChannelFuture(member)
                     .channel().writeAndFlush(msg);
