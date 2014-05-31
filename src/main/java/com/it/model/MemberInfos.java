@@ -26,7 +26,7 @@ public class MemberInfos {
     }
 
     public ChannelFuture getChannelFuture(Member member) {
-        return channelFutureMap.get(member);
+        return channelFutureMap.get(member.getHostPort());
     }
 
     public void put(Member member, ChannelFuture channelFuture) {

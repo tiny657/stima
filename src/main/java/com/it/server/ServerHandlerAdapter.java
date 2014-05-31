@@ -17,6 +17,7 @@ import com.it.command.StopCommand;
 import com.it.common.Config;
 import com.it.main.ClientHandler;
 import com.it.main.ItRunner;
+import com.it.main.TestCommand;
 import com.it.model.AllMember;
 import com.it.model.Clusters;
 import com.it.model.Member;
@@ -84,6 +85,8 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
 
                 ReferenceCountUtil.release(msg);
             }
+        } else if (msg instanceof TestCommand) {
+            logger.info("server received: TestCommand");
         }
         logger.info(AllMember.getInstance().toString());
     }
