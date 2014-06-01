@@ -15,7 +15,6 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.model.AllMember;
 import com.it.model.Member;
 import com.it.model.Status;
 
@@ -25,8 +24,8 @@ public class Server extends Thread {
     private ServerHandlerAdapter serverHandlerAdapter;
     private boolean isStartup = false;
 
-    public Server() {
-        myInfo = AllMember.getInstance().getClusters().findMe();
+    public Server(Member member) {
+        myInfo = member;
     }
 
     public void setServerHandler(ServerHandlerAdapter serverHandlerAdapter) {
@@ -84,7 +83,6 @@ public class Server extends Thread {
 
     public void await() {
         while (!isStartup) {
-            logger.info("await that server is started.");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

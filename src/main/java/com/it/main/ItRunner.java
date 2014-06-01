@@ -42,15 +42,15 @@ public class ItRunner {
 
         try {
             Config.getInstance().init(args);
+            Clusters clusters = AllMember.getInstance().getClusters();
 
             // server
-            Server server = new Server();
+            Server server = new Server(clusters.findMe());
             server.setServerHandler(serverHandlerAdapter);
             server.start();
             server.await();
 
             // clients
-            Clusters clusters = AllMember.getInstance().getClusters();
             for (String clusterName : clusters.getClusterNames()) {
                 for (Member member : clusters.getMemberListIn(clusterName)
                         .getMembers()) {

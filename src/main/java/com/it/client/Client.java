@@ -22,13 +22,13 @@ import com.it.model.Status;
 public class Client extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
 
-    private Member targetServer;
+    private Member myInfo;
     private ClientHandlerAdapter clientHandlerAdapter;
 
     private boolean isStartup = false;
 
     public Client(Member member) {
-        targetServer = member;
+        myInfo = member;
     }
 
     public void setClientHandler(ClientHandlerAdapter clientHandlerAdapter) {
@@ -63,7 +63,7 @@ public class Client extends Thread {
                 awaitDisconnection(channelFuture);
             }
         } catch (InterruptedException e) {
-            logger.info("Connection({}) is closed.", targetServer.getHostPort());
+            logger.info("Connection({}) is closed.", myInfo.getHostPort());
         } finally {
             workerGroup.shutdownGracefully();
         }
@@ -71,7 +71,6 @@ public class Client extends Thread {
 
     public void await() {
         while (!isStartup) {
-            logger.info("await client startup.");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -82,18 +81,18 @@ public class Client extends Thread {
 
     private ChannelFuture connect(Bootstrap bootstrap)
             throws InterruptedException {
-        logger.info("Connecting to {}", targetServer.getHostPort());
+        logger.info("Connecting to {}", myInfo.getHostPort());
 
         ChannelFuture channelFuture;
         do {
-            channelFuture = bootstrap.connect(targetServer.getHost(),
-                    targetServer.getPort()).await();
+            channelFuture = bootstrap.connect(myInfo.getHost(),
+                    myInfo.getPort()).await();
             isStartup = true;
             Thread.sleep(100);
         } while (!channelFuture.isSuccess());
 
         logger.info("Connection({}) is established.",
-                targetServer.getHostPort());
+                myInfo.getHostPort());
 
         return channelFuture;
     }
@@ -101,11 +100,11 @@ public class Client extends Thread {
     private void update(ChannelFuture channelFuture) {
         // update member and memberInfo.
         AllMember.getInstance().getMemberInfos()
-                .put(targetServer, channelFuture, this);
+                .put(myInfo, channelFuture, this);
 
         // update status
-        if (targetServer.getStatus() == Status.SHUTDOWN) {
-            targetServer.setStatus(Status.STANDBY);
+        if (myInfo.getStatus() == Status.SHUTDOWN) {
+            myInfo.setStatus(Status.STANDBY);
         }
 
         logger.info(AllMember.getInstance().toString());
@@ -115,9 +114,9 @@ public class Client extends Thread {
             throws InterruptedException {
         channelFuture.channel().closeFuture().sync();
 
-        targetServer.setStatus(Status.SHUTDOWN);
+        myInfo.setStatus(Status.SHUTDOWN);
 
-        logger.info("Connection({}) is closed.", targetServer.getHostPort());
+        logger.info("Connection({}) is closed.", myInfo.getHostPort());
         logger.info(AllMember.getInstance().toString());
     }
 }
