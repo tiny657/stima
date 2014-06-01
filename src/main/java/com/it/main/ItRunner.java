@@ -64,9 +64,11 @@ public class ItRunner {
             }
 
             // change status to Running
-            AllMember.getInstance().getMember(server.getMyInfo())
+            Member myInfo = server.getMyInfo();
+            AllMember.getInstance()
+                    .getMember(myInfo.getHost(), myInfo.getPort())
                     .setStatus(Status.RUNNING);
-            ;
+
             logger.info(AllMember.getInstance().toString());
 
             Thread.sleep(3000);

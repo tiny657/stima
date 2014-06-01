@@ -50,10 +50,6 @@ public class AllMember {
         return clusters.getMemberListIn(cluster).getMembers();
     }
 
-    public Member getMember(Member member) {
-        return getMember(member.getHost(), member.getPort());
-    }
-
     public Member getMember(String host, int port) {
         for (String clusterName : clusters.getClusterNames()) {
             Member member = clusters.getMemberListIn(clusterName).findMember(
@@ -64,10 +60,6 @@ public class AllMember {
         }
 
         return null;
-    }
-
-    public void setStatus(Member member, Status status) {
-        clusters.setStatus(member, status);
     }
 
     public MemberInfos getMemberInfos() {

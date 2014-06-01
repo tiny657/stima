@@ -53,16 +53,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
             } else if (msg instanceof InfoCommand) {
                 InfoCommand cmd = (InfoCommand) msg;
                 Clusters clusters = cmd.getClusters();
-
-                // client start
-                Member member = clusters.findMe();
-                if (AllMember.getInstance().getMemberInfos().getClient(member) == null) {
-                    Client client = new Client(member);
-                    client.setClientHandler(ItRunner.getInstance()
-                            .getClientHandlerAdapter());
-                    client.start();
-                    client.await();
-                }
+                Member receivedMember = clusters.findMe();
 
                 // compare the received properties.
                 if (AllMember.getInstance().getClusters()
@@ -82,8 +73,11 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                 }
 
                 // update the status of the sender.
-                AllMember.getInstance().getMember(member)
-                        .setStatus(member.getStatus());
+                AllMember
+                        .getInstance()
+                        .getMember(receivedMember.getHost(),
+                                receivedMember.getPort())
+                        .setStatus(receivedMember.getStatus());
 
                 ReferenceCountUtil.release(msg);
             }
