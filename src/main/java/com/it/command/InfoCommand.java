@@ -13,4 +13,9 @@ public class InfoCommand extends Command {
     public void setClusters(Clusters clusters) {
         this.clusters = clusters;
     }
+
+    @Override
+    public String toString() {
+        return "InfoCommand";
+    }
 }

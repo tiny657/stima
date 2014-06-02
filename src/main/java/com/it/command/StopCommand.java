@@ -9,4 +9,9 @@ public class StopCommand extends Command {
     public StopCommand(String srcHost, int srcPort) {
         super(srcHost, srcPort);
     }
+    
+    @Override
+    public String toString() {
+        return "StopCommand";
+    }
 }

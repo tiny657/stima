@@ -31,11 +31,12 @@ public class Sender {
                 .getClusters().getMemberListMap().entrySet()) {
             for (Member member : entry.getValue().getMembers()) {
                 if (member.isRunning() && !member.isMe()) {
-                    logger.info("({}) was sent to {}.", msg.toString(),
-                            member.toString());
+                    member.increaseSentCount();
                     AllMember.getInstance().getMemberInfos()
                             .getChannelFuture(member).channel()
                             .writeAndFlush(msg);
+                    logger.info("({}) was sent to {}.", msg.toString(),
+                            member.toString());
                 }
             }
         }
@@ -52,10 +53,11 @@ public class Sender {
                     targetCluster);
             return false;
         } else {
-            logger.info("({}) was sent to {}.", msg.toString(),
-                    member.toString());
+            member.increaseSentCount();
             AllMember.getInstance().getMemberInfos().getChannelFuture(member)
                     .channel().writeAndFlush(msg);
+            logger.info("({}) was sent to {}.", msg.toString(),
+                    member.toString());
         }
 
         return true;

@@ -40,12 +40,12 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                         cmd.getSrcHost(), cmd.getSrcPort());
                 if (member != null) {
                     member.setStatus(Status.RUNNING);
-                    logger.info("StartCommand was received from {}.",
-                            cmd.toString());
+                    logger.info("StartCommand was received from {}:{}.",
+                            cmd.getSrcHost(), cmd.getSrcPort());
                 } else {
                     logger.error(
-                            "StartCommand was received from {}.  But that isn't existed.",
-                            cmd.toString());
+                            "StartCommand was received from {}:{}.  But that isn't existed.",
+                            cmd.getSrcHost(), cmd.getSrcPort());
                 }
                 ReferenceCountUtil.release(msg);
             } else if (msg instanceof StopCommand) {
@@ -54,12 +54,12 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                         cmd.getSrcHost(), cmd.getSrcPort());
                 if (member != null) {
                     member.setStatus(Status.STANDBY);
-                    logger.info("StopCommand was received from {}.",
-                            cmd.toString());
+                    logger.info("StopCommand was received from {}:{}.",
+                            cmd.getSrcHost(), cmd.getSrcPort());
                 } else {
                     logger.error(
-                            "StopCommand was received from {}.  But that isn't existed.",
-                            cmd.toString());
+                            "StopCommand was received from {}:{}.  But that isn't existed.",
+                            cmd.getSrcHost(), cmd.getSrcPort());
                 }
                 ReferenceCountUtil.release(msg);
             } else if (msg instanceof InfoCommand) {
@@ -95,7 +95,12 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
             }
             logger.info(AllMember.getInstance().toString());
         } else if (msg instanceof TestCommand) {
-            logger.info("TestCommand was received.");
+            TestCommand cmd = (TestCommand) msg;
+            Member me = AllMember.getInstance().getClusters().findMe();
+            me.increaseReceivedCount();
+
+            logger.info("TestCommand was received. (received: {})",
+                    me.getReceivedCount());
         }
     }
 

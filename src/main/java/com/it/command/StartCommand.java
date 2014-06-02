@@ -9,4 +9,9 @@ public class StartCommand extends Command {
     public StartCommand(String host, int port) {
         super(host, port);
     }
+    
+    @Override
+    public String toString() {
+        return "StartCommand";
+    }
 }

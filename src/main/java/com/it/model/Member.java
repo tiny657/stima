@@ -11,6 +11,7 @@ public class Member implements Comparable<Member>, Serializable {
     private int port;
     private Status status = Status.SHUTDOWN;
     private boolean me = false;
+    transient private long sentCount, receivedCount;
 
     public Member() {
     }
@@ -74,6 +75,22 @@ public class Member implements Comparable<Member>, Serializable {
         this.status = status;
     }
 
+    public long getSentcount() {
+        return sentCount;
+    }
+
+    public long increaseSentCount() {
+        return ++sentCount;
+    }
+
+    public long getReceivedCount() {
+        return receivedCount;
+    }
+
+    public long increaseReceivedCount() {
+        return ++receivedCount;
+    }
+
     public boolean equals(Member member) {
         return equals(member.host, member.port);
     }
@@ -101,6 +118,7 @@ public class Member implements Comparable<Member>, Serializable {
             status += ", me";
         }
 
-        return host + ":" + port + "(" + status + ")";
+        return host + ":" + port + "(" + status + ", sent: " + sentCount
+                + ", received: " + receivedCount + ")";
     }
 }
