@@ -1,5 +1,5 @@
 package com.it.common;
 
-public enum SenderType {
+public enum Type {
     BROADCAST, ANYCAST, UNICAST;
 }

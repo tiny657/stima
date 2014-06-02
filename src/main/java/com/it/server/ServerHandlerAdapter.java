@@ -16,7 +16,6 @@ import com.it.command.StartCommand;
 import com.it.command.StopCommand;
 import com.it.common.Config;
 import com.it.main.ClientHandler;
-import com.it.main.ItRunner;
 import com.it.main.TestCommand;
 import com.it.model.AllMember;
 import com.it.model.Clusters;
@@ -39,16 +38,29 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                 StartCommand cmd = (StartCommand) msg;
                 Member member = AllMember.getInstance().getMember(
                         cmd.getSrcHost(), cmd.getSrcPort());
-                member.setStatus(Status.RUNNING);
-                logger.info("StartCommand was received from {}.",
-                        cmd.toString());
+                if (member != null) {
+                    member.setStatus(Status.RUNNING);
+                    logger.info("StartCommand was received from {}.",
+                            cmd.toString());
+                } else {
+                    logger.error(
+                            "StartCommand was received from {}.  But that isn't existed.",
+                            cmd.toString());
+                }
                 ReferenceCountUtil.release(msg);
             } else if (msg instanceof StopCommand) {
                 StopCommand cmd = (StopCommand) msg;
                 Member member = AllMember.getInstance().getMember(
                         cmd.getSrcHost(), cmd.getSrcPort());
-                member.setStatus(Status.STANDBY);
-                logger.info("StopCommand was received from {}.", cmd.toString());
+                if (member != null) {
+                    member.setStatus(Status.STANDBY);
+                    logger.info("StopCommand was received from {}.",
+                            cmd.toString());
+                } else {
+                    logger.error(
+                            "StopCommand was received from {}.  But that isn't existed.",
+                            cmd.toString());
+                }
                 ReferenceCountUtil.release(msg);
             } else if (msg instanceof InfoCommand) {
                 InfoCommand cmd = (InfoCommand) msg;
