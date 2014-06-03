@@ -1,5 +1,6 @@
 package com.it.client;
 
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -10,6 +11,7 @@ import com.it.command.InfoCommand;
 import com.it.common.Config;
 import com.it.model.AllMember;
 
+@Sharable
 public class ClientHandlerAdapter extends ChannelHandlerAdapter {
     private static final Logger logger = LoggerFactory
             .getLogger(ClientHandlerAdapter.class);

@@ -1,5 +1,6 @@
 package com.it.server;
 
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
@@ -23,6 +24,7 @@ import com.it.model.Member;
 import com.it.model.MemberList;
 import com.it.model.Status;
 
+@Sharable
 public class ServerHandlerAdapter extends ChannelHandlerAdapter {
     private static final Logger logger = LoggerFactory
             .getLogger(ServerHandlerAdapter.class);

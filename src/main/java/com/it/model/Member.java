@@ -3,15 +3,22 @@ package com.it.model;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Member implements Comparable<Member>, Serializable {
-    private static final long serialVersionUID = -3329506897816445518L;
+    private static final long serialVersionUID = 1176857242699928766L;
+    private static final Logger logger = LoggerFactory.getLogger(Member.class);
 
     private String host;
     private int port;
     private Status status = Status.SHUTDOWN;
     private boolean me = false;
+
     transient private long sentCount, receivedCount;
+    transient private int nowSecond;
+    transient private int sentTPS, receivedTPS;
 
     public Member() {
     }
@@ -80,7 +87,15 @@ public class Member implements Comparable<Member>, Serializable {
     }
 
     public long increaseSentCount() {
-        return ++sentCount;
+        sentTPS++;
+        if (nowSecond != DateTime.now().getSecondOfDay()) {
+            logger.info("sentTPS: {}", sentTPS);
+            sentCount += sentTPS;
+            sentTPS = 0;
+            nowSecond = DateTime.now().getSecondOfDay();
+        }
+
+        return sentCount;
     }
 
     public long getReceivedCount() {
@@ -88,7 +103,15 @@ public class Member implements Comparable<Member>, Serializable {
     }
 
     public long increaseReceivedCount() {
-        return ++receivedCount;
+        receivedTPS++;
+        if (nowSecond != DateTime.now().getSecondOfDay()) {
+            logger.info("receivedTPS: {}", receivedTPS);
+            receivedCount += receivedTPS;
+            receivedTPS = 0;
+            nowSecond = DateTime.now().getSecondOfDay();
+        }
+
+        return receivedCount;
     }
 
     public boolean equals(Member member) {
