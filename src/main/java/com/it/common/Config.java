@@ -44,6 +44,7 @@ public class Config {
     private String propertiesFile;
     private String host;
     private int port;
+    private int spreadTime = 5;
     private boolean isAutoSpread;
 
     private Config() {
@@ -76,6 +77,14 @@ public class Config {
 
     public void setPort(int port) {
         this.port = port;
+    }
+    
+    public int getSpreadTime() {
+        return spreadTime;
+    }
+    
+    public void setSpreadTime(int spreadTime) {
+        this.spreadTime = spreadTime;
     }
 
     public boolean isAutoSpread() {

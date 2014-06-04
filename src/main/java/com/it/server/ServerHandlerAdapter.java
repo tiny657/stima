@@ -28,6 +28,7 @@ import com.it.model.Status;
 public class ServerHandlerAdapter extends ChannelHandlerAdapter {
     private static final Logger logger = LoggerFactory
             .getLogger(ServerHandlerAdapter.class);
+    private Clusters savedClusters = null;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -40,6 +41,12 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                 StartCommand cmd = (StartCommand) msg;
                 Member member = AllMember.getInstance().getMember(
                         cmd.getSrcHost(), cmd.getSrcPort());
+                if (savedClusters != null) {
+                    removeMembers(savedClusters);
+                    addMembers(savedClusters);
+                    logger.info("Appled the received properties.");
+                }
+
                 if (member != null) {
                     member.setStatus(Status.RUNNING);
                     logger.info("StartCommand was received from {}:{}.",
@@ -73,17 +80,23 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                 if (AllMember.getInstance().getClusters()
                         .isEarlier(clusters.getBootupTime())) {
                     if (AllMember.getInstance().getClusters().equals(clusters)) {
-                        logger.info("properties is same.");
+                        logger.info("Properties are same.");
+                        savedClusters = null;
                     } else {
-                        logger.info("properties is different.");
-                        removeMembers(clusters);
-                        addMembers(clusters);
+                        logger.info("Properties are different.");
+                        savedClusters = clusters;
                     }
 
                     logger.info("InfoCommand was received. {}.",
                             clusters.toString());
                 } else {
-                    logger.info("ignore the received InfoCommand because this server was started up late.");
+                    if (AllMember.getInstance().getClusters().equals(clusters)) {
+                        logger.info("Properties are same.");
+                    } else {
+                        logger.info(
+                                "Properties are different.  Stop this application in {} seconds if this properties don't spread to all members.",
+                                Config.getInstance().getSpreadTime());
+                    }
                 }
 
                 // update the status of the sender.
@@ -120,13 +133,13 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
     private void removeMembers(Clusters clusters) {
         Map<String, MemberList> removedmember = AllMember.getInstance()
                 .getClusters().diff(clusters);
-        logger.info("removed member : {}", removedmember.toString());
+        logger.info("Member({}) are removed.", removedmember.toString());
 
         for (String cluster : removedmember.keySet()) {
             // remove clister
             if (AllMember.getInstance().getMemberListIn(cluster).size() == removedmember
                     .get(cluster).size()) {
-                logger.info("removed cluster: {}", cluster);
+                logger.info("Cluster({}) is removed.", cluster);
                 AllMember.getInstance().removeCluster(cluster);
                 Config.getInstance().removeCluster(cluster);
             }
@@ -147,7 +160,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
     private void addMembers(Clusters clusters) {
         Map<String, MemberList> addedMember = clusters.diff(AllMember
                 .getInstance().getClusters());
-        logger.info("added member : " + addedMember.toString());
+        logger.info("Member({}) is added.", addedMember.toString());
 
         for (String cluster : addedMember.keySet()) {
             AllMember.getInstance().addCluster(cluster);

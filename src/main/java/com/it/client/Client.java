@@ -57,6 +57,7 @@ public class Client extends Thread {
                 }
             });
 
+            AllMember.getInstance().getMemberInfos().put(myInfo, this);
             while (true) {
                 ChannelFuture channelFuture = connect(bootstrap);
                 update(channelFuture);
@@ -91,16 +92,13 @@ public class Client extends Thread {
             Thread.sleep(100);
         } while (!channelFuture.isSuccess());
 
-        logger.info("Connection({}) is established.",
-                myInfo.getHostPort());
+        logger.info("Connection({}) is established.", myInfo.getHostPort());
 
         return channelFuture;
     }
 
     private void update(ChannelFuture channelFuture) {
-        // update member and memberInfo.
-        AllMember.getInstance().getMemberInfos()
-                .put(myInfo, channelFuture, this);
+        AllMember.getInstance().getMemberInfos().put(myInfo, channelFuture);
 
         // update status
         if (myInfo.getStatus() == Status.SHUTDOWN) {

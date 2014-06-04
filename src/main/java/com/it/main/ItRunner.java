@@ -71,7 +71,7 @@ public class ItRunner {
 
             logger.info(AllMember.getInstance().toString());
 
-            Thread.sleep(3000);
+            Thread.sleep(Config.getInstance().getSpreadTime() * 1000);
 
             // broadcast StartCommand
             Sender.sendBroadcast(new StartCommand(Config.getInstance()
