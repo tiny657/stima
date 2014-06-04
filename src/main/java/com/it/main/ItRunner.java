@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.it.client.Client;
 import com.it.client.ClientHandlerAdapter;
 import com.it.command.StartCommand;
+import com.it.command.StopCommand;
 import com.it.common.Config;
 import com.it.common.Sender;
 import com.it.model.AllMember;
@@ -77,11 +78,26 @@ public class ItRunner {
             Sender.sendBroadcast(new StartCommand(Config.getInstance()
                     .getHost(), Config.getInstance().getPort()));
         } catch (Exception e) {
-            shutdownNow();
+            shutdown();
         }
     }
 
-    public void shutdownNow() {
-        Runtime.getRuntime().exit(-1);
+    public void shutdown() {
+        Sender.sendBroadcast(new StopCommand(Config.getInstance().getHost(),
+                Config.getInstance().getPort()));
+
+        Member me = AllMember.getInstance().getClusters().findMe();
+        int waitTime = 100;
+        int maxWaitTime = 5000;
+        do {
+            try {
+                Thread.sleep(waitTime);
+                maxWaitTime -= waitTime;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            logger.info("await to shutdown.");
+        } while(me.getReceivedTPS() > 0 && maxWaitTime > 0);
+        System.exit(0);
     }
 }

@@ -16,7 +16,7 @@ public class Member implements Comparable<Member>, Serializable {
     private Status status = Status.SHUTDOWN;
     private boolean me = false;
 
-    transient private long sentCount, receivedCount;
+    transient private long totalSent, totalReceived;
     transient private int nowSecond;
     transient private int sentTPS, receivedTPS;
 
@@ -82,36 +82,52 @@ public class Member implements Comparable<Member>, Serializable {
         this.status = status;
     }
 
-    public long getSentcount() {
-        return sentCount;
+    public long getTotalSent() {
+        return totalSent;
+    }
+
+    public int getSentTPS() {
+        if (nowSecond != DateTime.now().getSecondOfDay()) {
+            sentTPS = 0;
+            nowSecond = DateTime.now().getSecondOfDay();
+        }
+        return sentTPS;
     }
 
     public long increaseSentCount() {
         sentTPS++;
+        totalSent++;
         if (nowSecond != DateTime.now().getSecondOfDay()) {
             logger.info("sentTPS: {}", sentTPS);
-            sentCount += sentTPS;
             sentTPS = 0;
             nowSecond = DateTime.now().getSecondOfDay();
         }
 
-        return sentCount;
+        return totalSent;
     }
 
-    public long getReceivedCount() {
-        return receivedCount;
+    public long getTotalReceived() {
+        return totalReceived;
+    }
+
+    public int getReceivedTPS() {
+        if (nowSecond != DateTime.now().getSecondOfDay()) {
+            receivedTPS = 0;
+            nowSecond = DateTime.now().getSecondOfDay();
+        }
+        return receivedTPS;
     }
 
     public long increaseReceivedCount() {
         receivedTPS++;
+        totalReceived++;
         if (nowSecond != DateTime.now().getSecondOfDay()) {
             logger.info("receivedTPS: {}", receivedTPS);
-            receivedCount += receivedTPS;
             receivedTPS = 0;
             nowSecond = DateTime.now().getSecondOfDay();
         }
 
-        return receivedCount;
+        return totalReceived;
     }
 
     public boolean equals(Member member) {
@@ -141,7 +157,7 @@ public class Member implements Comparable<Member>, Serializable {
             status += ", me";
         }
 
-        return host + ":" + port + "(" + status + ", sent: " + sentCount
-                + ", received: " + receivedCount + ")";
+        return host + ":" + port + "(" + status + ", sent: " + totalSent
+                + ", received: " + totalReceived + ")";
     }
 }

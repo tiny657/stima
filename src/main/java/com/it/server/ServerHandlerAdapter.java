@@ -115,7 +115,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
             me.increaseReceivedCount();
 
             logger.info("TestCommand was received. (received: {})",
-                    me.getReceivedCount());
+                    me.getTotalReceived());
         }
     }
 
