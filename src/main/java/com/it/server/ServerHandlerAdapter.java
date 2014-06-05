@@ -110,12 +110,8 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
             }
             logger.info(AllMember.getInstance().toString());
         } else if (msg instanceof TestCommand) {
-            TestCommand cmd = (TestCommand) msg;
             Member me = AllMember.getInstance().getClusters().findMe();
             me.increaseReceivedCount();
-
-            logger.info("TestCommand was received. (received: {})",
-                    me.getTotalReceived());
         }
     }
 

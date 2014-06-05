@@ -35,8 +35,6 @@ public class Sender {
                     AllMember.getInstance().getMemberInfos()
                             .getChannelFuture(member).channel()
                             .writeAndFlush(msg);
-                    logger.info("({}) was sent to {}.", msg.toString(),
-                            member.toString());
                 }
             }
         }
@@ -56,8 +54,6 @@ public class Sender {
             member.increaseSentCount();
             AllMember.getInstance().getMemberInfos().getChannelFuture(member)
                     .channel().writeAndFlush(msg);
-            logger.info("({}) was sent to {}.", msg.toString(),
-                    member.toString());
         }
 
         return true;

@@ -10,7 +10,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 
 public class Clusters implements Serializable {
-    private static final long serialVersionUID = 6434259282472434984L;
+    private static final long serialVersionUID = 3310797219667479354L;
 
     private Date bootupTime = new Date();
     private Map<String, MemberList> memberListMap = Maps.newHashMap();

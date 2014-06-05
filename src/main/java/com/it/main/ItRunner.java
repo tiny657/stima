@@ -78,6 +78,7 @@ public class ItRunner {
             Sender.sendBroadcast(new StartCommand(Config.getInstance()
                     .getHost(), Config.getInstance().getPort()));
         } catch (Exception e) {
+            e.printStackTrace();
             shutdown();
         }
     }
@@ -87,17 +88,7 @@ public class ItRunner {
                 Config.getInstance().getPort()));
 
         Member me = AllMember.getInstance().getClusters().findMe();
-        int waitTime = 100;
-        int maxWaitTime = 5000;
-        do {
-            try {
-                Thread.sleep(waitTime);
-                maxWaitTime -= waitTime;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            logger.info("await to shutdown.");
-        } while(me.getReceivedTPS() > 0 && maxWaitTime > 0);
-        System.exit(0);
+        AllMember.getInstance().getMemberInfos().getChannelFuture(me).channel()
+                .close();
     }
 }

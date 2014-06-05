@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Member implements Comparable<Member>, Serializable {
-    private static final long serialVersionUID = 1176857242699928766L;
+    private static final long serialVersionUID = -633161397329811060L;
     private static final Logger logger = LoggerFactory.getLogger(Member.class);
 
     private String host;
@@ -98,7 +98,7 @@ public class Member implements Comparable<Member>, Serializable {
         sentTPS++;
         totalSent++;
         if (nowSecond != DateTime.now().getSecondOfDay()) {
-            logger.info("sentTPS: {}", sentTPS);
+            logger.info("sent: {}/{}", sentTPS, totalSent);
             sentTPS = 0;
             nowSecond = DateTime.now().getSecondOfDay();
         }
@@ -122,7 +122,7 @@ public class Member implements Comparable<Member>, Serializable {
         receivedTPS++;
         totalReceived++;
         if (nowSecond != DateTime.now().getSecondOfDay()) {
-            logger.info("receivedTPS: {}", receivedTPS);
+            logger.info("received: {}/{}", receivedTPS, totalReceived);
             receivedTPS = 0;
             nowSecond = DateTime.now().getSecondOfDay();
         }

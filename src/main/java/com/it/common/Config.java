@@ -7,6 +7,7 @@ import java.util.List;
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import joptsimple.OptionSpecBuilder;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -40,12 +41,18 @@ public class Config {
             .accepts("port", "this server's port").withOptionalArg()
             .ofType(Integer.class).defaultsTo(0);
 
+    private OptionSpecBuilder senderOpt = parser.accepts("sender",
+            "If set, this is the sender.");
+
     private PropertiesConfiguration config;
     private String propertiesFile;
     private String host;
     private int port;
     private int spreadTime = 5;
     private boolean isAutoSpread;
+
+    // for test
+    private boolean isSender;
 
     private Config() {
     }
@@ -78,11 +85,11 @@ public class Config {
     public void setPort(int port) {
         this.port = port;
     }
-    
+
     public int getSpreadTime() {
         return spreadTime;
     }
-    
+
     public void setSpreadTime(int spreadTime) {
         this.spreadTime = spreadTime;
     }
@@ -93,6 +100,14 @@ public class Config {
 
     public void setAutoSpread(boolean isAutoSpread) {
         this.isAutoSpread = isAutoSpread;
+    }
+
+    public boolean isSender() {
+        return isSender;
+    }
+
+    public void setSender(boolean isSender) {
+        this.isSender = isSender;
     }
 
     public void addMember(String cluster, Member member) {
@@ -154,6 +169,9 @@ public class Config {
         setPropertiesFile(options.valueOf(propertiesOpt));
         setHost(options.valueOf(hostOpt));
         setPort(options.valueOf(portOpt));
+
+        // for test
+        setSender(options.has(senderOpt));
     }
 
     private void loadProperties() throws ConfigurationException {

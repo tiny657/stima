@@ -15,6 +15,7 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.it.model.AllMember;
 import com.it.model.Member;
 import com.it.model.Status;
 
@@ -69,6 +70,7 @@ public class Server extends Thread {
             ChannelFuture channelFuture = bootstrap.bind(myInfo.getPort())
                     .sync();
 
+            AllMember.getInstance().getMemberInfos().put(myInfo, channelFuture);
             myInfo.setStatus(Status.STANDBY);
             isStartup = true;
             logger.info("server started ({})", myInfo.toString());
