@@ -9,7 +9,6 @@ import java.util.Set;
 import org.junit.Test;
 
 public class ClustersTest {
-
     @Test
     public void addCluster() {
         // Given

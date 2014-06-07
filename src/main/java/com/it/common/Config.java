@@ -24,7 +24,7 @@ public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static Config instance = new Config();
 
-    private static final String DEFAULT_PROPERTIES_NAME = "server.properties";
+    private static final String DEFAULT_PROPERTIES_NAME = "member.properties";
     private static final String CLUSTER = "cluster";
     private static final String HOST = "myinfo.host";
     private static final String PORT = "myinfo.port";

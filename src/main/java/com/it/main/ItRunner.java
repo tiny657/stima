@@ -8,6 +8,7 @@ import com.it.client.ClientHandlerAdapter;
 import com.it.command.StartCommand;
 import com.it.command.StopCommand;
 import com.it.common.Config;
+import com.it.common.MailConfig;
 import com.it.common.Sender;
 import com.it.model.AllMember;
 import com.it.model.Clusters;
@@ -43,6 +44,7 @@ public class ItRunner {
 
         try {
             Config.getInstance().init(args);
+            MailConfig.getInstance().init(args);
             Clusters clusters = AllMember.getInstance().getClusters();
 
             // server
