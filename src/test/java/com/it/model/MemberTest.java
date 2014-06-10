@@ -55,59 +55,49 @@ public class MemberTest {
     }
 
     @Test
-    public void checkMasterOfPriorityWhenConnect() throws InterruptedException {
+    public void selectedMasterAsPriorityWhenConnected()
+            throws InterruptedException {
         // Given
         Member member1 = new Member();
-        member1.setMasterPriority(0);
-        member1.setBootupTime(new Date());
+        member1.setMasterPriority(1);
+        member1.setBootupTime(new Date()); // ignore
+        Thread.sleep(1);
+        Member member2 = new Member();
+        member2.setMasterPriority(2);
+        member2.setBootupTime(new Date()); // ignore
+
+        // When
+        member1.calculatePriorityPointWhenConnect(member2);
+        member2.calculatePriorityPointWhenConnect(member1);
+
+        // Then
+        assertThat(member1.isMaster(), is(true));
+        assertThat(member2.isStandby(), is(true));
+    }
+
+    @Test
+    public void selectedMasterAsPriorityWhenConnected2()
+            throws InterruptedException {
+        // Given
+        Member member1 = new Member();
+        member1.setMasterPriority(2);
+        member1.setBootupTime(new Date()); // ignore
         Thread.sleep(1);
         Member member2 = new Member();
         member2.setMasterPriority(1);
-        member2.setBootupTime(new Date());
-
-        Member member3 = new Member();
-        member3.setMasterPriority(1);
-        member3.setBootupTime(new Date());
-        Thread.sleep(1);
-        Member member4 = new Member();
-        member4.setMasterPriority(0);
-        member4.setBootupTime(new Date());
-
-        // When
-        member1.calculatePriorityPointWhenConnect(member2);
-        member2.calculatePriorityPointWhenConnect(member1);
-        member3.calculatePriorityPointWhenConnect(member4);
-        member4.calculatePriorityPointWhenConnect(member3);
-
-        // Then
-        assertThat(member1.isMaster(), is(true));
-        assertThat(member2.isSlave(), is(true));
-        assertThat(member3.isSlave(), is(true));
-        assertThat(member4.isMaster(), is(true));
-    }
-
-    @Test
-    public void checkMasterOfBootupWhenConnect() throws InterruptedException {
-        // Given
-        Member member1 = new Member();
-        member1.setMasterPriority(0);
-        member1.setBootupTime(new Date());
-        Thread.sleep(1);
-        Member member2 = new Member();
-        member2.setMasterPriority(0);
-        member2.setBootupTime(new Date());
+        member2.setBootupTime(new Date()); // ignore
 
         // When
         member1.calculatePriorityPointWhenConnect(member2);
         member2.calculatePriorityPointWhenConnect(member1);
 
         // Then
-        assertThat(member1.isMaster(), is(true));
-        assertThat(member2.isSlave(), is(true));
+        assertThat(member1.isStandby(), is(true));
+        assertThat(member2.isMaster(), is(true));
     }
 
     @Test
-    public void checkMasterOfPriorityWhenDisconnect()
+    public void selectedMasterExceptPriority0WhenConnected()
             throws InterruptedException {
         // Given
         Member member1 = new Member();
@@ -116,6 +106,124 @@ public class MemberTest {
         Thread.sleep(1);
         Member member2 = new Member();
         member2.setMasterPriority(1);
+        member2.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member3 = new Member();
+        member3.setMasterPriority(0);
+        member3.setBootupTime(new Date());
+
+        // When
+        member1.calculatePriorityPointWhenConnect(member2);
+        member1.calculatePriorityPointWhenConnect(member3);
+        member2.calculatePriorityPointWhenConnect(member1);
+        member2.calculatePriorityPointWhenConnect(member3);
+        member3.calculatePriorityPointWhenConnect(member1);
+        member3.calculatePriorityPointWhenConnect(member2);
+
+        // Then
+        assertThat(member1.isStandby(), is(true));
+        assertThat(member2.isMaster(), is(true));
+        assertThat(member3.isStandby(), is(true));
+    }
+
+    @Test
+    public void selectedMasterAsBootupWhenConnected()
+            throws InterruptedException {
+        // Given
+        Member member1 = new Member();
+        member1.setMasterPriority(1);
+        member1.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member2 = new Member();
+        member2.setMasterPriority(1);
+        member2.setBootupTime(new Date());
+
+        // When
+        member1.calculatePriorityPointWhenConnect(member2);
+        member2.calculatePriorityPointWhenConnect(member1);
+
+        // Then
+        assertThat(member1.isMaster(), is(true));
+        assertThat(member2.isStandby(), is(true));
+    }
+
+    @Test
+    public void selectedMasterAsBootupExceptPriority0WhenConnected()
+            throws InterruptedException {
+        // Given
+        Member member1 = new Member();
+        member1.setMasterPriority(0);
+        member1.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member2 = new Member();
+        member2.setMasterPriority(1);
+        member2.setBootupTime(new Date());
+
+        // When
+        member1.calculatePriorityPointWhenConnect(member2);
+        member2.calculatePriorityPointWhenConnect(member1);
+
+        // Then
+        assertThat(member1.isStandby(), is(true));
+        assertThat(member2.isMaster(), is(true));
+    }
+
+    @Test
+    public void selectedMasterAsPriorityWhenDisconnected()
+            throws InterruptedException {
+        // Given
+        Member member1 = new Member();
+        member1.setMasterPriority(1);
+        member1.setBootupTime(new Date()); // ignore
+        Thread.sleep(1);
+        Member member2 = new Member();
+        member2.setMasterPriority(2);
+        member2.setBootupTime(new Date()); // ignore
+
+        member1.calculatePriorityPointWhenConnect(member2);
+        member2.calculatePriorityPointWhenConnect(member1);
+
+        // When
+        // member1 is down
+        member2.calculatePriorityPointWhenDisconnect(member1);
+
+        // Then
+        assertThat(member2.isMaster(), is(true));
+    }
+
+    @Test
+    public void selectedMasterExceptPriority0WhenDisconnected()
+            throws InterruptedException {
+        // Given
+        Member member1 = new Member();
+        member1.setMasterPriority(1);
+        member1.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member2 = new Member();
+        member2.setMasterPriority(0);
+        member2.setBootupTime(new Date());
+
+        member1.calculatePriorityPointWhenConnect(member2);
+        member2.calculatePriorityPointWhenConnect(member1);
+
+        // When
+        // case: member1 is down
+        member2.calculatePriorityPointWhenDisconnect(member1);
+
+        // Then
+        assertThat(member2.isStandby(), is(true));
+    }
+
+    @Test
+    public void selectedMasterExceptPriority0WhenDisconnected2()
+            throws InterruptedException {
+        // Given
+        Member member1 = new Member();
+        member1.setMasterPriority(1);
+        member1.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member2 = new Member();
+        member2.setMasterPriority(0);
         member2.setBootupTime(new Date());
         Thread.sleep(1);
         Member member3 = new Member();
@@ -130,47 +238,13 @@ public class MemberTest {
         member3.calculatePriorityPointWhenConnect(member2);
 
         // When
-        member1.calculatePriorityPointWhenDisconnect(member2);
+        // case: member1 is down
         member2.calculatePriorityPointWhenDisconnect(member1);
         member3.calculatePriorityPointWhenDisconnect(member1);
 
         // Then
-        assertThat(member1.isMaster(), is(true));
-        assertThat(member2.isMaster(), is(true));
-        assertThat(member3.isSlave(), is(true));
-    }
-
-    @Test
-    public void checkMasterOfBootupWhenDisconnect() throws InterruptedException {
-        // Given
-        Member member1 = new Member();
-        member1.setMasterPriority(0);
-        member1.setBootupTime(new Date());
-        Thread.sleep(1);
-        Member member2 = new Member();
-        member2.setMasterPriority(0);
-        member2.setBootupTime(new Date());
-        Thread.sleep(1);
-        Member member3 = new Member();
-        member3.setMasterPriority(0);
-        member3.setBootupTime(new Date());
-
-        member1.calculatePriorityPointWhenConnect(member2);
-        member1.calculatePriorityPointWhenConnect(member3);
-        member2.calculatePriorityPointWhenConnect(member1);
-        member2.calculatePriorityPointWhenConnect(member3);
-        member3.calculatePriorityPointWhenConnect(member1);
-        member3.calculatePriorityPointWhenConnect(member2);
-
-        // When
-        member1.calculatePriorityPointWhenDisconnect(member2);
-        member2.calculatePriorityPointWhenDisconnect(member1);
-        member3.calculatePriorityPointWhenDisconnect(member1);
-
-        // Then
-        assertThat(member1.isMaster(), is(true));
-        assertThat(member2.isMaster(), is(true));
-        assertThat(member3.isSlave(), is(true));
+        assertThat(member2.isStandby(), is(true));
+        assertThat(member3.isMaster(), is(true));
     }
 
     @Test

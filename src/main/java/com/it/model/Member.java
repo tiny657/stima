@@ -11,7 +11,8 @@ import org.slf4j.LoggerFactory;
 import com.it.common.Utils;
 
 public class Member implements Comparable<Member>, Serializable {
-    private static final long serialVersionUID = 4145607009200321641L;
+    private static final long serialVersionUID = -5112411599686358922L;
+
     private static final Logger logger = LoggerFactory.getLogger(Member.class);
 
     private Date bootupTime;
@@ -77,10 +78,14 @@ public class Member implements Comparable<Member>, Serializable {
     }
 
     public boolean isMaster() {
+        if (getMasterPriority() == 0) {
+            return false;
+        }
+
         return getPriorityPoint() == 0;
     }
 
-    public boolean isSlave() {
+    public boolean isStandby() {
         return !isMaster();
     }
 
@@ -97,31 +102,29 @@ public class Member implements Comparable<Member>, Serializable {
     }
 
     public void calculatePriorityPointWhenConnect(Member member) {
+        if (getMasterPriority() == 0 || member.getMasterPriority() == 0) {
+            return;
+        }
+
         if (masterPriority > member.getMasterPriority()) {
             increasePriorityPoint();
-        } else if (masterPriority < member.getMasterPriority()) {
-            member.increasePriorityPoint();
-        } else {
-            if (isEarlier(member)) {
-                member.increasePriorityPoint();
-            } else {
-                increasePriorityPoint();
-            }
+        } else if (masterPriority == member.getMasterPriority()
+                && !isEarlier(member)) {
+            increasePriorityPoint();
         }
         logger.info("master: {}", isMaster());
     }
 
     public void calculatePriorityPointWhenDisconnect(Member member) {
+        if (getMasterPriority() == 0 || member.getMasterPriority() == 0) {
+            return;
+        }
+
         if (masterPriority > member.getMasterPriority()) {
             decreasePriorityPoint();
-        } else if (masterPriority < member.getMasterPriority()) {
-            member.decreasePriorityPoint();
-        } else {
-            if (isEarlier(member)) {
-                member.decreasePriorityPoint();
-            } else {
-                decreasePriorityPoint();
-            }
+        } else if (masterPriority == member.getMasterPriority()
+                && !isEarlier(member)) {
+            decreasePriorityPoint();
         }
         logger.info("master: {}", isMaster());
     }

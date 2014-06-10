@@ -205,9 +205,9 @@ public class Config {
             }
         }
 
-        // add master.priority & bootup time.
+        // set master.priority & bootup time.
         Member me = AllMember.getInstance().me();
-        me.setMasterPriority(config.getInt(MASTER_PRIORITY));
+        me.setMasterPriority(config.getInt(MASTER_PRIORITY, 0));
         me.setBootupTime(new Date());
     }
 
