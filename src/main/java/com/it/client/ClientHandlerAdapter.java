@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.it.command.InfoCommand;
-import com.it.common.Config;
+import com.it.config.MemberConfig;
 import com.it.model.AllMember;
 
 @Sharable
@@ -18,7 +18,7 @@ public class ClientHandlerAdapter extends ChannelHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        if (Config.getInstance().isAutoSpread()) {
+        if (MemberConfig.getInstance().isAutoSpread()) {
             InfoCommand infoCommand = new InfoCommand();
             infoCommand.setClusters(AllMember.getInstance().getClusters());
             ctx.channel().writeAndFlush(infoCommand);

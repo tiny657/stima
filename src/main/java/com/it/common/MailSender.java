@@ -12,6 +12,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.it.config.MailConfig;
+
 public class MailSender {
     public static MailSender mailSender = new MailSender();
     private Properties props;

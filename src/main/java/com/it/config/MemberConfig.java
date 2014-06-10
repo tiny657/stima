@@ -1,14 +1,9 @@
-package com.it.common;
+package com.it.config;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-
-import joptsimple.ArgumentAcceptingOptionSpec;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpecBuilder;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -21,30 +16,17 @@ import com.google.common.base.Joiner;
 import com.it.model.AllMember;
 import com.it.model.Member;
 
-public class Config {
-    private static final Logger logger = LoggerFactory.getLogger(Config.class);
-    private static Config instance = new Config();
+public class MemberConfig {
+    private static final Logger logger = LoggerFactory
+            .getLogger(MemberConfig.class);
+    private static MemberConfig instance = new MemberConfig();
 
-    private static final String DEFAULT_PROPERTIES_NAME = "member.properties";
     private static final String CLUSTER = "cluster";
     private static final String HOST = "myinfo.host";
     private static final String PORT = "myinfo.port";
     private static final String AUTO_SPREAD = "config.autoSpread";
+    private static final String SPREAD_TIME = "config.spreadTime";
     private static final String MASTER_PRIORITY = "master.priority";
-
-    private OptionParser parser = new OptionParser();
-    private ArgumentAcceptingOptionSpec<String> propertiesOpt = parser
-            .accepts("prop", "properties file").withOptionalArg()
-            .ofType(String.class).defaultsTo(DEFAULT_PROPERTIES_NAME);
-    private ArgumentAcceptingOptionSpec<String> hostOpt = parser
-            .accepts("host", "this server's host").withOptionalArg()
-            .ofType(String.class).defaultsTo(StringUtils.EMPTY);
-    private ArgumentAcceptingOptionSpec<Integer> portOpt = parser
-            .accepts("port", "this server's port").withOptionalArg()
-            .ofType(Integer.class).defaultsTo(0);
-
-    private OptionSpecBuilder senderOpt = parser.accepts("sender",
-            "If set, this is the sender.");
 
     private PropertiesConfiguration config;
     private String propertiesFile;
@@ -56,18 +38,20 @@ public class Config {
     // for test
     private boolean isSender;
 
-    private Config() {
+    private MemberConfig() {
     }
 
-    public static Config getInstance() {
+    public static MemberConfig getInstance() {
         return instance;
+    }
+
+    public void setPropertiesFile(String propertiesFile) {
+        this.propertiesFile = propertiesFile;
     }
 
     public void init(String[] args) throws FileNotFoundException, IOException,
             Exception {
-        loadJoptOptions(args);
         loadProperties();
-
         logger.info(" * Config");
         logger.info(AllMember.getInstance().toString());
     }
@@ -166,19 +150,13 @@ public class Config {
         return CLUSTER + "." + cluster;
     }
 
-    private void loadJoptOptions(String[] args) {
-        OptionSet options = parser.parse(args);
-        setPropertiesFile(options.valueOf(propertiesOpt));
-        setHost(options.valueOf(hostOpt));
-        setPort(options.valueOf(portOpt));
-
-        // for test
-        setSender(options.has(senderOpt));
-    }
-
     private void loadProperties() throws ConfigurationException {
         config = new PropertiesConfiguration(propertiesFile);
         config.setAutoSave(true);
+
+        // from jopt
+        setHost(JoptConfig.getInstance().getHost());
+        setPort(JoptConfig.getInstance().getPort());
 
         if (host.equals(StringUtils.EMPTY)) {
             setHost(config.getString(HOST));
@@ -189,6 +167,7 @@ public class Config {
         }
 
         setAutoSpread(config.getBoolean(AUTO_SPREAD));
+        setSpreadTime(config.getInt(SPREAD_TIME));
 
         // add cluster
         AllMember.getInstance().addCluster(getClustersArray());
@@ -209,9 +188,5 @@ public class Config {
         Member me = AllMember.getInstance().me();
         me.setMasterPriority(config.getInt(MASTER_PRIORITY, 0));
         me.setBootupTime(new Date());
-    }
-
-    private void setPropertiesFile(String propertiesFile) {
-        this.propertiesFile = propertiesFile;
     }
 }

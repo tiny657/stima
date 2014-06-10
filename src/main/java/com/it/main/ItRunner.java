@@ -7,9 +7,10 @@ import com.it.client.Client;
 import com.it.client.ClientHandlerAdapter;
 import com.it.command.StartCommand;
 import com.it.command.StopCommand;
-import com.it.common.Config;
-import com.it.common.MailConfig;
 import com.it.common.Sender;
+import com.it.config.JoptConfig;
+import com.it.config.MailConfig;
+import com.it.config.MemberConfig;
 import com.it.model.AllMember;
 import com.it.model.Clusters;
 import com.it.model.Member;
@@ -43,7 +44,8 @@ public class ItRunner {
         this.clientHandlerAdapter = clientHandlerAdapter;
 
         try {
-            Config.getInstance().init(args);
+            JoptConfig.getInstance().init(args);
+            MemberConfig.getInstance().init(args);
             MailConfig.getInstance().init(args);
             Clusters clusters = AllMember.getInstance().getClusters();
             Member me = AllMember.getInstance().me();
@@ -75,11 +77,11 @@ public class ItRunner {
 
             logger.info(AllMember.getInstance().toString());
 
-            Thread.sleep(Config.getInstance().getSpreadTime() * 1000);
+            Thread.sleep(MemberConfig.getInstance().getSpreadTime() * 1000);
 
             // broadcast StartCommand
-            Sender.sendBroadcast(new StartCommand(Config.getInstance()
-                    .getHost(), Config.getInstance().getPort()));
+            Sender.sendBroadcast(new StartCommand(MemberConfig.getInstance()
+                    .getHost(), MemberConfig.getInstance().getPort()));
         } catch (Exception e) {
             e.printStackTrace();
             shutdown();
@@ -87,8 +89,8 @@ public class ItRunner {
     }
 
     public void shutdown() {
-        Sender.sendBroadcast(new StopCommand(Config.getInstance().getHost(),
-                Config.getInstance().getPort()));
+        Sender.sendBroadcast(new StopCommand(MemberConfig.getInstance().getHost(),
+                MemberConfig.getInstance().getPort()));
 
         Member me = AllMember.getInstance().me();
         AllMember.getInstance().getMemberInfos().getChannelFuture(me).channel()

@@ -15,7 +15,7 @@ import com.it.command.Command;
 import com.it.command.InfoCommand;
 import com.it.command.StartCommand;
 import com.it.command.StopCommand;
-import com.it.common.Config;
+import com.it.config.MemberConfig;
 import com.it.main.ClientHandler;
 import com.it.main.TestCommand;
 import com.it.model.AllMember;
@@ -94,7 +94,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                     } else {
                         logger.info(
                                 "Properties are different.  Stop this application in {} seconds if this properties don't spread to all members.",
-                                Config.getInstance().getSpreadTime());
+                                MemberConfig.getInstance().getSpreadTime());
                     }
                 }
 
@@ -135,7 +135,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                     .get(cluster).size()) {
                 logger.info("Cluster({}) is removed.", cluster);
                 AllMember.getInstance().removeCluster(cluster);
-                Config.getInstance().removeCluster(cluster);
+                MemberConfig.getInstance().removeCluster(cluster);
             }
 
             for (Member member : removedmember.get(cluster).getMembers()) {
@@ -146,7 +146,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                 // remove the client and the client info
                 AllMember.getInstance().removeMember(cluster, member);
                 AllMember.getInstance().getMemberInfos().removeInfo(member);
-                Config.getInstance().removeMember(cluster, member);
+                MemberConfig.getInstance().removeMember(cluster, member);
             }
         }
     }
@@ -167,7 +167,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                 // add the client data
                 AllMember.getInstance().addMember(cluster, member);
                 AllMember.getInstance().getMemberInfos().put(member, client);
-                Config.getInstance().addMember(cluster, member);
+                MemberConfig.getInstance().addMember(cluster, member);
             }
         }
     }

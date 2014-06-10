@@ -1,23 +1,20 @@
-package com.it.common;
+package com.it.config;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import joptsimple.ArgumentAcceptingOptionSpec;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.it.common.MailSender;
+
 public class MailConfig {
     private static final Logger logger = LoggerFactory
             .getLogger(MailConfig.class);
     private static MailConfig instance = new MailConfig();
 
-    private static final String DEFAULT_MAIL_PROPERTIES_NAME = "mail.properties";
     private static final String MASTER_PRIORITY = "master.priority";
     private static final String MAIL_SMTP_STARTTLS_ENABLE = "mail.smtp.starttls.enable";
     private static final String MAIL_SMTP_AUTH = "mail.smtp.auth";
@@ -25,11 +22,6 @@ public class MailConfig {
     private static final String MAIL_SMTP_PORT = "mail.smtp.port";
     private static final String MAIL_ID = "mail.id";
     private static final String MAIL_PASSWORD = "mail.password";
-
-    private OptionParser parser = new OptionParser();
-//    private ArgumentAcceptingOptionSpec<String> propertiesOpt = parser
-//            .accepts("mailProp", "properties file").withOptionalArg()
-//            .ofType(String.class).defaultsTo(DEFAULT_MAIL_PROPERTIES_NAME);
 
     private PropertiesConfiguration config;
     private String propertiesFile;
@@ -50,15 +42,13 @@ public class MailConfig {
         return instance;
     }
 
-    public void init(String[] args) throws FileNotFoundException, IOException,
-            Exception {
-//        loadJoptOptions(args);
-        loadProperties();
+    public void setPropertiesFile(String propertiesFile) {
+        this.propertiesFile = propertiesFile;
     }
 
-    private void loadJoptOptions(String[] args) {
-//        OptionSet options = parser.parse(args);
-//        setPropertiesFile(options.valueOf(propertiesOpt));
+    public void init(String[] args) throws FileNotFoundException, IOException,
+            Exception {
+        loadProperties();
     }
 
     private void loadProperties() {
@@ -85,10 +75,6 @@ public class MailConfig {
 
     public int getMasterPriority() {
         return masterPriority;
-    }
-
-    private void setPropertiesFile(String propertiesFile) {
-        this.propertiesFile = propertiesFile;
     }
 
     public boolean isStarttlsEnable() {
