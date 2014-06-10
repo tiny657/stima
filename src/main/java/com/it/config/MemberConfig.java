@@ -35,9 +35,6 @@ public class MemberConfig {
     private int spreadTime = 5;
     private boolean isAutoSpread;
 
-    // for test
-    private boolean isSender;
-
     private MemberConfig() {
     }
 
@@ -86,14 +83,6 @@ public class MemberConfig {
 
     public void setAutoSpread(boolean isAutoSpread) {
         this.isAutoSpread = isAutoSpread;
-    }
-
-    public boolean isSender() {
-        return isSender;
-    }
-
-    public void setSender(boolean isSender) {
-        this.isSender = isSender;
     }
 
     public void addMember(String cluster, Member member) {

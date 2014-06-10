@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.it.command.Command;
 import com.it.model.AllMember;
 import com.it.model.Member;
 import com.it.model.MemberList;
@@ -31,7 +32,9 @@ public class Sender {
                 .getClusters().getMemberListMap().entrySet()) {
             for (Member member : entry.getValue().getMembers()) {
                 if (member.isRunning() && !member.isMe()) {
-                    member.increaseSentCount();
+                    if (!(msg instanceof Command)) {
+                        member.increaseSentCount();
+                    }
                     AllMember.getInstance().getMemberInfos()
                             .getChannelFuture(member).channel()
                             .writeAndFlush(msg);
@@ -51,7 +54,9 @@ public class Sender {
                     targetCluster);
             return false;
         } else {
-            member.increaseSentCount();
+            if (!(msg instanceof Command)) {
+                member.increaseSentCount();
+            }
             AllMember.getInstance().getMemberInfos().getChannelFuture(member)
                     .channel().writeAndFlush(msg);
         }

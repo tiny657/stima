@@ -180,7 +180,7 @@ public class Member implements Comparable<Member>, Serializable {
         sentTPS++;
         totalSent++;
         if (nowSecond != DateTime.now().getSecondOfDay()) {
-            logger.info("sent: {}/{}", sentTPS, totalSent);
+            logger.info("sentTps: {}, totalSent: {}", sentTPS, totalSent);
             sentTPS = 0;
             nowSecond = DateTime.now().getSecondOfDay();
         }
@@ -204,7 +204,8 @@ public class Member implements Comparable<Member>, Serializable {
         receivedTPS++;
         totalReceived++;
         if (nowSecond != DateTime.now().getSecondOfDay()) {
-            logger.info("received: {}/{}", receivedTPS, totalReceived);
+            logger.info("receivedTps: {}, totalReceived: {}", receivedTPS,
+                    totalReceived);
             receivedTPS = 0;
             nowSecond = DateTime.now().getSecondOfDay();
         }
