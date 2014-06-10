@@ -62,6 +62,8 @@ public class Client extends Thread {
                 ChannelFuture channelFuture = connect(bootstrap);
                 update(channelFuture);
                 awaitDisconnection(channelFuture);
+                AllMember.getInstance().me()
+                        .calculatePriorityPointWhenDisconnect(myInfo);
             }
         } catch (InterruptedException e) {
             logger.info("Connection({}) is closed.", myInfo.getHostPort());

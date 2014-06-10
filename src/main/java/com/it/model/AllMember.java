@@ -5,11 +5,19 @@ import java.util.Map;
 
 public class AllMember {
     public static AllMember instance = new AllMember();
+    private Member me = null;
     private Clusters clusters = new Clusters();
     private MemberInfos memberInfos = new MemberInfos();
 
     public static AllMember getInstance() {
         return instance;
+    }
+
+    public Member me() {
+        if (me == null) {
+            me = getClusters().findMe();
+        }
+        return me;
     }
 
     public void addCluster(String[] clusterNames) {

@@ -46,9 +46,10 @@ public class ItRunner {
             Config.getInstance().init(args);
             MailConfig.getInstance().init(args);
             Clusters clusters = AllMember.getInstance().getClusters();
+            Member me = AllMember.getInstance().me();
 
             // server
-            Server server = new Server(clusters.findMe());
+            Server server = new Server(me);
             server.setServerHandler(serverHandlerAdapter);
             server.start();
             server.await();
@@ -89,7 +90,7 @@ public class ItRunner {
         Sender.sendBroadcast(new StopCommand(Config.getInstance().getHost(),
                 Config.getInstance().getPort()));
 
-        Member me = AllMember.getInstance().getClusters().findMe();
+        Member me = AllMember.getInstance().me();
         AllMember.getInstance().getMemberInfos().getChannelFuture(me).channel()
                 .close();
     }

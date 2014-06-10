@@ -77,8 +77,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                 Member receivedMember = clusters.findMe();
 
                 // compare the received properties.
-                if (AllMember.getInstance().getClusters()
-                        .isEarlier(clusters.getBootupTime())) {
+                if (AllMember.getInstance().me().isEarlier(receivedMember)) {
                     if (AllMember.getInstance().getClusters().equals(clusters)) {
                         logger.info("Properties are same.");
                         savedClusters = null;
@@ -100,18 +99,17 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
                 }
 
                 // update the status of the sender.
-                AllMember
-                        .getInstance()
-                        .getMember(receivedMember.getHost(),
-                                receivedMember.getPort())
-                        .setStatus(receivedMember.getStatus());
+                Member receivedMemberInLocal = AllMember.getInstance().getMember(receivedMember.getHost(), receivedMember.getPort());
+                receivedMemberInLocal.setStatus(receivedMember.getStatus());
+                receivedMemberInLocal.setBootupTime(receivedMember.getBootupTime());
 
+                AllMember.getInstance().me()
+                        .calculatePriorityPointWhenConnect(receivedMember);
                 ReferenceCountUtil.release(msg);
             }
             logger.info(AllMember.getInstance().toString());
         } else if (msg instanceof TestCommand) {
-            Member me = AllMember.getInstance().getClusters().findMe();
-            me.increaseReceivedCount();
+            AllMember.getInstance().me().increaseReceivedCount();
         }
     }
 
@@ -141,11 +139,11 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
             }
 
             for (Member member : removedmember.get(cluster).getMembers()) {
-                // stop client thread
+                // stop the client thread
                 AllMember.getInstance().getMemberInfos().getClient(member)
                         .interrupt();
 
-                // remove client and client info
+                // remove the client and the client info
                 AllMember.getInstance().removeMember(cluster, member);
                 AllMember.getInstance().getMemberInfos().removeInfo(member);
                 Config.getInstance().removeMember(cluster, member);
@@ -161,12 +159,12 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
         for (String cluster : addedMember.keySet()) {
             AllMember.getInstance().addCluster(cluster);
             for (Member member : addedMember.get(cluster).getMembers()) {
-                // start client
+                // start the client
                 Client client = new Client(member);
                 client.setClientHandler(new ClientHandler());
                 client.start();
 
-                // add client data
+                // add the client data
                 AllMember.getInstance().addMember(cluster, member);
                 AllMember.getInstance().getMemberInfos().put(member, client);
                 Config.getInstance().addMember(cluster, member);

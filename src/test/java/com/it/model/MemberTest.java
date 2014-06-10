@@ -3,9 +3,176 @@ package com.it.model;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.util.Date;
+
 import org.junit.Test;
 
 public class MemberTest {
+    @Test
+    public void validatePort() {
+        // When
+        Member memberWithValidPort = new Member("host", 1);
+        Member memberWithInvalidPort1 = new Member("host", 0);
+        Member memberWithInvalidPort2 = new Member("host", 70000);
+
+        // Then
+        assertThat(memberWithValidPort.getPort(), is(not(0)));
+        assertThat(memberWithInvalidPort1.getPort(), is(0));
+        assertThat(memberWithInvalidPort2.getPort(), is(0));
+    }
+
+    @Test
+    public void isMe() {
+        // When
+        Member me = new Member("host", 1, "host", 1);
+        Member notMe1 = new Member("host", 1, "host", 2);
+        Member notMe2 = new Member("host1", 2, "host2", 2);
+
+        // Then
+        assertThat(me.isMe(), is(true));
+        assertThat(notMe1.isMe(), is(false));
+        assertThat(notMe2.isMe(), is(false));
+    }
+
+    @Test
+    public void isEarlier() throws InterruptedException {
+        // Given
+        Member member1 = new Member();
+        member1.setBootupTime(new Date());
+        Thread.sleep(10);
+        Member member2 = new Member();
+        member2.setBootupTime(new Date());
+
+        // When
+        boolean earlier1 = member1.isEarlier(member2);
+        boolean earlier2 = member2.isEarlier(member1);
+        boolean earlier3 = member1.isEarlier(member1);
+
+        // Then
+        assertThat(earlier1, is(true));
+        assertThat(earlier2, is(false));
+        assertThat(earlier3, is(false));
+    }
+
+    @Test
+    public void checkMasterOfPriorityWhenConnect() throws InterruptedException {
+        // Given
+        Member member1 = new Member();
+        member1.setMasterPriority(0);
+        member1.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member2 = new Member();
+        member2.setMasterPriority(1);
+        member2.setBootupTime(new Date());
+
+        Member member3 = new Member();
+        member3.setMasterPriority(1);
+        member3.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member4 = new Member();
+        member4.setMasterPriority(0);
+        member4.setBootupTime(new Date());
+
+        // When
+        member1.calculatePriorityPointWhenConnect(member2);
+        member2.calculatePriorityPointWhenConnect(member1);
+        member3.calculatePriorityPointWhenConnect(member4);
+        member4.calculatePriorityPointWhenConnect(member3);
+
+        // Then
+        assertThat(member1.isMaster(), is(true));
+        assertThat(member2.isSlave(), is(true));
+        assertThat(member3.isSlave(), is(true));
+        assertThat(member4.isMaster(), is(true));
+    }
+
+    @Test
+    public void checkMasterOfBootupWhenConnect() throws InterruptedException {
+        // Given
+        Member member1 = new Member();
+        member1.setMasterPriority(0);
+        member1.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member2 = new Member();
+        member2.setMasterPriority(0);
+        member2.setBootupTime(new Date());
+
+        // When
+        member1.calculatePriorityPointWhenConnect(member2);
+        member2.calculatePriorityPointWhenConnect(member1);
+
+        // Then
+        assertThat(member1.isMaster(), is(true));
+        assertThat(member2.isSlave(), is(true));
+    }
+
+    @Test
+    public void checkMasterOfPriorityWhenDisconnect()
+            throws InterruptedException {
+        // Given
+        Member member1 = new Member();
+        member1.setMasterPriority(0);
+        member1.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member2 = new Member();
+        member2.setMasterPriority(1);
+        member2.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member3 = new Member();
+        member3.setMasterPriority(2);
+        member3.setBootupTime(new Date());
+
+        member1.calculatePriorityPointWhenConnect(member2);
+        member1.calculatePriorityPointWhenConnect(member3);
+        member2.calculatePriorityPointWhenConnect(member1);
+        member2.calculatePriorityPointWhenConnect(member3);
+        member3.calculatePriorityPointWhenConnect(member1);
+        member3.calculatePriorityPointWhenConnect(member2);
+
+        // When
+        member1.calculatePriorityPointWhenDisconnect(member2);
+        member2.calculatePriorityPointWhenDisconnect(member1);
+        member3.calculatePriorityPointWhenDisconnect(member1);
+
+        // Then
+        assertThat(member1.isMaster(), is(true));
+        assertThat(member2.isMaster(), is(true));
+        assertThat(member3.isSlave(), is(true));
+    }
+
+    @Test
+    public void checkMasterOfBootupWhenDisconnect() throws InterruptedException {
+        // Given
+        Member member1 = new Member();
+        member1.setMasterPriority(0);
+        member1.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member2 = new Member();
+        member2.setMasterPriority(0);
+        member2.setBootupTime(new Date());
+        Thread.sleep(1);
+        Member member3 = new Member();
+        member3.setMasterPriority(0);
+        member3.setBootupTime(new Date());
+
+        member1.calculatePriorityPointWhenConnect(member2);
+        member1.calculatePriorityPointWhenConnect(member3);
+        member2.calculatePriorityPointWhenConnect(member1);
+        member2.calculatePriorityPointWhenConnect(member3);
+        member3.calculatePriorityPointWhenConnect(member1);
+        member3.calculatePriorityPointWhenConnect(member2);
+
+        // When
+        member1.calculatePriorityPointWhenDisconnect(member2);
+        member2.calculatePriorityPointWhenDisconnect(member1);
+        member3.calculatePriorityPointWhenDisconnect(member1);
+
+        // Then
+        assertThat(member1.isMaster(), is(true));
+        assertThat(member2.isMaster(), is(true));
+        assertThat(member3.isSlave(), is(true));
+    }
+
     @Test
     public void equals() {
         // Given
@@ -13,32 +180,25 @@ public class MemberTest {
         member1.setStatus(Status.RUNNING);
         Member member2 = new Member("host", 1001);
         member1.setStatus(Status.SHUTDOWN);
+        Member member3 = new Member("host1", 1001);
+        Member member4 = new Member("host", 1002);
 
         // When
-        boolean equals = member1.equals(member2);
+        boolean same = member1.equals(member2);
+        boolean differentHost = member1.equals(member3);
+        boolean differentPort = member1.equals(member4);
 
         // Then
-        assertThat(equals, is(true));
+        assertThat(same, is(true));
+        assertThat(differentHost, is(false));
+        assertThat(differentPort, is(false));
     }
 
     @Test
-    public void notEquals() {
+    public void compareToHost() {
         // Given
-        Member member1 = new Member("host", 1002);
-        Member member2 = new Member("host", 1001);
-
-        // When
-        boolean equals = member1.equals(member2);
-
-        // Then
-        assertThat(equals, is(false));
-    }
-
-    @Test
-    public void comparePort() {
-        // Given
-        Member member1 = new Member("host", 1001);
-        Member member2 = new Member("host", 1002);
+        Member member1 = new Member("host1", 1001);
+        Member member2 = new Member("host2", 1001);
 
         // When
         int compare1 = member1.compareTo(member2);
@@ -50,10 +210,10 @@ public class MemberTest {
     }
 
     @Test
-    public void compareHost() {
+    public void compareToPort() {
         // Given
-        Member member1 = new Member("host1", 1001);
-        Member member2 = new Member("host2", 1001);
+        Member member1 = new Member("host", 1001);
+        Member member2 = new Member("host", 1002);
 
         // When
         int compare1 = member1.compareTo(member2);

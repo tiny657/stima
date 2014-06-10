@@ -27,9 +27,9 @@ public class MailConfig {
     private static final String MAIL_PASSWORD = "mail.password";
 
     private OptionParser parser = new OptionParser();
-    private ArgumentAcceptingOptionSpec<String> propertiesOpt = parser
-            .accepts("mailProp", "properties file").withOptionalArg()
-            .ofType(String.class).defaultsTo(DEFAULT_MAIL_PROPERTIES_NAME);
+//    private ArgumentAcceptingOptionSpec<String> propertiesOpt = parser
+//            .accepts("mailProp", "properties file").withOptionalArg()
+//            .ofType(String.class).defaultsTo(DEFAULT_MAIL_PROPERTIES_NAME);
 
     private PropertiesConfiguration config;
     private String propertiesFile;
@@ -52,13 +52,13 @@ public class MailConfig {
 
     public void init(String[] args) throws FileNotFoundException, IOException,
             Exception {
-        loadJoptOptions(args);
+//        loadJoptOptions(args);
         loadProperties();
     }
 
     private void loadJoptOptions(String[] args) {
-        OptionSet options = parser.parse(args);
-        setPropertiesFile(options.valueOf(propertiesOpt));
+//        OptionSet options = parser.parse(args);
+//        setPropertiesFile(options.valueOf(propertiesOpt));
     }
 
     private void loadProperties() {

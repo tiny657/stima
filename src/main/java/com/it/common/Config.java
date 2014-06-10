@@ -2,6 +2,7 @@ package com.it.common;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import joptsimple.ArgumentAcceptingOptionSpec;
@@ -29,6 +30,7 @@ public class Config {
     private static final String HOST = "myinfo.host";
     private static final String PORT = "myinfo.port";
     private static final String AUTO_SPREAD = "config.autoSpread";
+    private static final String MASTER_PRIORITY = "master.priority";
 
     private OptionParser parser = new OptionParser();
     private ArgumentAcceptingOptionSpec<String> propertiesOpt = parser
@@ -202,6 +204,11 @@ public class Config {
                                 getHost(), getPort()));
             }
         }
+
+        // add master.priority & bootup time.
+        Member me = AllMember.getInstance().me();
+        me.setMasterPriority(config.getInt(MASTER_PRIORITY));
+        me.setBootupTime(new Date());
     }
 
     private void setPropertiesFile(String propertiesFile) {

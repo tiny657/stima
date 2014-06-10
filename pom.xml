@@ -19,7 +19,7 @@
         <!-- APACHE-COMMONS -->
         <commons-collections.version>3.2.1</commons-collections.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
-
+        <commons-validator.version>1.4.0</commons-validator.version>
         <commons-io.version>2.4</commons-io.version>
         <!-- GUAVA -->
         <guava.version>16.0.1</guava.version>
@@ -81,6 +81,12 @@
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
         </dependency>
+		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>${commons-validator.version}</version>
+			<scope>compile</scope>
+		</dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>

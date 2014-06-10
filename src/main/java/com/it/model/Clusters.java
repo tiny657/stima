@@ -1,7 +1,6 @@
 package com.it.model;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -10,19 +9,9 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 
 public class Clusters implements Serializable {
-    private static final long serialVersionUID = 3310797219667479354L;
-
-    private Date bootupTime = new Date();
+    private static final long serialVersionUID = -8267158344891748076L;
     private Map<String, MemberList> memberListMap = Maps.newHashMap();
     transient private static final MemberList EMPTY_MEMBERLIST = new MemberList();
-
-    public boolean isEarlier(Date date) {
-        return bootupTime.compareTo(date) < 0;
-    }
-
-    public Date getBootupTime() {
-        return bootupTime;
-    }
 
     public Member findMe() {
         for (Entry<String, MemberList> entry : memberListMap.entrySet()) {
