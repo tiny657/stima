@@ -35,6 +35,8 @@
         <jackson.core.version>2.3.3</jackson.core.version>
         <!-- JAVA MAIL -->
         <javamail.version>1.4.7</javamail.version>
+        <!-- SIGAR -->
+        <sigar.version>1.6.4</sigar.version>
         <!-- TEST -->
         <hamcrest.version>1.3</hamcrest.version>
         <junit.version>4.11</junit.version>
@@ -81,12 +83,12 @@
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
         </dependency>
-		<dependency>
-			<groupId>commons-validator</groupId>
-			<artifactId>commons-validator</artifactId>
-			<version>${commons-validator.version}</version>
-			<scope>compile</scope>
-		</dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>${commons-validator.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -173,6 +175,21 @@
             <version>${javamail.version}</version>
         </dependency>
 
+        <!-- SIGAR -->
+        <dependency>
+            <groupId>org.fusesource</groupId>
+            <artifactId>sigar</artifactId>
+            <version>${sigar.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fusesource</groupId>
+            <artifactId>sigar</artifactId>
+            <version>${sigar.version}</version>
+            <classifier>native</classifier>
+            <scope>test</scope>
+        </dependency>
+
         <!-- TEST -->
         <dependency>
             <groupId>junit</groupId>
@@ -218,12 +235,26 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
                 <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.fusesource</groupId>
+                                    <artifactId>sigar</artifactId>
+                                    <version>1.6.4</version>
+                                    <classifier>native</classifier>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/sigar-native-libs</outputDirectory>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>copy-dependencies</id>
                         <phase>package</phase>
@@ -268,6 +299,7 @@
                         </manifest>
                     </archive>
                 </configuration>
+
                 <executions>
                     <execution>
                         <id>make-assembly</id>
@@ -277,6 +309,19 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                     <systemPropertyVariables>
+                        <property>
+                             <name>java.library.path</name>
+                            <value>${project.build.directory}/sigar-native-libs</value>
+                        </property>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
 
             <plugin>
