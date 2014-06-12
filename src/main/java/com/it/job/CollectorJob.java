@@ -1,5 +1,7 @@
 package com.it.job;
 
+import java.util.List;
+
 import org.hyperic.sigar.Cpu;
 import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.NetInterfaceStat;
@@ -12,6 +14,8 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.it.job.FileSystemInfo.FileSystem;
 
 public class CollectorJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(CollectorJob.class);
@@ -34,6 +38,17 @@ public class CollectorJob implements Job {
             }
         }
 
+        FileSystemInfo fileSystemInfo = new FileSystemInfo();
+        fileSystemInfo.setSigar(sigar);
+        List<FileSystem> filesystems = fileSystemInfo.filesystems();
+        logger.info("fileSystem: {}", filesystems.toString());
+
+        try {
+            logger.info("swap: {}", sigar.getSwap().getUsed());
+        } catch (SigarException e1) {
+            e1.printStackTrace();
+        }
+
         SystemInfo systemInfo = new SystemInfo();
         systemInfo.setCollectTime(System.currentTimeMillis());
         try {
@@ -42,6 +57,7 @@ public class CollectorJob implements Job {
             systemInfo.setBandWidth(bandWidth);
             systemInfo.setCPUUsedPercentage((float) sigar.getCpuPerc()
                     .getCombined() * 100);
+            systemInfo.setLoadAverages(sigar.getLoadAverage());
             Cpu cpu = sigar.getCpu();
             systemInfo.setTotalCpuValue(cpu.getTotal());
             systemInfo.setIdleCpuValue(cpu.getIdle());
@@ -57,6 +73,7 @@ public class CollectorJob implements Job {
             logger.debug("Error trace is ", e);
         }
         context.getJobDetail().getJobDataMap().put("systemInfo", systemInfo);
+
         logger.info(systemInfo.toString());
     }
 

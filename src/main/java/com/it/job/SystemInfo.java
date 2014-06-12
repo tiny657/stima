@@ -19,7 +19,7 @@ public class SystemInfo extends MonitorInfo implements Serializable {
     private long totalMemory;
     private float cpuUsedPercentage;
     private String ip;
-    private String customValues;
+    private double[] loadAverages = new double[3];
 
     @Override
     public void parse(CompositeData cd) {
@@ -46,10 +46,6 @@ public class SystemInfo extends MonitorInfo implements Serializable {
                 this.bandWidth.setRecivedPerSec(recivedPerSec);
                 this.bandWidth.setSentPerSec(sentPerSec);
             }
-            if (containsKey(cd, "customValues")) {
-                this.setCustomValues(getString(cd, "customValues"));
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -123,18 +119,22 @@ public class SystemInfo extends MonitorInfo implements Serializable {
         this.bandWidth = bandWidth;
     }
 
-    public String getCustomValues() {
-        return customValues;
+    public double[] getLoadAverages() {
+        return loadAverages;
     }
 
-    public void setCustomValues(String customValues) {
-        this.customValues = customValues;
+    public void setLoadAverages(double[] loadAverages) {
+        for (int i = 0; i < 3; i++) {
+            this.loadAverages[i] = loadAverages[i];
+        }
     }
 
     @Override
     public String toString() {
         return "sent: " + bandWidth.getSentPerSec() + ", received: "
                 + bandWidth.getRecivedPerSec() + ", cpu: " + cpuUsedPercentage
-                + ", Memory: " + freeMemory + "/" + totalMemory;
+                + ", loadAverage: " + loadAverages[0] + ", " + loadAverages[1]
+                + ", " + loadAverages[2] + ", Memory: " + freeMemory + "/"
+                + totalMemory;
     }
 }
