@@ -6,14 +6,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class BandWidth implements Serializable {
     private static final long serialVersionUID = -474758079092837224L;
-    private long time;
-
-    public BandWidth() {
-    }
-
-    public BandWidth(long time) {
-        this.time = time;
-    }
 
     private long recieved;
     private long sent;
@@ -22,14 +14,9 @@ public class BandWidth implements Serializable {
     private long sentPerSec;
 
     public BandWidth adjust(BandWidth bandWidth) {
-        float rate = ((float) Math.abs(time - bandWidth.getTime())) / 1000;
-        recivedPerSec = ((long) ((recieved - bandWidth.getRecieved()) * rate));
-        sentPerSec = ((long) ((sent - bandWidth.getSent()) * rate));
+        recivedPerSec = recieved - bandWidth.getRecieved();
+        sentPerSec = sent - bandWidth.getSent();
         return this;
-    }
-
-    public long getTime() {
-        return time;
     }
 
     public long getSentPerSec() {

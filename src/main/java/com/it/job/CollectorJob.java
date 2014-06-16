@@ -3,9 +3,7 @@ package com.it.job;
 import java.util.List;
 
 import org.hyperic.sigar.Cpu;
-import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.NetInterfaceStat;
-import org.hyperic.sigar.OperatingSystem;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.quartz.Job;
@@ -15,70 +13,58 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.job.FileSystemInfo.FileSystem;
+import com.it.job.FilesystemMetrics.FileSystem;
+import com.it.job.NetworkMetrics.Network;
 
 public class CollectorJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(CollectorJob.class);
 
     private Sigar sigar;
-    private SystemInfo prev;
+    private Network prevNetwork;
 
     @Override
     public void execute(JobExecutionContext context)
             throws JobExecutionException {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
         sigar = (Sigar) dataMap.get("sigar");
-        prev = (SystemInfo) dataMap.get("systemInfo");
-        if (prev == null) {
-            prev = new SystemInfo();
-            try {
-                prev.setBandWidth(getNetworkUsage());
-            } catch (SigarException e) {
-                e.printStackTrace();
-            }
-        }
+        prevNetwork = (Network) dataMap.get("network");
 
-        FileSystemInfo fileSystemInfo = new FileSystemInfo();
-        fileSystemInfo.setSigar(sigar);
-        List<FileSystem> filesystems = fileSystemInfo.filesystems();
+        FilesystemMetrics fileSystemMetrics = new FilesystemMetrics(sigar);
+        List<FileSystem> filesystems = fileSystemMetrics.filesystems();
         logger.info("fileSystem: {}", filesystems.toString());
 
-        try {
-            logger.info("swap: {}", sigar.getSwap().getUsed());
-        } catch (SigarException e1) {
-            e1.printStackTrace();
+        MemoryMetrics memoryMetrics = new MemoryMetrics(sigar);
+        logger.info(memoryMetrics.mem().toString());
+        logger.info(memoryMetrics.swap().toString());
+
+        NetworkMetrics networkMetrics = new NetworkMetrics(sigar);
+        Network network = networkMetrics.sumOfNetworks();
+
+        if (prevNetwork != null) {
+            logger.info(network.diff(prevNetwork).toString());
         }
 
         SystemInfo systemInfo = new SystemInfo();
-        systemInfo.setCollectTime(System.currentTimeMillis());
         try {
-            BandWidth networkUsage = getNetworkUsage();
-            BandWidth bandWidth = networkUsage.adjust(prev.getBandWidth());
-            systemInfo.setBandWidth(bandWidth);
             systemInfo.setCPUUsedPercentage((float) sigar.getCpuPerc()
                     .getCombined() * 100);
             systemInfo.setLoadAverages(sigar.getLoadAverage());
+
             Cpu cpu = sigar.getCpu();
             systemInfo.setTotalCpuValue(cpu.getTotal());
             systemInfo.setIdleCpuValue(cpu.getIdle());
-            Mem mem = sigar.getMem();
-            systemInfo.setTotalMemory(mem.getTotal() / 1024L / 1024L);
-            systemInfo.setFreeMemory(mem.getActualFree() / 1024L / 1024L);
-            systemInfo
-                    .setSystem(OperatingSystem.IS_WIN32 ? SystemInfo.System.WINDOW
-                            : SystemInfo.System.LINUX);
         } catch (Throwable e) {
             logger.error("Error while getting system perf data:{}",
                     e.getMessage());
             logger.debug("Error trace is ", e);
         }
-        context.getJobDetail().getJobDataMap().put("systemInfo", systemInfo);
+        context.getJobDetail().getJobDataMap().put("network", network);
 
         logger.info(systemInfo.toString());
     }
 
     public BandWidth getNetworkUsage() throws SigarException {
-        BandWidth bandWidth = new BandWidth(System.currentTimeMillis());
+        BandWidth bandWidth = new BandWidth();
         for (String each : sigar.getNetInterfaceList()) {
             try {
                 NetInterfaceStat netInterfaceStat = sigar

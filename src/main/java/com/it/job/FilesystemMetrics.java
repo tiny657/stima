@@ -1,6 +1,5 @@
 package com.it.job;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,24 +8,22 @@ import org.hyperic.sigar.FileSystemUsage;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
-public class FileSystemInfo implements Serializable {
-    private static final long serialVersionUID = -8147779664020921043L;
-    Sigar sigar;
+public class FilesystemMetrics extends AbstractSigarMetric {
+    protected FilesystemMetrics(Sigar sigar) {
+        super(sigar);
+    }
 
     public static final class FileSystem {
         private final String deviceName;
-        private final String mountPoint;
         private final long totalSizeKB;
         private final long freeSpaceKB;
         private final long readBytes;
         private final long writeBytes;
 
-        public FileSystem( //
-                String deviceName, String mountPoint, //
-                String osSpecificFSType, //
-                long totalSizeKB, long freeSpaceKB, long readBytes, long writeBytes) {
+        public FileSystem(String deviceName, String osSpecificFSType,
+                long totalSizeKB, long freeSpaceKB, long readBytes,
+                long writeBytes) {
             this.deviceName = deviceName;
-            this.mountPoint = mountPoint;
             this.totalSizeKB = totalSizeKB;
             this.freeSpaceKB = freeSpaceKB;
             this.readBytes = readBytes;
@@ -34,17 +31,14 @@ public class FileSystemInfo implements Serializable {
         }
 
         public static FileSystem fromSigarBean(org.hyperic.sigar.FileSystem fs,
-                long totalSizeKB, long freeSpaceKB, long readBytes, long writeBytes) {
-            return new FileSystem(fs.getDevName(), fs.getDirName(),
-                    fs.getSysTypeName(), totalSizeKB, freeSpaceKB, readBytes, writeBytes);
+                FileSystemUsage usage) {
+            return new FileSystem(fs.getDevName(), fs.getSysTypeName(),
+                    usage.getTotal(), usage.getFree(),
+                    usage.getDiskReadBytes(), usage.getDiskWriteBytes());
         }
 
         public String deviceName() {
             return deviceName;
-        }
-
-        public String mountPoint() {
-            return mountPoint;
         }
 
         public long totalSizeKB() {
@@ -55,14 +49,18 @@ public class FileSystemInfo implements Serializable {
             return freeSpaceKB;
         }
 
+        public long readBytes() {
+            return readBytes;
+        }
+
+        public long writeBytes() {
+            return writeBytes;
+        }
+
         @Override
         public String toString() {
             return ToStringBuilder.reflectionToString(this);
         }
-    }
-
-    public void setSigar(Sigar sigar) {
-        this.sigar = sigar;
     }
 
     public List<FileSystem> filesystems() {
@@ -80,21 +78,13 @@ public class FileSystemInfo implements Serializable {
         }
 
         for (org.hyperic.sigar.FileSystem fs : fss) {
-            long totalSizeKB = 0L;
-            long freeSpaceKB = 0L;
-            long readBytes = 0L;
-            long writeBytes = 0L;
             try {
                 FileSystemUsage usage = sigar.getFileSystemUsage(fs
                         .getDirName());
-                totalSizeKB = usage.getTotal();
-                freeSpaceKB = usage.getFree();
-                readBytes = usage.getDiskReadBytes();
-                writeBytes = usage.getDiskWriteBytes();
+                result.add(FileSystem.fromSigarBean(fs, usage));
             } catch (SigarException e) {
-                // ignore
+                e.printStackTrace();
             }
-            result.add(FileSystem.fromSigarBean(fs, totalSizeKB, freeSpaceKB, readBytes, writeBytes));
         }
         return result;
     }

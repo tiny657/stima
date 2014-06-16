@@ -7,11 +7,13 @@ import org.quartz.JobListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.it.job.NetworkMetrics.Network;
+
 public class CollectorListener implements JobListener {
     private final Logger logger = LoggerFactory
             .getLogger(CollectorListener.class);
 
-    private SystemInfo prev = null;
+    private Network prevNetwork = null;
 
     @Override
     public String getName() {
@@ -20,7 +22,7 @@ public class CollectorListener implements JobListener {
 
     @Override
     public void jobToBeExecuted(JobExecutionContext context) {
-        context.getJobDetail().getJobDataMap().put("systemInfo", prev);
+        context.getJobDetail().getJobDataMap().put("network", prevNetwork);
     }
 
     @Override
@@ -31,6 +33,6 @@ public class CollectorListener implements JobListener {
     public void jobWasExecuted(JobExecutionContext context,
             JobExecutionException jobException) {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-        prev = (SystemInfo) dataMap.get("systemInfo");
+        prevNetwork = (Network) dataMap.get("network");
     }
 }

@@ -12,7 +12,6 @@ public class SystemInfo extends MonitorInfo implements Serializable {
     }
 
     private System system;
-    private BandWidth bandWidth;
     private long totalCpuValue;
     private long idleCpuValue;
     private long freeMemory;
@@ -27,8 +26,6 @@ public class SystemInfo extends MonitorInfo implements Serializable {
             return;
         }
         try {
-            long collectTime = getLong(cd, "collectTime");
-            setCollectTime(collectTime);
             String string = getString(cd, "system");
             this.system = System.valueOf(string);
             this.totalCpuValue = getLong(cd, "totalCpuValue");
@@ -36,16 +33,6 @@ public class SystemInfo extends MonitorInfo implements Serializable {
             this.freeMemory = getLong(cd, "freeMemory");
             this.totalMemory = getLong(cd, "totalMemory");
             this.cpuUsedPercentage = getFloat(cd, "CPUUsedPercentage");
-
-            if (containsKey(cd, "bandWidth")) {
-                CompositeData bandWidth = (CompositeData) getObject(cd,
-                        "bandWidth");
-                this.bandWidth = new BandWidth(collectTime);
-                long recivedPerSec = getLong(bandWidth, "recivedPerSec");
-                long sentPerSec = getLong(bandWidth, "sentPerSec");
-                this.bandWidth.setRecivedPerSec(recivedPerSec);
-                this.bandWidth.setSentPerSec(sentPerSec);
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -111,14 +98,6 @@ public class SystemInfo extends MonitorInfo implements Serializable {
         this.totalMemory = totalMemory;
     }
 
-    public BandWidth getBandWidth() {
-        return bandWidth;
-    }
-
-    public void setBandWidth(BandWidth bandWidth) {
-        this.bandWidth = bandWidth;
-    }
-
     public double[] getLoadAverages() {
         return loadAverages;
     }
@@ -131,10 +110,9 @@ public class SystemInfo extends MonitorInfo implements Serializable {
 
     @Override
     public String toString() {
-        return "sent: " + bandWidth.getSentPerSec() + ", received: "
-                + bandWidth.getRecivedPerSec() + ", cpu: " + cpuUsedPercentage
-                + ", loadAverage: " + loadAverages[0] + ", " + loadAverages[1]
-                + ", " + loadAverages[2] + ", Memory: " + freeMemory + "/"
+        return "cpu: " + cpuUsedPercentage + ", loadAverage: "
+                + loadAverages[0] + ", " + loadAverages[1] + ", "
+                + loadAverages[2] + ", Memory: " + freeMemory + "/"
                 + totalMemory;
     }
 }

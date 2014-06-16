@@ -6,8 +6,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
 public abstract class MonitorInfo {
-    private long collectTime;
-
     public abstract void parse(CompositeData cd);
 
     protected static Object getObject(CompositeData cd, String itemName) {
@@ -32,14 +30,6 @@ public abstract class MonitorInfo {
 
     protected static boolean containsKey(CompositeData cd, String itemName) {
         return cd.containsKey(itemName);
-    }
-
-    public long getCollectTime() {
-        return collectTime;
-    }
-
-    public void setCollectTime(long collectTime) {
-        this.collectTime = collectTime;
     }
 
     @Override
