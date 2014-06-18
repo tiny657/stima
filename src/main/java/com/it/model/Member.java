@@ -17,6 +17,7 @@ public class Member implements Comparable<Member>, Serializable {
 
     private Date bootupTime;
     private int masterPriority, priorityPoint;
+    private int id;
     private String host;
     private int port;
     private Status status = Status.SHUTDOWN;
@@ -29,22 +30,23 @@ public class Member implements Comparable<Member>, Serializable {
     public Member() {
     }
 
-    public Member(String host, String port, String myHost, int myPort) {
-        this(host, Utils.parseInt(port), myHost, myPort);
+    public Member(String id, String host, String port, String myHost, int myPort) {
+        this(Utils.parseInt(id), host, Utils.parseInt(port), myHost, myPort);
     }
 
-    public Member(String host, String port) {
-        this(host, Utils.parseInt(port));
+    public Member(String id, String host, String port) {
+        this(Utils.parseInt(id), host, Utils.parseInt(port));
     }
 
-    public Member(String host, int port, String myHost, int myPort) {
-        this(host, port);
+    public Member(int id, String host, int port, String myHost, int myPort) {
+        this(id, host, port);
         if (host.equals(myHost) && port == myPort) {
             me = true;
         }
     }
 
-    public Member(String host, int port) {
+    public Member(int id, String host, int port) {
+        this.id = id;
         this.host = host;
         if (Utils.isPortValid(port)) {
             this.port = port;
@@ -127,6 +129,14 @@ public class Member implements Comparable<Member>, Serializable {
             decreasePriorityPoint();
         }
         logger.info("master: {}", isMaster());
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getHost() {
@@ -240,7 +250,7 @@ public class Member implements Comparable<Member>, Serializable {
             status += ", me";
         }
 
-        return host + ":" + port + "(" + status + ", sent: " + totalSent
-                + ", received: " + totalReceived + ")";
+        return id + ":" + host + ":" + port + "(" + status + ", sent: "
+                + totalSent + ", received: " + totalReceived + ")";
     }
 }

@@ -20,7 +20,7 @@ public class AllMember {
         return me;
     }
 
-    public void addCluster(String[] clusterNames) {
+    public void addClusters(String[] clusterNames) {
         for (String clusterName : clusterNames) {
             addCluster(clusterName);
         }
@@ -57,7 +57,7 @@ public class AllMember {
     public List<Member> getMembers(String cluster) {
         return clusters.getMemberListIn(cluster).getMembers();
     }
-
+    
     public Member getMember(String host, int port) {
         for (String clusterName : clusters.getClusterNames()) {
             Member member = clusters.getMemberListIn(clusterName).findMember(

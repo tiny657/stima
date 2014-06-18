@@ -159,16 +159,16 @@ public class MemberConfig {
         setSpreadTime(config.getInt(SPREAD_TIME));
 
         // add cluster
-        AllMember.getInstance().addCluster(getClustersArray());
+        AllMember.getInstance().addClusters(getClustersArray());
 
         // add member
         for (String cluster : AllMember.getInstance().getClusters()
                 .getClusterNames()) {
             for (String hostPort : getMembers(cluster)) {
-                String[] splitedHostPort = StringUtils.split(hostPort, ":");
+                String[] idHostPort = StringUtils.split(hostPort, ":");
                 AllMember.getInstance().addMember(
                         cluster,
-                        new Member(splitedHostPort[0], splitedHostPort[1],
+                        new Member(idHostPort[0], idHostPort[1], idHostPort[2],
                                 getHost(), getPort()));
             }
         }

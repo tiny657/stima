@@ -11,9 +11,9 @@ public class MemberTest {
     @Test
     public void validatePort() {
         // When
-        Member memberWithValidPort = new Member("host", 1);
-        Member memberWithInvalidPort1 = new Member("host", 0);
-        Member memberWithInvalidPort2 = new Member("host", 70000);
+        Member memberWithValidPort = new Member(1, "host", 1);
+        Member memberWithInvalidPort1 = new Member(2, "host", 0);
+        Member memberWithInvalidPort2 = new Member(3, "host", 70000);
 
         // Then
         assertThat(memberWithValidPort.getPort(), is(not(0)));
@@ -24,9 +24,9 @@ public class MemberTest {
     @Test
     public void isMe() {
         // When
-        Member me = new Member("host", 1, "host", 1);
-        Member notMe1 = new Member("host", 1, "host", 2);
-        Member notMe2 = new Member("host1", 2, "host2", 2);
+        Member me = new Member(1, "host", 1, "host", 1);
+        Member notMe1 = new Member(2, "host", 1, "host", 2);
+        Member notMe2 = new Member(3, "host1", 2, "host2", 2);
 
         // Then
         assertThat(me.isMe(), is(true));
@@ -250,12 +250,12 @@ public class MemberTest {
     @Test
     public void equals() {
         // Given
-        Member member1 = new Member("host", 1001);
+        Member member1 = new Member(1, "host", 1001);
         member1.setStatus(Status.RUNNING);
-        Member member2 = new Member("host", 1001);
+        Member member2 = new Member(2, "host", 1001);
         member1.setStatus(Status.SHUTDOWN);
-        Member member3 = new Member("host1", 1001);
-        Member member4 = new Member("host", 1002);
+        Member member3 = new Member(3, "host1", 1001);
+        Member member4 = new Member(4, "host", 1002);
 
         // When
         boolean same = member1.equals(member2);
@@ -271,8 +271,8 @@ public class MemberTest {
     @Test
     public void compareToHost() {
         // Given
-        Member member1 = new Member("host1", 1001);
-        Member member2 = new Member("host2", 1001);
+        Member member1 = new Member(1, "host1", 1001);
+        Member member2 = new Member(2, "host2", 1001);
 
         // When
         int compare1 = member1.compareTo(member2);
@@ -286,8 +286,8 @@ public class MemberTest {
     @Test
     public void compareToPort() {
         // Given
-        Member member1 = new Member("host", 1001);
-        Member member2 = new Member("host", 1002);
+        Member member1 = new Member(1, "host", 1001);
+        Member member2 = new Member(2, "host", 1002);
 
         // When
         int compare1 = member1.compareTo(member2);

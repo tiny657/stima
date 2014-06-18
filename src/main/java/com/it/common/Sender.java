@@ -81,21 +81,24 @@ public class Sender {
     // return true;
     // }
 
-    // public static boolean sendUnicast(String targetHost, int targetPort,
-    // String msg) {
-    // Member member = AllMember.getInstance().getMember(targetHost,
-    // targetPort);
-    // if (member == null) {
-    // logger.error("Send fail because member({}:{}) is not found.",
-    // targetHost, targetPort);
-    // return false;
-    // }
-    //
-    // ByteBuf byteBuf = Unpooled.buffer(msg.length());
-    // byteBuf.writeBytes(msg.getBytes());
-    // AllMember.getInstance().getMemberInfos().getChannelFuture(member)
-    // .channel().writeAndFlush(byteBuf);
-    //
-    // return true;
-    // }
+    public static boolean sendUnicast(String targetCluster, int targetId,
+            Object msg) {
+        Member member = AllMember.getInstance().getClusters()
+                .getMemberListIn(targetCluster).getMember(targetId);
+
+        System.out.println(member.toString());
+        if (member == null) {
+            logger.error("Send fail.  Because there is no member in {}",
+                    targetCluster);
+            return false;
+        } else {
+            if (!(msg instanceof Command)) {
+                member.increaseSentCount();
+            }
+            AllMember.getInstance().getMemberInfos().getChannelFuture(member)
+                    .channel().writeAndFlush(msg);
+        }
+
+        return true;
+    }
 }

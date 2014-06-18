@@ -16,7 +16,7 @@ public class Sample {
                 new ClientHandler(), args);
         if (JoptConfig.getInstance().isSender()) {
             for (int i = 0; i < 3; i++) {
-                Sender.sendAnycast("b", new TestCommand());
+                Sender.sendUnicast("b", 2, new TestCommand());
                 Thread.sleep(1000);
             }
             ItRunner.getInstance().shutdown();

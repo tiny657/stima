@@ -3,10 +3,16 @@ package com.it.model;
 import java.io.Serializable;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 
 public class MemberList implements Serializable {
-    private static final long serialVersionUID = -564793597247779821L;
+    private static final long serialVersionUID = -5384674645915944849L;
+
+    private static final Logger logger = LoggerFactory
+            .getLogger(MemberList.class);
 
     private List<Member> members = Lists.newArrayList();
     transient private int index = 0;
@@ -25,6 +31,15 @@ public class MemberList implements Serializable {
     public Member findMe() {
         for (Member member : members) {
             if (member.isMe()) {
+                return member;
+            }
+        }
+        return null;
+    }
+
+    public Member getMember(int id) {
+        for (Member member : members) {
+            if (member.getId() == id) {
                 return member;
             }
         }
@@ -105,7 +120,20 @@ public class MemberList implements Serializable {
         return result;
     }
 
+    public boolean isDuplicatedId(Member member2) {
+        for (Member member : members) {
+            if (member.getId() == member2.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void addMember(Member member) {
+        if (isDuplicatedId(member)) {
+            logger.error("The id({}) is duplicated.", member.getId());
+            return;
+        }
         members.add(member);
     }
 
