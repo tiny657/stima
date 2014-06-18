@@ -1,5 +1,7 @@
 package com.it.main;
 
+import io.netty.channel.ChannelFuture;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,11 +91,31 @@ public class ItRunner {
     }
 
     public void shutdown() {
-        Sender.sendBroadcast(new StopCommand(MemberConfig.getInstance().getHost(),
-                MemberConfig.getInstance().getPort()));
+        Sender.sendBroadcast(new StopCommand(MemberConfig.getInstance()
+                .getHost(), MemberConfig.getInstance().getPort()));
+
+        try {
+            // wait for 1000ms after sending StopCommand.
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         Member me = AllMember.getInstance().me();
+        // close server.
         AllMember.getInstance().getMemberInfos().getChannelFuture(me).channel()
                 .close();
+
+        // close client.
+        Clusters clusters = AllMember.getInstance().getClusters();
+        for (String clusterName : clusters.getClusterNames()) {
+            for (Member member : clusters.getMemberListIn(clusterName)
+                    .getMembers()) {
+                if (!member.isMe()) {
+                    AllMember.getInstance().getMemberInfos().getClient(member)
+                            .shutdown();
+                }
+            }
+        }
     }
 }

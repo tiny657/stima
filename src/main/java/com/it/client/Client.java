@@ -24,7 +24,9 @@ public class Client extends Thread {
 
     private Member myInfo;
     private ClientHandlerAdapter clientHandlerAdapter;
+    private ChannelFuture channelFuture = null;
 
+    private boolean stopped = false;
     private boolean isStartup = false;
 
     public Client(Member member) {
@@ -58,8 +60,8 @@ public class Client extends Thread {
             });
 
             AllMember.getInstance().getMemberInfos().put(myInfo, this);
-            while (true) {
-                ChannelFuture channelFuture = connect(bootstrap);
+            while (!stopped) {
+                channelFuture = connect(bootstrap);
                 update(channelFuture);
                 awaitDisconnection(channelFuture);
                 AllMember.getInstance().me()
@@ -82,6 +84,14 @@ public class Client extends Thread {
         }
     }
 
+    public void shutdown() {
+        if (channelFuture != null) {
+            channelFuture.channel().close();
+        }
+        stopped = true;
+        logger.info("The client({}) is stopped.", myInfo.getHostPort());
+    }
+
     private ChannelFuture connect(Bootstrap bootstrap)
             throws InterruptedException {
         logger.info("Connecting to {}", myInfo.getHostPort());
@@ -92,9 +102,11 @@ public class Client extends Thread {
                     myInfo.getPort()).await();
             isStartup = true;
             Thread.sleep(100);
-        } while (!channelFuture.isSuccess());
+        } while (!stopped && !channelFuture.isSuccess());
 
-        logger.info("Connection({}) is established.", myInfo.getHostPort());
+        if (channelFuture.isSuccess()) {
+            logger.info("Connection({}) is established.", myInfo.getHostPort());
+        }
 
         return channelFuture;
     }
@@ -113,6 +125,7 @@ public class Client extends Thread {
     private void awaitDisconnection(ChannelFuture channelFuture)
             throws InterruptedException {
         channelFuture.channel().closeFuture().sync();
+        channelFuture = null;
 
         myInfo.setStatus(Status.SHUTDOWN);
 
