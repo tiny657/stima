@@ -24,16 +24,23 @@ public class MemberConfig {
     private static final String CLUSTER = "cluster";
     private static final String HOST = "myinfo.host";
     private static final String PORT = "myinfo.port";
+
     private static final String AUTO_SPREAD = "config.autoSpread";
     private static final String SPREAD_TIME = "config.spreadTime";
+
     private static final String MASTER_PRIORITY = "master.priority";
+
+    private static final String MONITOR_ENABLE = "monitor.enable";
 
     private PropertiesConfiguration config;
     private String propertiesFile;
     private String host;
     private int port;
+
     private int spreadTime = 5;
     private boolean isAutoSpread;
+
+    private boolean monitorEnable;
 
     private MemberConfig() {
     }
@@ -83,6 +90,14 @@ public class MemberConfig {
 
     public void setAutoSpread(boolean isAutoSpread) {
         this.isAutoSpread = isAutoSpread;
+    }
+
+    public boolean isMonitorEnable() {
+        return monitorEnable;
+    }
+
+    public void setMonitorEnable(boolean monitorEnable) {
+        this.monitorEnable = monitorEnable;
     }
 
     public void addMember(String cluster, Member member) {
@@ -155,8 +170,12 @@ public class MemberConfig {
             setPort(config.getInt(PORT));
         }
 
+        // config
         setAutoSpread(config.getBoolean(AUTO_SPREAD));
         setSpreadTime(config.getInt(SPREAD_TIME));
+
+        // monitor
+        setMonitorEnable(config.getBoolean(MONITOR_ENABLE));
 
         // add cluster
         AllMember.getInstance().addClusters(getClustersArray());

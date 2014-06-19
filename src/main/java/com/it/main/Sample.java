@@ -5,13 +5,11 @@ import org.slf4j.LoggerFactory;
 
 import com.it.common.Sender;
 import com.it.config.JoptConfig;
-import com.it.job.JobManager;
 
 public class Sample {
     private static final Logger logger = LoggerFactory.getLogger(Sample.class);
 
     public static void main(String[] args) throws InterruptedException {
-        JobManager.getInstance().runCollectorJob();
         ItRunner.getInstance().execute(new ServerHandler(),
                 new ClientHandler(), args);
         if (JoptConfig.getInstance().isSender()) {

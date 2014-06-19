@@ -1,7 +1,5 @@
 package com.it.main;
 
-import io.netty.channel.ChannelFuture;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +11,7 @@ import com.it.common.Sender;
 import com.it.config.JoptConfig;
 import com.it.config.MailConfig;
 import com.it.config.MemberConfig;
+import com.it.job.JobManager;
 import com.it.model.AllMember;
 import com.it.model.Clusters;
 import com.it.model.Member;
@@ -46,9 +45,7 @@ public class ItRunner {
         this.clientHandlerAdapter = clientHandlerAdapter;
 
         try {
-            JoptConfig.getInstance().init(args);
-            MemberConfig.getInstance().init(args);
-            MailConfig.getInstance().init(args);
+            initialize(args);
             Clusters clusters = AllMember.getInstance().getClusters();
             Member me = AllMember.getInstance().me();
 
@@ -117,5 +114,20 @@ public class ItRunner {
                 }
             }
         }
+    }
+
+    private void initialize(String[] args) {
+        // config
+        try {
+            JoptConfig.getInstance().init(args);
+            MemberConfig.getInstance().init(args);
+            MailConfig.getInstance().init(args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // monitor
+        JobManager.getInstance().runCollectorJob();
+
     }
 }
