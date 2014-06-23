@@ -25,7 +25,6 @@ public class MemberConfig {
     private static final String HOST = "myinfo.host";
     private static final String PORT = "myinfo.port";
 
-    private static final String AUTO_SPREAD = "config.autoSpread";
     private static final String SPREAD_TIME = "config.spreadTime";
 
     private static final String MASTER_PRIORITY = "master.priority";
@@ -38,7 +37,6 @@ public class MemberConfig {
     private int port;
 
     private int spreadTime = 5;
-    private boolean isAutoSpread;
 
     private boolean monitorEnable;
 
@@ -85,11 +83,7 @@ public class MemberConfig {
     }
 
     public boolean isAutoSpread() {
-        return isAutoSpread;
-    }
-
-    public void setAutoSpread(boolean isAutoSpread) {
-        this.isAutoSpread = isAutoSpread;
+        return getSpreadTime() != 0;
     }
 
     public boolean isMonitorEnable() {
@@ -171,7 +165,6 @@ public class MemberConfig {
         }
 
         // config
-        setAutoSpread(config.getBoolean(AUTO_SPREAD));
         setSpreadTime(config.getInt(SPREAD_TIME));
 
         // monitor
