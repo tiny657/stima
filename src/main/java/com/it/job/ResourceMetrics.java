@@ -1,5 +1,6 @@
 package com.it.job;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -10,6 +11,9 @@ import com.it.job.FilesystemMetrics.FileSystem;
 import com.it.job.NetworkMetrics.Network;
 
 public class ResourceMetrics {
+    // Current Time
+    private Date date = new Date();
+
     // CPU
     private byte cpuUserUsedPercentage, cpuSysUsedPercentage;
     private byte loadAverage1M, loadAverage5M, loadAverage15M;

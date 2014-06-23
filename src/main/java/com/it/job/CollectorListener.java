@@ -9,6 +9,7 @@ import org.quartz.JobListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.EvictingQueue;
 import com.it.job.FilesystemMetrics.FileSystem;
 import com.it.job.NetworkMetrics.Network;
 
@@ -16,10 +17,18 @@ public class CollectorListener implements JobListener {
     private final Logger logger = LoggerFactory
             .getLogger(CollectorListener.class);
 
+    private static CollectorListener instance = new CollectorListener();
+
     private Network prevNetwork = null;
     private List<FileSystem> prevFileSystems = null;
 
     private ResourceMetrics resource = null;
+    private EvictingQueue<ResourceMetrics> history = EvictingQueue
+            .create(30 * 24 * 60 * 60);
+
+    public static CollectorListener getInstance() {
+        return instance;
+    }
 
     @Override
     public String getName() {
@@ -45,6 +54,7 @@ public class CollectorListener implements JobListener {
         prevFileSystems = (List<FileSystem>) dataMap.get("fileSystems");
         resource = (ResourceMetrics) dataMap.get("resource");
 
+        history.add(resource);
         logger.info(resource.toString());
     }
 }

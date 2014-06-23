@@ -47,7 +47,8 @@ public class JobManager {
 
                 scheduler = StdSchedulerFactory.getDefaultScheduler();
                 scheduler.getListenerManager().addJobListener(
-                        new CollectorListener(), KeyMatcher.keyEquals(jobKey));
+                        CollectorListener.getInstance(),
+                        KeyMatcher.keyEquals(jobKey));
 
                 scheduler.scheduleJob(job, trigger);
                 scheduler.start();
