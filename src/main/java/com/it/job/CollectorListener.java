@@ -19,6 +19,8 @@ public class CollectorListener implements JobListener {
     private Network prevNetwork = null;
     private List<FileSystem> prevFileSystems = null;
 
+    private ResourceMetrics resource = null;
+
     @Override
     public String getName() {
         return "CollectorListener";
@@ -41,5 +43,8 @@ public class CollectorListener implements JobListener {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
         prevNetwork = (Network) dataMap.get("network");
         prevFileSystems = (List<FileSystem>) dataMap.get("fileSystems");
+        resource = (ResourceMetrics) dataMap.get("resource");
+
+        logger.info(resource.toString());
     }
 }

@@ -12,39 +12,49 @@ public class CpuMetrics extends AbstractSigarMetric {
     }
 
     public static final class CpuInfo {
-        private final long idle;
-        private final long total;
-        private final double cpuUsedPercentage;
-        private final double[] loadAverages;
+        private final byte userUsedPercentage;
+        private final byte sysUsedPercentage;
+        private final byte loadAverage1M;
+        private final byte loadAverage5M;
+        private final byte loadAverage15M;
 
-        public CpuInfo(long idle, long total, double cpuUsedPercentage,
+        public CpuInfo(double userUsedPercentage, double sysUsedPercentage,
                 double[] loadAverages) {
-            this.idle = idle;
-            this.total = total;
-            this.cpuUsedPercentage = cpuUsedPercentage;
-            this.loadAverages = loadAverages;
+            this.userUsedPercentage = (byte) (userUsedPercentage + 0.5);
+            this.sysUsedPercentage = (byte) (sysUsedPercentage + 0.5);
+            this.loadAverage1M = (byte) loadAverages[0];
+            this.loadAverage5M = (byte) loadAverages[1];
+            this.loadAverage15M = (byte) loadAverages[2];
         }
 
-        public static CpuInfo fromSigarBean(Cpu cpu, CpuPerc cpuPerc,
+        public static CpuInfo fromSigarBean(CpuPerc cpuPerc,
                 double[] loadAverages) {
-            return new CpuInfo(cpu.getIdle(), cpu.getTotal(),
-                    cpuPerc.getCombined() * 100, loadAverages);
+            return new CpuInfo(cpuPerc.getUser() * 100, cpuPerc.getSys() * 100,
+                    loadAverages);
         }
 
-        public long idle() {
-            return idle;
+        public static CpuInfo undef() {
+            return new CpuInfo(-1, -1, new double[] { -1, -1, -1 });
         }
 
-        public long total() {
-            return total;
+        public byte userUsedPercentage() {
+            return userUsedPercentage;
         }
 
-        public double cpuUsedPercentage() {
-            return cpuUsedPercentage;
+        public byte sysUsedPercentage() {
+            return sysUsedPercentage;
         }
 
-        public double[] loadAverages() {
-            return loadAverages;
+        public byte loadAverage1M() {
+            return loadAverage1M;
+        }
+
+        public byte loadAverage5M() {
+            return loadAverage5M;
+        }
+
+        public byte loadAverage15M() {
+            return loadAverage15M;
         }
 
         @Override
@@ -55,11 +65,11 @@ public class CpuMetrics extends AbstractSigarMetric {
 
     public CpuInfo cpu() {
         try {
-            return CpuInfo.fromSigarBean(sigar.getCpu(), sigar.getCpuPerc(),
+            return CpuInfo.fromSigarBean(sigar.getCpuPerc(),
                     sigar.getLoadAverage());
         } catch (SigarException e) {
             e.printStackTrace();
         }
-        return null;
+        return CpuInfo.undef();
     }
 }

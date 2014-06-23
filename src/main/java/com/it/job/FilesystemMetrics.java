@@ -15,50 +15,51 @@ public class FilesystemMetrics extends AbstractSigarMetric {
 
     public static final class FileSystem {
         private final String deviceName;
-        private final long totalSizeKB;
-        private final long freeSpaceKB;
-        private final long rxBytes;
-        private final long txBytes;
+        private final int totalSizeMB;
+        private final int freeSpaceMB;
+        private final int rxKBytes;
+        private final int txKBytes;
 
-        public FileSystem(String deviceName, long totalSizeKB,
-                long freeSpaceKB, long rxBytes, long txBytes) {
+        public FileSystem(String deviceName, long totalSizeMB,
+                long freeSpaceMB, long rxKBytes, long txKBytes) {
             this.deviceName = deviceName;
-            this.totalSizeKB = totalSizeKB;
-            this.freeSpaceKB = freeSpaceKB;
-            this.rxBytes = rxBytes;
-            this.txBytes = txBytes;
+            this.totalSizeMB = (int) (totalSizeMB);
+            this.freeSpaceMB = (int) (freeSpaceMB);
+            this.rxKBytes = (int) (rxKBytes);
+            this.txKBytes = (int) (txKBytes);
         }
 
         public static FileSystem fromSigarBean(org.hyperic.sigar.FileSystem fs,
                 FileSystemUsage usage) {
-            return new FileSystem(fs.getDevName(), usage.getTotal(),
-                    usage.getFree(), usage.getDiskReadBytes(),
-                    usage.getDiskWriteBytes());
+            return new FileSystem(fs.getDevName(), usage.getTotal() / 1024L,
+                    usage.getFree() / 1024L, usage.getDiskReadBytes() / 1024L,
+                    usage.getDiskWriteBytes() / 1024L);
         }
 
         public FileSystem diff(FileSystem fileSystem) {
-            return new FileSystem(deviceName, totalSizeKB, freeSpaceKB, txBytes
-                    - fileSystem.txBytes(), rxBytes - fileSystem.rxBytes());
+            return new FileSystem(deviceName, totalSizeMB, freeSpaceMB,
+                    txKBytes - fileSystem.txKBytes(), rxKBytes
+                            - fileSystem.rxKBytes());
         }
 
         public String deviceName() {
             return deviceName;
         }
 
-        public long totalSizeKB() {
-            return totalSizeKB;
+        public int totalSizeMB() {
+            return totalSizeMB;
         }
 
-        public long freeSpaceKB() {
-            return freeSpaceKB;
+        public int freeSpaceMB() {
+            return freeSpaceMB;
         }
 
-        public long rxBytes() {
-            return rxBytes;
+        public int rxKBytes() {
+            return rxKBytes;
         }
 
-        public long txBytes() {
-            return txBytes;
+        public int txKBytes() {
+            return txKBytes;
         }
 
         @Override

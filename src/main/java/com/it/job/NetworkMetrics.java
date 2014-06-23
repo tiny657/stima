@@ -15,38 +15,38 @@ public class NetworkMetrics extends AbstractSigarMetric {
     }
 
     public static final class Network {
-        private long rxBytes;
-        private long txBytes;
+        private long rxKBytes;
+        private long txKBytes;
 
         public Network() {
         }
 
-        public Network(long rxBytes, long txBytes) {
-            this.rxBytes = rxBytes;
-            this.txBytes = txBytes;
+        public Network(long rxKBytes, long txKBytes) {
+            this.rxKBytes = rxKBytes;
+            this.txKBytes = txKBytes;
         }
 
         public static Network fromSigarBean(NetInterfaceStat netInterfaceStat) {
-            return new Network(netInterfaceStat.getRxBytes(),
-                    netInterfaceStat.getTxBytes());
+            return new Network(netInterfaceStat.getRxBytes() / 1024L,
+                    netInterfaceStat.getTxBytes() / 1024L);
         }
 
         public void add(Network network) {
-            rxBytes += network.rxBytes;
-            txBytes += network.txBytes;
+            rxKBytes += network.rxKBytes;
+            txKBytes += network.txKBytes;
         }
 
         public Network diff(Network network) {
-            return new Network(rxBytes - network.rxBytes(), txBytes
-                    - network.txBytes());
+            return new Network(rxKBytes - network.rxKBytes(), txKBytes
+                    - network.txKBytes());
         }
 
-        public long rxBytes() {
-            return rxBytes;
+        public long rxKBytes() {
+            return rxKBytes;
         }
 
-        public long txBytes() {
-            return txBytes;
+        public long txKBytes() {
+            return txKBytes;
         }
 
         @Override

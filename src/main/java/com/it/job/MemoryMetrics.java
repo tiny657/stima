@@ -12,14 +12,14 @@ public class MemoryMetrics extends AbstractSigarMetric {
     }
 
     public static abstract class MemSegment {
-        protected final int total;
+        protected final int totalMB;
 
-        private MemSegment(long total) {
-            this.total = (int) (total / 1024L / 1024L);
+        private MemSegment(long totalBytes) {
+            this.totalMB = (int) (totalBytes / 1024L / 1024L);
         }
 
-        public int total() {
-            return total;
+        public int totalMB() {
+            return totalMB;
         }
 
         @Override
@@ -29,13 +29,13 @@ public class MemoryMetrics extends AbstractSigarMetric {
     }
 
     public static final class MainMemory extends MemSegment {
-        private final int actualUsed;
-        private final double usedPercent;
+        private final int usedMB;
+        private final double usedPercentage;
 
-        private MainMemory(long total, long actualUsed, double usedPercent) {
+        private MainMemory(long total, long usedBytes, double usedPercentage) {
             super(total);
-            this.actualUsed = (int) (actualUsed / 1024L / 1024L);
-            this.usedPercent = usedPercent;
+            this.usedMB = (int) (usedBytes / 1024L / 1024L);
+            this.usedPercentage = usedPercentage;
         }
 
         public static MainMemory fromSigarBean(Mem mem) {
@@ -47,21 +47,21 @@ public class MemoryMetrics extends AbstractSigarMetric {
             return new MainMemory(-1L, -1L, -1L);
         }
 
-        public int actualUsed() {
-            return actualUsed;
+        public int usedMB() {
+            return usedMB;
         }
 
-        public double usedPercent() {
-            return usedPercent;
+        public double usedPercentage() {
+            return usedPercentage;
         }
     }
 
     public static final class SwapSpace extends MemSegment {
-        private final int used;
+        private final int usedMB;
 
         private SwapSpace(long total, long used) {
             super(total);
-            this.used = (int) (used / 1024L / 1024L);
+            this.usedMB = (int) (used / 1024L / 1024L);
         }
 
         public static SwapSpace fromSigarBean(Swap swap) {
@@ -70,6 +70,10 @@ public class MemoryMetrics extends AbstractSigarMetric {
 
         private static SwapSpace undef() {
             return new SwapSpace(-1L, -1L);
+        }
+
+        public int usedMB() {
+            return usedMB;
         }
     }
 

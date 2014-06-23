@@ -33,7 +33,7 @@ public class JobManager {
     public void runCollectorJob() {
         if (MemberConfig.getInstance().isMonitorEnable()) {
             try {
-                JobKey jobKey = new JobKey("col lector", "group");
+                JobKey jobKey = new JobKey("collector", "group");
                 JobDetail job = newJob(CollectorJob.class).withIdentity(jobKey)
                         .build();
                 job.getJobDataMap().put("sigar", new Sigar());
