@@ -30,6 +30,10 @@ public class CollectorListener implements JobListener {
         return instance;
     }
 
+    public EvictingQueue<ResourceMetrics> getHistory() {
+        return history;
+    }
+
     @Override
     public String getName() {
         return "CollectorListener";

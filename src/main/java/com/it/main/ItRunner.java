@@ -16,6 +16,7 @@ import com.it.model.AllMember;
 import com.it.model.Clusters;
 import com.it.model.Member;
 import com.it.model.Status;
+import com.it.monitor.MonitorServer;
 import com.it.server.Server;
 import com.it.server.ServerHandlerAdapter;
 
@@ -49,6 +50,9 @@ public class ItRunner {
             Clusters clusters = AllMember.getInstance().getClusters();
             Member me = AllMember.getInstance().me();
 
+            // monitor
+            new MonitorServer(8080).run();
+
             // server
             Server server = new Server(me);
             server.setServerHandler(serverHandlerAdapter);
@@ -67,7 +71,7 @@ public class ItRunner {
                     }
                 }
             }
-
+            
             // change status to Running
             Member myInfo = server.getMyInfo();
             AllMember.getInstance()
