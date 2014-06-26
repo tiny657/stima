@@ -11,6 +11,8 @@ target/
 *.pyc
 .DS_Store
 
+*.iml
+
 # Package Files #
 *.war
 *.ear

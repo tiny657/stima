@@ -4,78 +4,77 @@ import java.util.List;
 import java.util.Map;
 
 public class AllMember {
-    public static AllMember instance = new AllMember();
-    private Member me = null;
-    private Clusters clusters = new Clusters();
-    private MemberInfos memberInfos = new MemberInfos();
+  public static AllMember instance = new AllMember();
+  private Member me = null;
+  private Clusters clusters = new Clusters();
+  private MemberInfos memberInfos = new MemberInfos();
 
-    public static AllMember getInstance() {
-        return instance;
+  public static AllMember getInstance() {
+    return instance;
+  }
+
+  public Member me() {
+    if (me == null) {
+      me = getClusters().findMe();
+    }
+    return me;
+  }
+
+  public void addClusters(String[] clusterNames) {
+    for (String clusterName : clusterNames) {
+      addCluster(clusterName);
+    }
+  }
+
+  public void addCluster(String clusterName) {
+    clusters.add(clusterName);
+  }
+
+  public void addMember(String clusterName, Member member) {
+    clusters.add(clusterName, member);
+  }
+
+  public void removeCluster(String clusterName) {
+    clusters.remove(clusterName);
+  }
+
+  public void removeMember(String clusterName, Member member) {
+    clusters.remove(clusterName, member);
+  }
+
+  public Clusters getClusters() {
+    return clusters;
+  }
+
+  public Map<String, MemberList> getMemberListMap() {
+    return clusters.getMemberListMap();
+  }
+
+  public MemberList getMemberListIn(String cluster) {
+    return clusters.getMemberListIn(cluster);
+  }
+
+  public List<Member> getMembers(String cluster) {
+    return clusters.getMemberListIn(cluster).getMembers();
+  }
+
+  public Member getMember(String host, int port) {
+    for (String clusterName : clusters.getClusterNames()) {
+      Member member = clusters.getMemberListIn(clusterName).findMember(host, port);
+      if (member != null) {
+        return member;
+      }
     }
 
-    public Member me() {
-        if (me == null) {
-            me = getClusters().findMe();
-        }
-        return me;
-    }
+    return null;
+  }
 
-    public void addClusters(String[] clusterNames) {
-        for (String clusterName : clusterNames) {
-            addCluster(clusterName);
-        }
-    }
+  public MemberInfos getMemberInfos() {
+    return memberInfos;
+  }
 
-    public void addCluster(String clusterName) {
-        clusters.add(clusterName);
-    }
-
-    public void addMember(String clusterName, Member member) {
-        clusters.add(clusterName, member);
-    }
-
-    public void removeCluster(String clusterName) {
-        clusters.remove(clusterName);
-    }
-
-    public void removeMember(String clusterName, Member member) {
-        clusters.remove(clusterName, member);
-    }
-
-    public Clusters getClusters() {
-        return clusters;
-    }
-
-    public Map<String, MemberList> getMemberListMap() {
-        return clusters.getMemberListMap();
-    }
-
-    public MemberList getMemberListIn(String cluster) {
-        return clusters.getMemberListIn(cluster);
-    }
-
-    public List<Member> getMembers(String cluster) {
-        return clusters.getMemberListIn(cluster).getMembers();
-    }
-    
-    public Member getMember(String host, int port) {
-        for (String clusterName : clusters.getClusterNames()) {
-            Member member = clusters.getMemberListIn(clusterName).findMember(
-                    host, port);
-            if (member != null) {
-                return member;
-            }
-        }
-
-        return null;
-    }
-
-    public MemberInfos getMemberInfos() {
-        return memberInfos;
-    }
-
-    @Override
-    public String toString() {
-        return clusters.toString();
-    }
+  @Override
+  public String toString() {
+    return clusters.toString();
+  }
 }

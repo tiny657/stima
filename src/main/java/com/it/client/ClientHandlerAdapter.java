@@ -13,30 +13,28 @@ import com.it.model.AllMember;
 
 @Sharable
 public class ClientHandlerAdapter extends ChannelHandlerAdapter {
-    private static final Logger logger = LoggerFactory
-            .getLogger(ClientHandlerAdapter.class);
+  private static final Logger logger = LoggerFactory.getLogger(ClientHandlerAdapter.class);
 
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) {
-        if (MemberConfig.getInstance().isAutoSpread()) {
-            InfoCommand infoCommand = new InfoCommand();
-            infoCommand.setClusters(AllMember.getInstance().getClusters());
-            ctx.channel().writeAndFlush(infoCommand);
-        }
+  @Override
+  public void channelActive(ChannelHandlerContext ctx) {
+    if (MemberConfig.getInstance().isAutoSpread()) {
+      InfoCommand infoCommand = new InfoCommand();
+      infoCommand.setClusters(AllMember.getInstance().getClusters());
+      ctx.channel().writeAndFlush(infoCommand);
     }
+  }
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-    }
+  @Override
+  public void channelRead(ChannelHandlerContext ctx, Object msg) {}
 
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.flush();
-    }
+  @Override
+  public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    ctx.flush();
+  }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
-    }
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    cause.printStackTrace();
+    ctx.close();
+  }
 }

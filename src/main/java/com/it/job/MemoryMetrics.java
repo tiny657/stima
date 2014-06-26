@@ -7,89 +7,90 @@ import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.Swap;
 
 public class MemoryMetrics extends AbstractSigarMetric {
-    protected MemoryMetrics(Sigar sigar) {
-        super(sigar);
+  protected MemoryMetrics(Sigar sigar) {
+    super(sigar);
+  }
+
+  public static abstract class MemSegment {
+    protected final int totalMB;
+
+    private MemSegment(long totalBytes) {
+      this.totalMB = (int) (totalBytes / 1024L / 1024L);
     }
 
-    public static abstract class MemSegment {
-        protected final int totalMB;
-
-        private MemSegment(long totalBytes) {
-            this.totalMB = (int) (totalBytes / 1024L / 1024L);
-        }
-
-        public int totalMB() {
-            return totalMB;
-        }
-
-        @Override
-        public String toString() {
-            return ToStringBuilder.reflectionToString(this);
-        }
+    public int totalMB() {
+      return totalMB;
     }
 
-    public static final class MainMemory extends MemSegment {
-        private final int usedMB;
-        private final double usedPercentage;
+    @Override
+    public String toString() {
+      return ToStringBuilder.reflectionToString(this);
+    }
+  }
 
-        private MainMemory(long total, long usedBytes, double usedPercentage) {
-            super(total);
-            this.usedMB = (int) (usedBytes / 1024L / 1024L);
-            this.usedPercentage = usedPercentage;
-        }
 
-        public static MainMemory fromSigarBean(Mem mem) {
-            return new MainMemory(mem.getTotal(), mem.getActualUsed(),
-                    mem.getUsedPercent());
-        }
+  public static final class MainMemory extends MemSegment {
+    private final int usedMB;
+    private final double usedPercentage;
 
-        private static MainMemory undef() {
-            return new MainMemory(-1L, -1L, -1L);
-        }
-
-        public int usedMB() {
-            return usedMB;
-        }
-
-        public double usedPercentage() {
-            return usedPercentage;
-        }
+    private MainMemory(long total, long usedBytes, double usedPercentage) {
+      super(total);
+      this.usedMB = (int) (usedBytes / 1024L / 1024L);
+      this.usedPercentage = usedPercentage;
     }
 
-    public static final class SwapSpace extends MemSegment {
-        private final int usedMB;
-
-        private SwapSpace(long total, long used) {
-            super(total);
-            this.usedMB = (int) (used / 1024L / 1024L);
-        }
-
-        public static SwapSpace fromSigarBean(Swap swap) {
-            return new SwapSpace(swap.getTotal(), swap.getUsed());
-        }
-
-        private static SwapSpace undef() {
-            return new SwapSpace(-1L, -1L);
-        }
-
-        public int usedMB() {
-            return usedMB;
-        }
+    public static MainMemory fromSigarBean(Mem mem) {
+      return new MainMemory(mem.getTotal(), mem.getActualUsed(), mem.getUsedPercent());
     }
 
-    public MainMemory mem() {
-        try {
-            return MainMemory.fromSigarBean(sigar.getMem());
-        } catch (SigarException e) {
-            return MainMemory.undef();
-        }
+    private static MainMemory undef() {
+      return new MainMemory(-1L, -1L, -1L);
     }
 
-    public SwapSpace swap() {
-        try {
-            return SwapSpace.fromSigarBean(sigar.getSwap());
-        } catch (SigarException e) {
-            return SwapSpace.undef();
-        }
+    public int usedMB() {
+      return usedMB;
     }
+
+    public double usedPercentage() {
+      return usedPercentage;
+    }
+  }
+
+
+  public static final class SwapSpace extends MemSegment {
+    private final int usedMB;
+
+    private SwapSpace(long total, long used) {
+      super(total);
+      this.usedMB = (int) (used / 1024L / 1024L);
+    }
+
+    public static SwapSpace fromSigarBean(Swap swap) {
+      return new SwapSpace(swap.getTotal(), swap.getUsed());
+    }
+
+    private static SwapSpace undef() {
+      return new SwapSpace(-1L, -1L);
+    }
+
+    public int usedMB() {
+      return usedMB;
+    }
+  }
+
+  public MainMemory mem() {
+    try {
+      return MainMemory.fromSigarBean(sigar.getMem());
+    } catch (SigarException e) {
+      return MainMemory.undef();
+    }
+  }
+
+  public SwapSpace swap() {
+    try {
+      return SwapSpace.fromSigarBean(sigar.getSwap());
+    } catch (SigarException e) {
+      return SwapSpace.undef();
+    }
+  }
 }

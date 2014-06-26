@@ -10,11 +10,10 @@ import com.it.server.ServerHandlerAdapter;
 
 @Sharable
 public class ServerHandler extends ServerHandlerAdapter {
-    private static final Logger logger = LoggerFactory
-            .getLogger(ServerHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        super.channelRead(ctx, msg);
-    }
+  @Override
+  public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    super.channelRead(ctx, msg);
+  }
 }

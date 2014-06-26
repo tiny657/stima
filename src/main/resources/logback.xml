@@ -9,8 +9,8 @@
     </appender>
 
     <logger name="com.it" additivity="false">
-        <level value="DEBUG" />
-        <appender-ref ref="stdout" />
+        <level value="DEBUG"/>
+        <appender-ref ref="stdout"/>
     </logger>
 
     <root level="DEBUG"></root>
