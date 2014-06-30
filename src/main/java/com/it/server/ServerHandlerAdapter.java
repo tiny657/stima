@@ -1,5 +1,10 @@
 package com.it.server;
 
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.it.client.Client;
 import com.it.command.Command;
 import com.it.command.InfoCommand;
@@ -9,14 +14,11 @@ import com.it.config.MemberConfig;
 import com.it.main.ClientHandler;
 import com.it.main.TestCommand;
 import com.it.model.*;
+
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 @Sharable
 public class ServerHandlerAdapter extends ChannelHandlerAdapter {

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap 101 Template</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Cluster A</div>
+
+    <table class="table">
+        <tbody>
+        <tr>
+            <td>id</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>ip</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>desc</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>sent TPS</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>total sent</td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+    function interval() {
+        var data = {};
+        $.ajax({
+            url: "/interval",
+            type: "GET",
+            dataType: "json",
+            data: data,
+            success: function(data, textStatus, jqXHR) {
+                alert("TEST");
+                if (data != 'null') {
+                    var jsonData = jQuery.parseJSON(data);
+                }
+            }
+        });
+    }
+
+    var refresh = setInterval(function () {
+        interval();
+    }, 1000);
+</script>
+
+</body>
+</html>
