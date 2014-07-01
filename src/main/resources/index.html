@@ -26,24 +26,36 @@
     <table class="table">
         <tbody>
         <tr>
-            <td>id</td>
-            <td></td>
+            <td>host</td>
+            <td id="host"></td>
         </tr>
         <tr>
-            <td>ip</td>
-            <td></td>
+            <td>port</td>
+            <td id="port"></td>
         </tr>
         <tr>
             <td>desc</td>
-            <td></td>
+            <td id="desc"></td>
         </tr>
         <tr>
             <td>sent TPS</td>
-            <td></td>
+            <td id="sentTps"></td>
         </tr>
         <tr>
             <td>total sent</td>
-            <td></td>
+            <td id="totalSent"></td>
+        </tr>
+        <tr>
+            <td>masterPriority</td>
+            <td id="masterPriority"></td>
+        </tr>
+        <tr>
+            <td>priorityPoint</td>
+            <td id="priorityPoint"></td>
+        </tr>
+        <tr>
+            <td>status</td>
+            <td id="status"></td>
         </tr>
         </tbody>
     </table>
@@ -57,11 +69,15 @@
             type: "GET",
             dataType: "json",
             data: data,
-            success: function(data, textStatus, jqXHR) {
-                alert("TEST");
-                if (data != 'null') {
-                    var jsonData = jQuery.parseJSON(data);
-                }
+            success: function(json) {
+                $("#host").text(json.host);
+                $("#port").text(json.port);
+                $("#desc").text(json.desc);
+                $("#sentTps").text(json.sentTps);
+                $("#totalSent").text(json.totalSent);
+                $("#masterPriority").text(json.masterPriority);
+                $("#priorityPoint").text(json.priorityPoint);
+                $("#status").text(json.status);
             }
         });
     }

@@ -23,17 +23,16 @@ public class MemberConfig {
   private static final String CLUSTER = "cluster";
   private static final String HOST = "myinfo.host";
   private static final String PORT = "myinfo.port";
-
+  private static final String DESC = "myinfo.desc";
   private static final String SPREAD_TIME = "config.spreadTime";
-
   private static final String MASTER_PRIORITY = "master.priority";
-
   private static final String MONITOR_ENABLE = "monitor.enable";
 
   private PropertiesConfiguration config;
   private String propertiesFile;
   private String host;
   private int port;
+  private String desc;
 
   private int spreadTime = 5;
 
@@ -69,6 +68,14 @@ public class MemberConfig {
 
   public void setPort(int port) {
     this.port = port;
+  }
+
+  public String getDesc() {
+    return desc;
+  }
+
+  public void setDesc(String desc) {
+    this.desc = desc;
   }
 
   public int getSpreadTime() {
@@ -161,6 +168,8 @@ public class MemberConfig {
       setPort(config.getInt(PORT));
     }
 
+    setDesc(config.getString(DESC));
+
     // config
     setSpreadTime(config.getInt(SPREAD_TIME));
 
@@ -181,7 +190,7 @@ public class MemberConfig {
 
     // set master.priority & bootup time.
     Member me = AllMember.getInstance().me();
-    me.setMasterPriority(config.getInt(MASTER_PRIORITY, 0));
+    me.setMasterPriority(config.getShort(MASTER_PRIORITY, (short) 0));
     me.setBootupTime(new Date());
   }
 }

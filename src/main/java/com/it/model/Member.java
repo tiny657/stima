@@ -16,7 +16,7 @@ public class Member implements Comparable<Member>, Serializable {
   private static final Logger logger = LoggerFactory.getLogger(Member.class);
 
   private Date bootupTime;
-  private int masterPriority, priorityPoint;
+  private short masterPriority, priorityPoint;
   private int id;
   private String host;
   private int port;
@@ -70,11 +70,11 @@ public class Member implements Comparable<Member>, Serializable {
     this.bootupTime = bootupTime;
   }
 
-  public int getMasterPriority() {
+  public short getMasterPriority() {
     return masterPriority;
   }
 
-  public void setMasterPriority(int masterPriority) {
+  public void setMasterPriority(short masterPriority) {
     this.masterPriority = masterPriority;
   }
 
@@ -90,7 +90,7 @@ public class Member implements Comparable<Member>, Serializable {
     return !isMaster();
   }
 
-  public int getPriorityPoint() {
+  public short getPriorityPoint() {
     return priorityPoint;
   }
 

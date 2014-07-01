@@ -59,11 +59,11 @@ public class MemberTest {
       throws InterruptedException {
     // Given
     Member member1 = new Member();
-    member1.setMasterPriority(1);
+    member1.setMasterPriority((short) 1);
     member1.setBootupTime(new Date()); // ignore
     Thread.sleep(1);
     Member member2 = new Member();
-    member2.setMasterPriority(2);
+    member2.setMasterPriority((short) 2);
     member2.setBootupTime(new Date()); // ignore
 
     // When
@@ -80,11 +80,11 @@ public class MemberTest {
       throws InterruptedException {
     // Given
     Member member1 = new Member();
-    member1.setMasterPriority(2);
+    member1.setMasterPriority((short) 2);
     member1.setBootupTime(new Date()); // ignore
     Thread.sleep(1);
     Member member2 = new Member();
-    member2.setMasterPriority(1);
+    member2.setMasterPriority((short) 1);
     member2.setBootupTime(new Date()); // ignore
 
     // When
@@ -101,15 +101,15 @@ public class MemberTest {
       throws InterruptedException {
     // Given
     Member member1 = new Member();
-    member1.setMasterPriority(0);
+    member1.setMasterPriority((short) 0);
     member1.setBootupTime(new Date());
     Thread.sleep(1);
     Member member2 = new Member();
-    member2.setMasterPriority(1);
+    member2.setMasterPriority((short) 1);
     member2.setBootupTime(new Date());
     Thread.sleep(1);
     Member member3 = new Member();
-    member3.setMasterPriority(0);
+    member3.setMasterPriority((short) 0);
     member3.setBootupTime(new Date());
 
     // When
@@ -131,11 +131,11 @@ public class MemberTest {
       throws InterruptedException {
     // Given
     Member member1 = new Member();
-    member1.setMasterPriority(1);
+    member1.setMasterPriority((short) 1);
     member1.setBootupTime(new Date());
     Thread.sleep(1);
     Member member2 = new Member();
-    member2.setMasterPriority(1);
+    member2.setMasterPriority((short) 1);
     member2.setBootupTime(new Date());
 
     // When
@@ -152,11 +152,11 @@ public class MemberTest {
       throws InterruptedException {
     // Given
     Member member1 = new Member();
-    member1.setMasterPriority(0);
+    member1.setMasterPriority((short) 0);
     member1.setBootupTime(new Date());
     Thread.sleep(1);
     Member member2 = new Member();
-    member2.setMasterPriority(1);
+    member2.setMasterPriority((short) 1);
     member2.setBootupTime(new Date());
 
     // When
@@ -173,11 +173,11 @@ public class MemberTest {
       throws InterruptedException {
     // Given
     Member member1 = new Member();
-    member1.setMasterPriority(1);
+    member1.setMasterPriority((short) 1);
     member1.setBootupTime(new Date()); // ignore
     Thread.sleep(1);
     Member member2 = new Member();
-    member2.setMasterPriority(2);
+    member2.setMasterPriority((short) 2);
     member2.setBootupTime(new Date()); // ignore
 
     member1.calculatePriorityPointWhenConnect(member2);
@@ -196,11 +196,11 @@ public class MemberTest {
       throws InterruptedException {
     // Given
     Member member1 = new Member();
-    member1.setMasterPriority(1);
+    member1.setMasterPriority((short) 1);
     member1.setBootupTime(new Date());
     Thread.sleep(1);
     Member member2 = new Member();
-    member2.setMasterPriority(0);
+    member2.setMasterPriority((short) 0);
     member2.setBootupTime(new Date());
 
     member1.calculatePriorityPointWhenConnect(member2);
@@ -219,15 +219,15 @@ public class MemberTest {
       throws InterruptedException {
     // Given
     Member member1 = new Member();
-    member1.setMasterPriority(1);
+    member1.setMasterPriority((short) 1);
     member1.setBootupTime(new Date());
     Thread.sleep(1);
     Member member2 = new Member();
-    member2.setMasterPriority(0);
+    member2.setMasterPriority((short) 0);
     member2.setBootupTime(new Date());
     Thread.sleep(1);
     Member member3 = new Member();
-    member3.setMasterPriority(2);
+    member3.setMasterPriority((short) 2);
     member3.setBootupTime(new Date());
 
     member1.calculatePriorityPointWhenConnect(member2);
