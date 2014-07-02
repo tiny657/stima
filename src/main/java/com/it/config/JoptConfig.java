@@ -31,10 +31,14 @@ public class JoptConfig {
       .defaultsTo(StringUtils.EMPTY);
   private ArgumentAcceptingOptionSpec<Integer> portOpt = parser
       .accepts("port", "this server's port").withOptionalArg().ofType(Integer.class).defaultsTo(0);
+  private ArgumentAcceptingOptionSpec<Integer> monitorPortOpt = parser
+      .accepts("monitorPort", "this monitor's port").withOptionalArg().ofType(Integer.class)
+      .defaultsTo(0);
   private OptionSpecBuilder senderOpt = parser.accepts("sender", "If set, this is the sender.");
 
   private String host;
   private int port;
+  private int monitorPort;
   private boolean isSender;
 
   private JoptConfig() {}
@@ -63,6 +67,14 @@ public class JoptConfig {
     this.port = port;
   }
 
+  public int getMonitorPort() {
+    return monitorPort;
+  }
+
+  public void setMonitorPort(int monitorPort) {
+    this.monitorPort = monitorPort;
+  }
+
   public boolean isSender() {
     return isSender;
   }
@@ -77,6 +89,7 @@ public class JoptConfig {
     MailConfig.getInstance().setPropertiesFile(options.valueOf(mailPropertiesOpt));
     setHost(options.valueOf(hostOpt));
     setPort(options.valueOf(portOpt));
+    setMonitorPort(options.valueOf(monitorPortOpt));
     setSender(options.has(senderOpt));
   }
 }

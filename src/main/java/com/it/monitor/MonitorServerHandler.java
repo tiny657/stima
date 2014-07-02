@@ -15,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.it.common.Utils;
-import com.it.config.MemberConfig;
 import com.it.model.AllMember;
-import com.it.model.Interval;
-import com.it.model.Member;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,7 +29,7 @@ import io.netty.util.CharsetUtil;
 public class MonitorServerHandler extends SimpleChannelInboundHandler<Object> {
   private static final Logger logger = LoggerFactory.getLogger(MonitorServerHandler.class);
 
-  private final StringBuilder buf = new StringBuilder();
+  private static final String INDEX = "/index.html";
 
   @Override
   public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
@@ -75,16 +72,11 @@ public class MonitorServerHandler extends SimpleChannelInboundHandler<Object> {
   private String getContent(String path) {
     String content = StringUtils.EMPTY;
     if (StringUtils.equals(path, "/interval")) {
-      MemberConfig memberConfig = MemberConfig.getInstance();
-      Member me = AllMember.getInstance().me();
-      Interval interval =
-          new Interval(memberConfig.getHost(), memberConfig.getPort(), memberConfig.getDesc(),
-              me.getSentTPS(), me.getTotalSent(), me.getMasterPriority(), me.getPriorityPoint(), me
-                  .getStatus().toString());
-      content = Utils.toJson(interval);
+      content = Utils.toJson(AllMember.getInstance().getClusters().getMemberListMap());
+      logger.info(content);
     } else if (StringUtils.equals(path, "/")) {
       try {
-        content = IOUtils.toString(getClass().getResourceAsStream("/index.html"), "UTF-8");
+        content = IOUtils.toString(getClass().getResourceAsStream(INDEX), "UTF-8");
       } catch (IOException e) {
         e.printStackTrace();
       }

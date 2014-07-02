@@ -50,7 +50,7 @@ public class ItRunner {
       Member me = AllMember.getInstance().me();
 
       // monitor
-      new MonitorServer(8080).run();
+      new MonitorServer(MemberConfig.getInstance().getMonitorPort()).run();
 
       // server
       Server server = new Server(me);
@@ -126,6 +126,5 @@ public class ItRunner {
 
     // monitor
     JobManager.getInstance().runCollectorJob();
-
   }
 }

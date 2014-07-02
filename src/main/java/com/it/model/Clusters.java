@@ -6,11 +6,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Maps;
 
 public class Clusters implements Serializable {
   private static final long serialVersionUID = -8267158344891748076L;
-  private Map<String, MemberList> memberListMap = Maps.newHashMap();
+
+  private Map<String, MemberList> memberListMap = Maps.newTreeMap();
   transient private static final MemberList EMPTY_MEMBERLIST = new MemberList();
 
   public Member findMe() {
@@ -59,6 +61,7 @@ public class Clusters implements Serializable {
     }
   }
 
+  @JsonIgnore
   public Set<String> getClusterNames() {
     return memberListMap.keySet();
   }

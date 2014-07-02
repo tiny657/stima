@@ -19,46 +19,7 @@
 <body>
 
 
-<div class="panel panel-default">
-    <!-- Default panel contents -->
-    <div class="panel-heading">Cluster A</div>
-
-    <table class="table">
-        <tbody>
-        <tr>
-            <td>host</td>
-            <td id="host"></td>
-        </tr>
-        <tr>
-            <td>port</td>
-            <td id="port"></td>
-        </tr>
-        <tr>
-            <td>desc</td>
-            <td id="desc"></td>
-        </tr>
-        <tr>
-            <td>sent TPS</td>
-            <td id="sentTps"></td>
-        </tr>
-        <tr>
-            <td>total sent</td>
-            <td id="totalSent"></td>
-        </tr>
-        <tr>
-            <td>masterPriority</td>
-            <td id="masterPriority"></td>
-        </tr>
-        <tr>
-            <td>priorityPoint</td>
-            <td id="priorityPoint"></td>
-        </tr>
-        <tr>
-            <td>status</td>
-            <td id="status"></td>
-        </tr>
-        </tbody>
-    </table>
+<div id="base" class="panel panel-default">
 </div>
 
 <script type="text/javascript">
@@ -70,14 +31,25 @@
             dataType: "json",
             data: data,
             success: function(json) {
-                $("#host").text(json.host);
-                $("#port").text(json.port);
-                $("#desc").text(json.desc);
-                $("#sentTps").text(json.sentTps);
-                $("#totalSent").text(json.totalSent);
-                $("#masterPriority").text(json.masterPriority);
-                $("#priorityPoint").text(json.priorityPoint);
-                $("#status").text(json.status);
+                var base = "";
+                $.each(json, function(cluster, members){
+                    base += "<div class=\"panel-heading\">" + cluster + "</div>";
+
+                    $.each(members.members, function(i, member) {
+                        base += '<table class="table">';
+                        base += '<thead><tr><th>host</th><th>' + member.hostPort + '</th></tr></thread>';
+                        base += '<tbody><tr><td>desc</td><td>' + member.desc + '</td></tr>';
+                        base += '<tr><td>sent TPS</td><td>' + member.sentTPS + '</td></tr>';
+                        base += '<tr><td>total sent</td><td>' + member.totalSent + '</td></tr>';
+                        base += '<tr><td>received TPS</td><td>' + member.receivedTPS + '</td></tr>';
+                        base += '<tr><td>total received</td><td>' + member.totalReceived + '</td></tr>';
+                        base += '<tr><td>masterPriority</td><td>' + member.masterPriority + '</td></tr>';
+                        base += '<tr><td>priorityPoint</td><td>' + member.priorityPoint + '</td></tr>';
+                        base += '<tr><td>status</td><td>' + member.status + '</td></tr>';
+                        base += '</tbody></table>';
+                    });
+                });
+                $("#base").html(base);
             }
         });
     }

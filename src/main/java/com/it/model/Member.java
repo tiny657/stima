@@ -3,6 +3,7 @@ package com.it.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ public class Member implements Comparable<Member>, Serializable {
   private int id;
   private String host;
   private int port;
+  private String desc;
   private Status status = Status.SHUTDOWN;
   private boolean me = false;
 
@@ -86,6 +88,7 @@ public class Member implements Comparable<Member>, Serializable {
     return getPriorityPoint() == 0;
   }
 
+  @JsonIgnore
   public boolean isStandby() {
     return !isMaster();
   }
@@ -136,6 +139,7 @@ public class Member implements Comparable<Member>, Serializable {
     this.id = id;
   }
 
+  @JsonIgnore
   public String getHost() {
     return host;
   }
@@ -144,6 +148,7 @@ public class Member implements Comparable<Member>, Serializable {
     this.host = host;
   }
 
+  @JsonIgnore
   public int getPort() {
     return port;
   }
@@ -156,6 +161,15 @@ public class Member implements Comparable<Member>, Serializable {
     return host + ":" + port;
   }
 
+  public String getDesc() {
+    return desc;
+  }
+
+  public void setDesc(String desc) {
+    this.desc = desc;
+  }
+
+  @JsonIgnore
   public boolean isRunning() {
     if (status == Status.RUNNING) {
       return true;

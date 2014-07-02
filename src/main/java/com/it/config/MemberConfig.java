@@ -27,6 +27,7 @@ public class MemberConfig {
   private static final String SPREAD_TIME = "config.spreadTime";
   private static final String MASTER_PRIORITY = "master.priority";
   private static final String MONITOR_ENABLE = "monitor.enable";
+  private static final String MONITOR_PORT = "monitor.port";
 
   private PropertiesConfiguration config;
   private String propertiesFile;
@@ -37,6 +38,7 @@ public class MemberConfig {
   private int spreadTime = 5;
 
   private boolean monitorEnable;
+  private int monitorPort;
 
   private MemberConfig() {}
 
@@ -96,6 +98,14 @@ public class MemberConfig {
 
   public void setMonitorEnable(boolean monitorEnable) {
     this.monitorEnable = monitorEnable;
+  }
+
+  public void setMonitorPort(int monitorPort) {
+    this.monitorPort = monitorPort;
+  }
+
+  public int getMonitorPort() {
+    return monitorPort;
   }
 
   public void addMember(String cluster, Member member) {
@@ -159,6 +169,7 @@ public class MemberConfig {
     // from jopt
     setHost(JoptConfig.getInstance().getHost());
     setPort(JoptConfig.getInstance().getPort());
+    setMonitorPort(JoptConfig.getInstance().getMonitorPort());
 
     if (host.equals(StringUtils.EMPTY)) {
       setHost(config.getString(HOST));
@@ -175,6 +186,9 @@ public class MemberConfig {
 
     // monitor
     setMonitorEnable(config.getBoolean(MONITOR_ENABLE));
+    if (monitorPort == 0) {
+      setMonitorPort(config.getInt(MONITOR_PORT));
+    }
 
     // add cluster
     AllMember.getInstance().addClusters(getClustersArray());
@@ -188,9 +202,10 @@ public class MemberConfig {
       }
     }
 
-    // set master.priority & bootup time.
+    // set master.priority & bootup time & desc.
     Member me = AllMember.getInstance().me();
     me.setMasterPriority(config.getShort(MASTER_PRIORITY, (short) 0));
     me.setBootupTime(new Date());
+    me.setDesc(desc);
   }
 }

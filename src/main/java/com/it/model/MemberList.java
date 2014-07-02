@@ -3,6 +3,7 @@ package com.it.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,7 @@ public class MemberList implements Serializable {
     return members;
   }
 
+  @JsonIgnore
   public List<Member> getRunningMembers() {
     List<Member> runningMembers = Lists.newArrayList();
     for (Member member : members) {

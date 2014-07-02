@@ -91,12 +91,13 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
             AllMember.getInstance().getMember(receivedMember.getHost(), receivedMember.getPort());
         receivedMemberInLocal.setStatus(receivedMember.getStatus());
         receivedMemberInLocal.setBootupTime(receivedMember.getBootupTime());
+        receivedMemberInLocal.setDesc(receivedMember.getDesc());
 
         AllMember.getInstance().me().calculatePriorityPointWhenConnect(receivedMember);
         ReferenceCountUtil.release(msg);
       }
       logger.info(AllMember.getInstance().toString());
-    } else if (msg instanceof TestCommand) {
+    } else {
       AllMember.getInstance().me().increaseReceivedCount();
     }
   }
