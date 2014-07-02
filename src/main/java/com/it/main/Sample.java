@@ -12,9 +12,9 @@ public class Sample {
   public static void main(String[] args) throws InterruptedException {
     ItRunner.getInstance().execute(new ServerHandler(), new ClientHandler(), args);
     if (JoptConfig.getInstance().isSender()) {
-      for (int i = 0; i < 3; i++) {
-        Sender.sendUnicast("b", 2, new TestCommand());
-        Thread.sleep(1000);
+      for (int i = 0; i < 30; i++) {
+        Sender.sendAnycast("b", new TestCommand());
+        Thread.sleep(100);
       }
       ItRunner.getInstance().shutdown();
     }

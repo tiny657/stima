@@ -38,14 +38,16 @@
                     $.each(members.members, function(i, member) {
                         base += '<table class="table">';
                         base += '<thead><tr><th>host</th><th>' + member.hostPort + '</th></tr></thread>';
+                        base += '<tbody><tr><td>id</td><td>' + member.id + '</td></tr>';
                         base += '<tbody><tr><td>desc</td><td>' + member.desc + '</td></tr>';
                         base += '<tr><td>sent TPS</td><td>' + member.sentTPS + '</td></tr>';
                         base += '<tr><td>total sent</td><td>' + member.totalSent + '</td></tr>';
                         base += '<tr><td>received TPS</td><td>' + member.receivedTPS + '</td></tr>';
                         base += '<tr><td>total received</td><td>' + member.totalReceived + '</td></tr>';
                         base += '<tr><td>masterPriority</td><td>' + member.masterPriority + '</td></tr>';
-                        base += '<tr><td>priorityPoint</td><td>' + member.priorityPoint + '</td></tr>';
                         base += '<tr><td>status</td><td>' + member.status + '</td></tr>';
+                        base += '<tr><td>bootup time</td><td>' + new Date(member.bootupTime) + '</td></tr>';
+                        base += '<tr><td>me</td><td>' + member.me + '</td></tr>';
                         base += '</tbody></table>';
                     });
                 });

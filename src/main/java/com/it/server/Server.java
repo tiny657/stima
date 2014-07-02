@@ -69,6 +69,7 @@ public class Server extends Thread {
 
       awaitDisconnection(channelFuture);
     } catch (InterruptedException e) {
+      e.printStackTrace();
     } finally {
       workerGroup.shutdownGracefully();
       bossGroup.shutdownGracefully();

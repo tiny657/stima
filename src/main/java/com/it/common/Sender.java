@@ -9,6 +9,7 @@ import com.it.command.Command;
 import com.it.model.AllMember;
 import com.it.model.Member;
 import com.it.model.MemberList;
+import io.netty.channel.ChannelFuture;
 
 public class Sender {
   private static final Logger logger = LoggerFactory.getLogger(Sender.class);
@@ -52,11 +53,11 @@ public class Sender {
       logger.error("Send fail.  Because there is no member in {}", targetCluster);
       return false;
     } else {
+      AllMember.getInstance().getMemberInfos().getChannelFuture(member).channel()
+          .writeAndFlush(msg);
       if (!(msg instanceof Command)) {
         member.increaseSentCount();
       }
-      AllMember.getInstance().getMemberInfos().getChannelFuture(member).channel()
-          .writeAndFlush(msg);
     }
 
     return true;
@@ -83,16 +84,21 @@ public class Sender {
     Member member =
         AllMember.getInstance().getClusters().getMemberListIn(targetCluster).getMember(targetId);
 
-    System.out.println(member.toString());
     if (member == null) {
-      logger.error("Send fail.  Because there is no member in {}", targetCluster);
+      logger.error("Send fail.  Because there is no member in {}(id:{})", targetCluster, targetId);
       return false;
     } else {
-      if (!(msg instanceof Command)) {
-        member.increaseSentCount();
+      ChannelFuture channelFuture =
+          AllMember.getInstance().getMemberInfos().getChannelFuture(member);
+      if (channelFuture != null) {
+        channelFuture.channel().writeAndFlush(msg);
+        if (!(msg instanceof Command)) {
+          member.increaseSentCount();
+        }
+      } else {
+        logger.warn("Send fail.  Because the status of {}(id:{}) isn't running.", targetCluster,
+            targetId);
       }
-      AllMember.getInstance().getMemberInfos().getChannelFuture(member).channel()
-          .writeAndFlush(msg);
     }
 
     return true;

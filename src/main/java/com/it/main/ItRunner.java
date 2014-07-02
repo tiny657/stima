@@ -50,7 +50,8 @@ public class ItRunner {
       Member me = AllMember.getInstance().me();
 
       // monitor
-      new MonitorServer(MemberConfig.getInstance().getMonitorPort()).run();
+      MonitorServer monitorServer = new MonitorServer(MemberConfig.getInstance().getMonitorPort());
+      monitorServer.start();
 
       // server
       Server server = new Server(me);
@@ -112,6 +113,11 @@ public class ItRunner {
         }
       }
     }
+
+    // change status to Shutdown
+    Member myInfo = AllMember.getInstance().me();
+    AllMember.getInstance().getMember(myInfo.getHost(), myInfo.getPort())
+        .setStatus(Status.SHUTDOWN);
   }
 
   private void initialize(String[] args) {

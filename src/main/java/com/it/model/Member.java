@@ -3,12 +3,12 @@ package com.it.model;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.it.common.Utils;
 
 public class Member implements Comparable<Member>, Serializable {
@@ -26,6 +26,7 @@ public class Member implements Comparable<Member>, Serializable {
   private boolean me = false;
 
   transient private long totalSent, totalReceived;
+  transient private long prevTotalSent, prevTotalReceived;
   transient private int nowSecond;
   transient private int sentTPS, receivedTPS;
 
@@ -93,6 +94,7 @@ public class Member implements Comparable<Member>, Serializable {
     return !isMaster();
   }
 
+  @JsonIgnore
   public short getPriorityPoint() {
     return priorityPoint;
   }
@@ -198,11 +200,11 @@ public class Member implements Comparable<Member>, Serializable {
   }
 
   public long increaseSentCount() {
-    sentTPS++;
     totalSent++;
     if (nowSecond != DateTime.now().getSecondOfDay()) {
+      sentTPS = (int) (totalSent - prevTotalSent);
+      prevTotalSent = totalSent;
       logger.info("sentTps: {}, totalSent: {}", sentTPS, totalSent);
-      sentTPS = 0;
       nowSecond = DateTime.now().getSecondOfDay();
     }
 
@@ -222,11 +224,11 @@ public class Member implements Comparable<Member>, Serializable {
   }
 
   public long increaseReceivedCount() {
-    receivedTPS++;
     totalReceived++;
     if (nowSecond != DateTime.now().getSecondOfDay()) {
+      receivedTPS = (int) (totalReceived - prevTotalReceived);
+      prevTotalReceived = totalReceived;
       logger.info("receivedTps: {}, totalReceived: {}", receivedTPS, totalReceived);
-      receivedTPS = 0;
       nowSecond = DateTime.now().getSecondOfDay();
     }
 

@@ -1,7 +1,10 @@
 package com.it.monitor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -10,19 +13,22 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
-public class MonitorServer {
+public class MonitorServer extends Thread {
+  private static final Logger logger = LoggerFactory.getLogger(MonitorServer.class);
+
   private final int port;
 
   public MonitorServer(int port) {
     this.port = port;
   }
 
-  public void run() throws Exception {
+  @Override
+  public void run() {
     EventLoopGroup bossGroup = new NioEventLoopGroup();
     EventLoopGroup workerGroup = new NioEventLoopGroup();
     try {
-      ServerBootstrap b = new ServerBootstrap();
-      b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+      ServerBootstrap bootstrap = new ServerBootstrap();
+      bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
           .childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             public void initChannel(SocketChannel socketChannel) throws Exception {
@@ -31,11 +37,19 @@ public class MonitorServer {
             }
           });
 
-      Channel ch = b.bind(port).sync().channel();
-      ch.closeFuture().sync();
+      ChannelFuture channelFuture = bootstrap.bind(port).sync();
+      logger.info("monitor server started (port: {})", port);
+      awaitDisconnection(channelFuture);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     } finally {
       bossGroup.shutdownGracefully();
       workerGroup.shutdownGracefully();
     }
+  }
+
+  private void awaitDisconnection(ChannelFuture channelFuture) throws InterruptedException {
+    channelFuture.channel().closeFuture().sync();
+    logger.info("monitor server closed (port: {})", port);
   }
 }

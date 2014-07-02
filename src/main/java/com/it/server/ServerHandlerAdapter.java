@@ -37,7 +37,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
         if (savedClusters != null) {
           removeMembers(savedClusters);
           addMembers(savedClusters);
-          logger.info("Appled the received properties.");
+          logger.info("Applied the received properties.");
         }
 
         if (member != null) {
