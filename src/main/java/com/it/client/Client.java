@@ -116,7 +116,6 @@ public class Client extends Thread {
 
   private void awaitDisconnection(ChannelFuture channelFuture) throws InterruptedException {
     channelFuture.channel().closeFuture().sync();
-    channelFuture = null;
 
     myInfo.setStatus(Status.SHUTDOWN);
 

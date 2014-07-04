@@ -47,14 +47,13 @@ public class ItRunner {
     try {
       initialize(args);
       Clusters clusters = AllMember.getInstance().getClusters();
-      Member me = AllMember.getInstance().me();
 
       // monitor
       MonitorServer monitorServer = new MonitorServer(MemberConfig.getInstance().getMonitorPort());
       monitorServer.start();
 
       // server
-      Server server = new Server(me);
+      Server server = new Server(AllMember.getInstance().me());
       server.setServerHandler(serverHandlerAdapter);
       server.start();
       server.await();
@@ -100,10 +99,6 @@ public class ItRunner {
       e.printStackTrace();
     }
 
-    Member me = AllMember.getInstance().me();
-    // close server.
-    AllMember.getInstance().getMemberInfos().getChannelFuture(me).channel().close();
-
     // close client.
     Clusters clusters = AllMember.getInstance().getClusters();
     for (String clusterName : clusters.getClusterNames()) {
@@ -114,10 +109,9 @@ public class ItRunner {
       }
     }
 
-    // change status to Shutdown
-    Member myInfo = AllMember.getInstance().me();
-    AllMember.getInstance().getMember(myInfo.getHost(), myInfo.getPort())
-        .setStatus(Status.SHUTDOWN);
+    // close server.
+    Member me = AllMember.getInstance().me();
+    AllMember.getInstance().getMemberInfos().getChannelFuture(me).channel().close();
   }
 
   private void initialize(String[] args) {

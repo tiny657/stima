@@ -12,7 +12,6 @@ import com.it.command.StartCommand;
 import com.it.command.StopCommand;
 import com.it.config.MemberConfig;
 import com.it.main.ClientHandler;
-import com.it.main.TestCommand;
 import com.it.model.*;
 
 import io.netty.channel.ChannelHandler.Sharable;

@@ -1,5 +1,12 @@
 package com.it.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.it.model.AllMember;
+import com.it.model.Member;
+import com.it.model.Status;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -11,13 +18,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.it.model.AllMember;
-import com.it.model.Member;
-import com.it.model.Status;
 
 public class Server extends Thread {
   private static final Logger logger = LoggerFactory.getLogger(Server.class);
@@ -87,6 +87,11 @@ public class Server extends Thread {
 
   private void awaitDisconnection(ChannelFuture channelFuture) throws InterruptedException {
     channelFuture.channel().closeFuture().sync();
+
+    // change status to Shutdown
+    AllMember.getInstance().getMember(myInfo.getHost(), myInfo.getPort())
+        .setStatus(Status.SHUTDOWN);
+
     logger.info("server closed ({})", myInfo.getHostPort());
   }
 }

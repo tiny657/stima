@@ -27,7 +27,7 @@ public class Member implements Comparable<Member>, Serializable {
 
   transient private long totalSent, totalReceived;
   transient private long prevTotalSent, prevTotalReceived;
-  transient private int nowSecond;
+  transient private int timeForReceived, timeForSent;
   transient private int sentTPS, receivedTPS;
 
   public Member() {}
@@ -73,6 +73,7 @@ public class Member implements Comparable<Member>, Serializable {
     this.bootupTime = bootupTime;
   }
 
+  @JsonIgnore
   public short getMasterPriority() {
     return masterPriority;
   }
@@ -192,20 +193,20 @@ public class Member implements Comparable<Member>, Serializable {
   }
 
   public int getSentTPS() {
-    if (nowSecond != DateTime.now().getSecondOfDay()) {
+    if (timeForSent != DateTime.now().getSecondOfDay()) {
       sentTPS = 0;
-      nowSecond = DateTime.now().getSecondOfDay();
+      timeForSent = DateTime.now().getSecondOfDay();
     }
     return sentTPS;
   }
 
   public long increaseSentCount() {
     totalSent++;
-    if (nowSecond != DateTime.now().getSecondOfDay()) {
+    if (timeForSent != DateTime.now().getSecondOfDay()) {
       sentTPS = (int) (totalSent - prevTotalSent);
       prevTotalSent = totalSent;
       logger.info("sentTps: {}, totalSent: {}", sentTPS, totalSent);
-      nowSecond = DateTime.now().getSecondOfDay();
+      timeForSent = DateTime.now().getSecondOfDay();
     }
 
     return totalSent;
@@ -216,20 +217,20 @@ public class Member implements Comparable<Member>, Serializable {
   }
 
   public int getReceivedTPS() {
-    if (nowSecond != DateTime.now().getSecondOfDay()) {
+    if (timeForReceived != DateTime.now().getSecondOfDay()) {
       receivedTPS = 0;
-      nowSecond = DateTime.now().getSecondOfDay();
+      timeForReceived = DateTime.now().getSecondOfDay();
     }
     return receivedTPS;
   }
 
   public long increaseReceivedCount() {
     totalReceived++;
-    if (nowSecond != DateTime.now().getSecondOfDay()) {
+    if (timeForReceived != DateTime.now().getSecondOfDay()) {
       receivedTPS = (int) (totalReceived - prevTotalReceived);
       prevTotalReceived = totalReceived;
       logger.info("receivedTps: {}, totalReceived: {}", receivedTPS, totalReceived);
-      nowSecond = DateTime.now().getSecondOfDay();
+      timeForReceived = DateTime.now().getSecondOfDay();
     }
 
     return totalReceived;
@@ -262,7 +263,7 @@ public class Member implements Comparable<Member>, Serializable {
       status += ", me";
     }
 
-    return id + ":" + host + ":" + port + "(" + status + ", sent: " + totalSent + ", received: "
-        + totalReceived + ")";
+    return id + ":" + host + ":" + port + "(" + status + ", sent: " + +sentTPS + "/" + totalSent
+        + ", received: " + receivedTPS + "/" + totalReceived + ")";
   }
 }
