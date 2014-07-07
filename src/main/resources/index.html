@@ -39,22 +39,23 @@
                     code += '<div class="panel-group">';
                     $.each(members.members, function(i, member) {
                         code += '<table class="table">';
-                        code += '<thead><tr><th>host</th><th>' + member.hostPort + '</th></tr></thread>';
+                        var me = "";
+                        if (member.me == true) {
+                            me = "class=\"success\"";
+                        }
+                        code += '<thead><tr ' + me + '><th>host</th><th>' + member.hostPort + '</th></tr></thread>';
                         code += '<tbody><tr><td>id</td><td>' + member.id + '</td></tr>';
                         code += '<tr><td>desc</td><td>' + member.desc + '</td></tr>';
                         if (member.me == true) {
-                            code += '<tr><td>received TPS</td><td>' + member.receivedTPS + '</td></tr>';
-                            code += '<tr><td>total received</td><td>' + member.totalReceived + '</td></tr>';
+                            code += '<tr><td>read (TPS/total)</td><td>' + member.receivedTPS + '/' + member.totalReceived + '</td></tr>';
                         } else {
-                            code += '<tr><td>sent TPS</td><td>' + member.sentTPS + '</td></tr>';
-                            code += '<tr><td>total sent</td><td>' + member.totalSent + '</td></tr>';
+                            code += '<tr><td>write (TPS/total)</td><td>' + member.sentTPS + '/' + member.totalSent + '</td></tr>';
                         }
                         code += '<tr><td>master</td><td>' + member.master + '</td></tr>';
                         code += '<tr><td>status</td><td>' + member.status + '</td></tr>';
                         if (member.bootupTime != null) {
                             code += '<tr><td>bootup time</td><td>' + new Date(member.bootupTime) + '</td></tr>';
                         }
-                        code += '<tr><td>me</td><td>' + member.me + '</td></tr>';
                         code += '</tbody></table>';
                     });
                     code += '</div></div></div>';
