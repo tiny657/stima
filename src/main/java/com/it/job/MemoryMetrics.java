@@ -31,12 +31,12 @@ public class MemoryMetrics extends AbstractSigarMetric {
 
   public static final class MainMemory extends MemSegment {
     private final int usedMB;
-    private final double usedPercentage;
+    private final double usedPercent;
 
-    private MainMemory(long total, long usedBytes, double usedPercentage) {
+    private MainMemory(long total, long usedBytes, double usedPercent) {
       super(total);
       this.usedMB = (int) (usedBytes / 1024L / 1024L);
-      this.usedPercentage = usedPercentage;
+      this.usedPercent = usedPercent;
     }
 
     public static MainMemory fromSigarBean(Mem mem) {
@@ -51,8 +51,8 @@ public class MemoryMetrics extends AbstractSigarMetric {
       return usedMB;
     }
 
-    public double usedPercentage() {
-      return usedPercentage;
+    public double usedPercent() {
+      return usedPercent;
     }
   }
 

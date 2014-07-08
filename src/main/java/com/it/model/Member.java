@@ -3,6 +3,9 @@ package com.it.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.it.job.CollectorListener;
+import com.it.job.ResourceMetrics;
+import com.mchange.v2.util.ResourceClosedException;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -59,6 +62,14 @@ public class Member implements Comparable<Member>, Serializable {
 
   public boolean isMe() {
     return me;
+  }
+
+  public ResourceMetrics getResource() {
+    if (me) {
+      return CollectorListener.getInstance().getLastResourceMetrics();
+    } else {
+      return null;
+    }
   }
 
   public boolean isEarlier(Member member) {

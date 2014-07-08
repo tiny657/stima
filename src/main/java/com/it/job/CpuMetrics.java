@@ -1,7 +1,6 @@
 package com.it.job;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hyperic.sigar.Cpu;
 import org.hyperic.sigar.CpuPerc;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
@@ -12,46 +11,46 @@ public class CpuMetrics extends AbstractSigarMetric {
   }
 
   public static final class CpuInfo {
-    private final byte userUsedPercentage;
-    private final byte sysUsedPercentage;
-    private final byte loadAverage1M;
-    private final byte loadAverage5M;
-    private final byte loadAverage15M;
+    private final byte userUsedPercent;
+    private final byte sysUsedPercent;
+    private final byte loadAvg1M;
+    private final byte loadAvg5M;
+    private final byte loadAvg15M;
 
-    public CpuInfo(double userUsedPercentage, double sysUsedPercentage, double[] loadAverages) {
-      this.userUsedPercentage = (byte) (userUsedPercentage + 0.5);
-      this.sysUsedPercentage = (byte) (sysUsedPercentage + 0.5);
-      this.loadAverage1M = (byte) loadAverages[0];
-      this.loadAverage5M = (byte) loadAverages[1];
-      this.loadAverage15M = (byte) loadAverages[2];
+    public CpuInfo(double userUsedPercent, double sysUsedPercent, double[] loadAvgs) {
+      this.userUsedPercent = (byte) (userUsedPercent + 0.5);
+      this.sysUsedPercent = (byte) (sysUsedPercent + 0.5);
+      this.loadAvg1M = (byte) loadAvgs[0];
+      this.loadAvg5M = (byte) loadAvgs[1];
+      this.loadAvg15M = (byte) loadAvgs[2];
     }
 
-    public static CpuInfo fromSigarBean(CpuPerc cpuPerc, double[] loadAverages) {
-      return new CpuInfo(cpuPerc.getUser() * 100, cpuPerc.getSys() * 100, loadAverages);
+    public static CpuInfo fromSigarBean(CpuPerc cpuPerc, double[] loadAvgs) {
+      return new CpuInfo(cpuPerc.getUser() * 100, cpuPerc.getSys() * 100, loadAvgs);
     }
 
     public static CpuInfo undef() {
       return new CpuInfo(-1, -1, new double[] {-1, -1, -1});
     }
 
-    public byte userUsedPercentage() {
-      return userUsedPercentage;
+    public byte userUsedPercent() {
+      return userUsedPercent;
     }
 
-    public byte sysUsedPercentage() {
-      return sysUsedPercentage;
+    public byte sysUsedPercent() {
+      return sysUsedPercent;
     }
 
-    public byte loadAverage1M() {
-      return loadAverage1M;
+    public byte loadAvg1M() {
+      return loadAvg1M;
     }
 
-    public byte loadAverage5M() {
-      return loadAverage5M;
+    public byte loadAvg5M() {
+      return loadAvg5M;
     }
 
-    public byte loadAverage15M() {
-      return loadAverage15M;
+    public byte loadAvg15M() {
+      return loadAvg15M;
     }
 
     @Override

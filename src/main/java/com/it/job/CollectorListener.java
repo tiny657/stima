@@ -32,6 +32,10 @@ public class CollectorListener implements JobListener {
     return history;
   }
 
+  public ResourceMetrics getLastResourceMetrics() {
+    return resource;
+  }
+
   @Override
   public String getName() {
     return "CollectorListener";
@@ -54,6 +58,5 @@ public class CollectorListener implements JobListener {
     resource = (ResourceMetrics) dataMap.get("resource");
 
     history.add(resource);
-    logger.info(resource.toString());
   }
 }

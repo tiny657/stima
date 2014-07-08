@@ -15,11 +15,11 @@ public class ResourceMetrics {
   private Date date = new Date();
 
   // CPU
-  private byte cpuUserUsedPercentage, cpuSysUsedPercentage;
-  private byte loadAverage1M, loadAverage5M, loadAverage15M;
+  private byte cpuUserUsedPercent, cpuSysUsedPercent;
+  private byte loadAvg1M, loadAvg5M, loadAvg15M;
 
   // Memory
-  private int memoryUsedMB, memoryTotalMB;
+  private int memUsedMB, memTotalMB;
   private int swapUsedMB, swapTotalMB;
 
   // FileSystem
@@ -39,12 +39,26 @@ public class ResourceMetrics {
       this.txKBytes = fileSystem.txKBytes();
     }
 
-    @Override
-    public String toString() {
-      return ToStringBuilder.reflectionToString(this);
+    public String getDeviceName() {
+      return deviceName;
+    }
+
+    public int getFreeSpaceMB() {
+      return freeSpaceMB;
+    }
+
+    public int getTotalSizeMB() {
+      return totalSizeMB;
+    }
+
+    public int getRxKBytes() {
+      return rxKBytes;
+    }
+
+    public int getTxKBytes() {
+      return txKBytes;
     }
   }
-
 
   // Network
   private int networkRxKBytes, networkTxKBytes;
@@ -52,15 +66,15 @@ public class ResourceMetrics {
   public ResourceMetrics(CpuMetrics cpuMetrics, MemoryMetrics memoryMetrics,
       List<FileSystem> fileSystems, Network network) {
     CpuInfo cpu = cpuMetrics.cpu();
-    cpuUserUsedPercentage = cpu.userUsedPercentage();
-    cpuSysUsedPercentage = cpu.sysUsedPercentage();
+    cpuUserUsedPercent = cpu.userUsedPercent();
+    cpuSysUsedPercent = cpu.sysUsedPercent();
 
-    loadAverage1M = cpu.loadAverage1M();
-    loadAverage5M = cpu.loadAverage5M();
-    loadAverage15M = cpu.loadAverage15M();
+    loadAvg1M = cpu.loadAvg1M();
+    loadAvg5M = cpu.loadAvg5M();
+    loadAvg15M = cpu.loadAvg15M();
 
-    memoryUsedMB = memoryMetrics.mem().usedMB();
-    memoryTotalMB = memoryMetrics.mem().totalMB();
+    memUsedMB = memoryMetrics.mem().usedMB();
+    memTotalMB = memoryMetrics.mem().totalMB();
     swapUsedMB = memoryMetrics.swap().usedMB();
     swapTotalMB = memoryMetrics.swap().totalMB();
 
@@ -72,40 +86,40 @@ public class ResourceMetrics {
     networkTxKBytes = (int) network.txKBytes();
   }
 
-  public float getCpuUserUsedPercentage() {
-    return cpuUserUsedPercentage;
+  public float getCpuUserUsedPercent() {
+    return cpuUserUsedPercent;
   }
 
-  public float getCpuSysUsedPercentage() {
-    return cpuSysUsedPercentage;
+  public float getCpuSysUsedPercent() {
+    return cpuSysUsedPercent;
   }
 
-  public byte getLoadAverage1M() {
-    return loadAverage1M;
+  public byte getLoadAvg1M() {
+    return loadAvg1M;
   }
 
-  public byte getLoadAverage5M() {
-    return loadAverage5M;
+  public byte getLoadAvg5M() {
+    return loadAvg5M;
   }
 
-  public byte getLoadAverage15M() {
-    return loadAverage15M;
+  public byte getLoadAvg15M() {
+    return loadAvg15M;
   }
 
-  public int getNetworkRxKBytesPerSecond() {
+  public int getNetworkRxKBytes() {
     return networkRxKBytes;
   }
 
-  public int getNetworkTxKBytesPerSecond() {
+  public int getNetworkTxKBytes() {
     return networkTxKBytes;
   }
 
-  public int getMemoryUsedMB() {
-    return memoryUsedMB;
+  public int getMemUsedMB() {
+    return memUsedMB;
   }
 
-  public int getMemoryTotalMB() {
-    return memoryTotalMB;
+  public int getMemTotalMB() {
+    return memTotalMB;
   }
 
   public int getSwapUsedMB() {
@@ -114,6 +128,10 @@ public class ResourceMetrics {
 
   public int getSwapTotalMB() {
     return swapTotalMB;
+  }
+
+  public List<System> getFileSystems() {
+    return fileSystems;
   }
 
   @Override

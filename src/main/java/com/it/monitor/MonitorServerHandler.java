@@ -73,7 +73,6 @@ public class MonitorServerHandler extends SimpleChannelInboundHandler<Object> {
     String content = StringUtils.EMPTY;
     if (StringUtils.equals(path, "/interval")) {
       content = Utils.toJson(AllMember.getInstance().getClusters().getMemberListMap());
-      logger.info(content);
     } else if (StringUtils.equals(path, "/")) {
       try {
         content = IOUtils.toString(getClass().getResourceAsStream(INDEX), "UTF-8");

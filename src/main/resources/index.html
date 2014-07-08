@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap 101 Template</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap 101 Template</title>
 
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 </head>
 <body>
 
@@ -23,51 +23,69 @@
 </div>
 
 <script type="text/javascript">
-    function interval() {
-        var data = {};
-        $.ajax({
-            url: "/interval",
-            type: "GET",
-            dataType: "json",
-            data: data,
-            success: function(json) {
-                var code = "";
-                $.each(json, function(cluster, members){
-                    code += '<div class="panel panel-default">';
-                    code += '<div class="panel-heading">' + cluster + '</div>';
-                    code += '<div class=panel-body>';
-                    code += '<div class="panel-group">';
-                    $.each(members.members, function(i, member) {
-                        code += '<table class="table">';
-                        var me = "";
-                        if (member.me == true) {
-                            me = "class=\"success\"";
-                        }
-                        code += '<thead><tr ' + me + '><th>host</th><th>' + member.hostPort + '</th></tr></thread>';
-                        code += '<tbody><tr><td>id</td><td>' + member.id + '</td></tr>';
-                        code += '<tr><td>desc</td><td>' + member.desc + '</td></tr>';
-                        if (member.me == true) {
-                            code += '<tr><td>read (TPS/total)</td><td>' + member.receivedTPS + '/' + member.totalReceived + '</td></tr>';
-                        } else {
-                            code += '<tr><td>write (TPS/total)</td><td>' + member.sentTPS + '/' + member.totalSent + '</td></tr>';
-                        }
-                        code += '<tr><td>master</td><td>' + member.master + '</td></tr>';
-                        code += '<tr><td>status</td><td>' + member.status + '</td></tr>';
-                        if (member.bootupTime != null) {
-                            code += '<tr><td>bootup time</td><td>' + new Date(member.bootupTime) + '</td></tr>';
-                        }
-                        code += '</tbody></table>';
-                    });
-                    code += '</div></div></div>';
-                });
-                $("#base").html(code);
+  function interval() {
+    var data = {};
+    $.ajax({
+      url: "/interval",
+      type: "GET",
+      dataType: "json",
+      data: data,
+      success: function (json) {
+        var code = "";
+        $.each(json, function (cluster, members) {
+          code += '<div class="panel panel-default">';
+          code += '<div class="panel-heading">' + cluster + '</div>';
+          code += '<div class=panel-body>';
+          code += '<div class="panel-group">';
+          $.each(members.members, function (i, member) {
+            code += '<table class="table">';
+            var cssForMe = "";
+            if (member.me == true) {
+              cssForMe = "class=\"success\"";
             }
-        });
-    }
+            code += '<thead><tr ' + cssForMe + '><th>host</th><th>' + member.hostPort + '</th></tr></thread>';
+            code += '<tbody><tr><td>id</td><td>' + member.id + '</td></tr>';
+            code += '<tr><td>desc</td><td>' + member.desc + '</td></tr>';
+            if (member.me == true) {
+              code += '<tr><td>read (TPS/total)</td><td>' + member.receivedTPS + '/' + member.totalReceived + '</td></tr>';
+            } else {
+              code += '<tr><td>write (TPS/total)</td><td>' + member.sentTPS + '/' + member.totalSent + '</td></tr>';
+            }
+            code += '<tr><td>master</td><td>' + member.master + '</td></tr>';
+            code += '<tr><td>status</td><td>' + member.status + '</td></tr>';
+            if (member.bootupTime != null) {
+              code += '<tr><td>bootup time</td><td>' + new Date(member.bootupTime) + '</td></tr>';
+            }
+            code += '</tbody></table>';
 
-    var refresh = setInterval(function () {
-        interval();
-    }, 1000);
+            if (member.me == true && member.resource != null) {
+              code += '<table class="table">';
+              code += '<tr><td>cpu usage</td><td>' + member.resource.cpuUserUsedPercent + '% user, ' + member.resource.cpuSysUsedPercent + '% sys </td></tr>';
+              code += '<tr><td>Load Avg(1M 5M 15M)</td><td>' + member.resource.loadAvg1M + ' ' + member.resource.loadAvg5M + ' ' + member.resource.loadAvg15M + '</td></tr>';
+              code += '<tr><td>memory usage</td><td>' + member.resource.memUsedMB + ' / ' + member.resource.memTotalMB + ' MB </td></tr>';
+              code += '<tr><td>swap usage</td><td>' + member.resource.swapUsedMB + ' / ' + member.resource.swapTotalMB + ' MB </td></tr>';
+              code += '<tr><td>network usage(In/Out)</td><td>' + member.resource.networkRxKBytes + ' / ' + member.resource.networkTxKBytes + ' KB </td></tr>';
+              code += '</table>';
+
+              $.each(member.resource.fileSystems, function (j, fileSystem) {
+                code += '<table class="table">';
+                code += '<tr><td>deviceName</td><td>' + fileSystem.deviceName + '</td></tr>';
+                code += '<tr><td>disk usage</td><td>' + fileSystem.freeSpaceMB + ' / ' + fileSystem.totalSizeMB + ' MB </td></tr>';
+                code += '<tr><td>read/write</td><td>' + fileSystem.rxKBytes + ' / ' + fileSystem.txKBytes + ' B </td></tr>';
+                code += '</table>';
+              });
+            }
+          });
+          code += '</div></div></div>';
+        });
+        $("#base").html(code);
+      }
+    });
+  }
+
+  var refresh = setInterval(function () {
+    interval();
+  }, 1000);
 </script>
 
 </body>
