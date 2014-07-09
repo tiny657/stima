@@ -27,11 +27,11 @@ public class AllMember {
   }
 
   public void addCluster(String clusterName) {
-    clusters.add(clusterName);
+    clusters.createCluster(clusterName);
   }
 
   public void addMember(String clusterName, Member member) {
-    clusters.add(clusterName, member);
+    clusters.addMember(clusterName, member);
   }
 
   public void removeCluster(String clusterName) {

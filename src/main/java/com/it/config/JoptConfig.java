@@ -1,7 +1,6 @@
 package com.it.config;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
@@ -47,7 +46,7 @@ public class JoptConfig {
     return instance;
   }
 
-  public void init(String[] args) throws FileNotFoundException, IOException, Exception {
+  public void init(String[] args) throws FileNotFoundException {
     loadJoptOptions(args);
   }
 

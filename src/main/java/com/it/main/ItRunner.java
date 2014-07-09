@@ -1,5 +1,7 @@
 package com.it.main;
 
+import io.netty.channel.ChannelFuture;
+import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,8 @@ import com.it.model.Status;
 import com.it.monitor.MonitorServer;
 import com.it.server.Server;
 import com.it.server.ServerHandlerAdapter;
+
+import java.io.FileNotFoundException;
 
 public class ItRunner {
   private static final Logger logger = LoggerFactory.getLogger(ItRunner.class);
@@ -104,25 +108,27 @@ public class ItRunner {
     for (String clusterName : clusters.getClusterNames()) {
       for (Member member : clusters.getMemberListIn(clusterName).getMembers()) {
         if (!member.isMe()) {
-          AllMember.getInstance().getMemberInfos().getClient(member).shutdown();
+          Client client = AllMember.getInstance().getMemberInfos().getClient(member);
+          if (client != null) {
+            client.shutdown();
+          }
         }
       }
     }
 
     // close server.
     Member me = AllMember.getInstance().me();
-    AllMember.getInstance().getMemberInfos().getChannelFuture(me).channel().close();
+    ChannelFuture channelFuture = AllMember.getInstance().getMemberInfos().getChannelFuture(me);
+    if (channelFuture != null) {
+      channelFuture.channel().close();
+    }
   }
 
-  private void initialize(String[] args) {
+  private void initialize(String[] args) throws ConfigurationException, FileNotFoundException {
     // config
-    try {
-      JoptConfig.getInstance().init(args);
-      MemberConfig.getInstance().init(args);
-      MailConfig.getInstance().init(args);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    JoptConfig.getInstance().init(args);
+    MemberConfig.getInstance().init(args);
+    MailConfig.getInstance().init(args);
 
     // monitor
     JobManager.getInstance().runCollectorJob();

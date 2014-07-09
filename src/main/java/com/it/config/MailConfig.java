@@ -1,8 +1,5 @@
 package com.it.config;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
@@ -44,7 +41,7 @@ public class MailConfig {
     this.propertiesFile = propertiesFile;
   }
 
-  public void init(String[] args) throws FileNotFoundException, IOException, Exception {
+  public void init(String[] args) {
     loadProperties();
   }
 

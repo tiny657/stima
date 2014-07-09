@@ -35,7 +35,7 @@ public class Clusters implements Serializable {
     return null;
   }
 
-  public void add(String clusterName) {
+  public void createCluster(String clusterName) {
     if (!memberListMap.containsKey(clusterName)) {
       memberListMap.put(clusterName, new MemberList());
     }
@@ -45,10 +45,10 @@ public class Clusters implements Serializable {
     memberListMap.remove(clusterName);
   }
 
-  public void add(String clusterName, Member member) {
+  public void addMember(String clusterName, Member member) {
     MemberList memberList = getMemberListIn(clusterName);
     if (memberList == EMPTY_MEMBERLIST) {
-      add(clusterName);
+      createCluster(clusterName);
       memberList = getMemberListIn(clusterName);
     }
     memberList.addMember(member);

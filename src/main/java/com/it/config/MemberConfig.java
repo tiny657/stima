@@ -1,7 +1,5 @@
 package com.it.config;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -50,7 +48,7 @@ public class MemberConfig {
     this.propertiesFile = propertiesFile;
   }
 
-  public void init(String[] args) throws FileNotFoundException, IOException, Exception {
+  public void init(String[] args) throws ConfigurationException {
     loadProperties();
     logger.info(" * Config");
     logger.info(AllMember.getInstance().toString());

@@ -1,19 +1,8 @@
 todo.md
-private.properties
 mail.properties
 
-.springBeans
-.classpath
-.project
-.settings/
-target/
 *.class
 *.pyc
 .DS_Store
-
+target
 *.iml
-
-# Package Files #
-*.war
-*.ear
-/target

@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.Set;
 
+import com.it.exception.DuplicatedIdException;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -19,7 +20,7 @@ public class MemberListTest {
     List<Member> members = Lists.newArrayList();
     MemberList memberList = new MemberList();
     for (int i = 0; i < count; i++) {
-      members.add(new Member(1, "host", i));
+      members.add(new Member(i, "host", i));
       memberList.addMember(members.get(i));
       memberList.setStatus("host", i, Status.RUNNING);
     }
@@ -93,7 +94,7 @@ public class MemberListTest {
     assertThat(findMember2, nullValue());
   }
 
-  @Test
+  @Test(expected= DuplicatedIdException.class)
   public void isDuplicatedId() {
     // Given
     MemberList memberList = new MemberList();
@@ -102,9 +103,6 @@ public class MemberListTest {
 
     // When
     memberList.addMember(new Member(1, "host", 3));
-
-    // Then
-    assertThat(memberList.size(), is(2));
   }
 
   @Test
