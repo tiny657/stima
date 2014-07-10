@@ -3,6 +3,7 @@ package com.it.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.it.exception.InvalidMemberException;
 import com.it.job.CollectorListener;
 import com.it.job.ResourceMetrics;
 import com.mchange.v2.util.ResourceClosedException;
@@ -35,33 +36,23 @@ public class Member implements Comparable<Member>, Serializable {
 
   public Member() {}
 
-  public Member(String id, String host, String port, String myHost, int myPort) {
-    this(Utils.parseInt(id), host, Utils.parseInt(port), myHost, myPort);
-  }
-
-  public Member(String id, String host, String port) {
+  public Member(String id, String host, String port, boolean me) {
     this(Utils.parseInt(id), host, Utils.parseInt(port));
-  }
-
-  public Member(int id, String host, int port, String myHost, int myPort) {
-    this(id, host, port);
-    if (host.equals(myHost) && port == myPort) {
-      me = true;
-    }
+    setMe(me);
   }
 
   public Member(int id, String host, int port) {
-    this.id = id;
-    this.host = host;
-    if (Utils.isPortValid(port)) {
-      this.port = port;
-    } else {
-      logger.error("port({}) is invalid.", port);
-    }
+    setId(id);
+    setHost(host);
+    setPort(port);
   }
 
   public boolean isMe() {
     return me;
+  }
+
+  public void setMe(boolean me) {
+    this.me = me;
   }
 
   public ResourceMetrics getResource() {
@@ -168,7 +159,15 @@ public class Member implements Comparable<Member>, Serializable {
   }
 
   public void setPort(String port) {
-    this.port = Integer.valueOf(port);
+    setPort(Utils.parseInt(port));
+  }
+
+  public void setPort(int port) {
+    if (!Utils.isPortValid(port)) {
+      throw new InvalidMemberException("Port (" + port + ") is invalid.");
+    }
+
+    this.port = port;
   }
 
   public String getHostPort() {

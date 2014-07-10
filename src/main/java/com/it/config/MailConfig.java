@@ -42,10 +42,6 @@ public class MailConfig {
   }
 
   public void init(String[] args) {
-    loadProperties();
-  }
-
-  private void loadProperties() {
     try {
       config = new PropertiesConfiguration(propertiesFile);
       setMasterPriority(config.getInt(MASTER_PRIORITY));
@@ -63,12 +59,12 @@ public class MailConfig {
     logger.info(" * MailConfig is {}", isEnable);
   }
 
-  public void setMasterPriority(int masterPriority) {
-    this.masterPriority = masterPriority;
-  }
-
   public int getMasterPriority() {
     return masterPriority;
+  }
+
+  public void setMasterPriority(int masterPriority) {
+    this.masterPriority = masterPriority;
   }
 
   public boolean isStarttlsEnable() {

@@ -84,8 +84,8 @@ public class ItRunner {
       Thread.sleep(MemberConfig.getInstance().getSpreadTime() * 1000);
 
       // broadcast StartCommand
-      Sender.sendBroadcast(new StartCommand(MemberConfig.getInstance().getHost(), MemberConfig
-          .getInstance().getPort()));
+      Sender.sendBroadcast(new StartCommand(MemberConfig.getInstance().getMyCluster(), MemberConfig
+          .getInstance().getMyId()));
     } catch (Exception e) {
       e.printStackTrace();
       shutdown();
@@ -93,8 +93,8 @@ public class ItRunner {
   }
 
   public void shutdown() {
-    Sender.sendBroadcast(new StopCommand(MemberConfig.getInstance().getHost(), MemberConfig
-        .getInstance().getPort()));
+    Sender.sendBroadcast(new StopCommand(MemberConfig.getInstance().getMyCluster(), MemberConfig
+        .getInstance().getMyId()));
 
     try {
       // wait for 1000ms after sending StopCommand.

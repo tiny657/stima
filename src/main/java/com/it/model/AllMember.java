@@ -69,6 +69,16 @@ public class AllMember {
     return null;
   }
 
+  public Member getMemberByClusterAndId(String cluster, int id) {
+    MemberList memberList = clusters.getMemberListIn(cluster);
+    System.out.println("@" + memberList.toString());
+    if (memberList == null) {
+      return null;
+    }
+
+    return memberList.getMember(id);
+  }
+
   public MemberInfos getMemberInfos() {
     return memberInfos;
   }

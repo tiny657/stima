@@ -3,36 +3,28 @@ package com.it.command;
 import java.io.Serializable;
 
 public class Command implements Serializable {
-  private static final long serialVersionUID = 8171910229844694018L;
+  private static final long serialVersionUID = 4258334791271723894L;
 
-  private String srcHost;
-  private int srcPort;
+  private String myCluster;
+  private int myId;
 
   public Command() {}
 
-  public Command(String srcHost, int srcPort) {
-    this.srcHost = srcHost;
-    this.srcPort = srcPort;
+  public Command(String myCluster, int myId) {
+    this.myCluster = myCluster;
+    this.myId = myId;
   }
 
-  public String getSrcHost() {
-    return srcHost;
+  public String getMyCluster() {
+    return myCluster;
   }
 
-  public void setSrcHost(String host) {
-    this.srcHost = host;
-  }
-
-  public int getSrcPort() {
-    return srcPort;
-  }
-
-  public void setSrcPort(int srcPort) {
-    this.srcPort = srcPort;
+  public int getMyId() {
+    return myId;
   }
 
   @Override
   public String toString() {
-    return srcHost + ":" + srcPort;
+    return myCluster + "." + myId;
   }
 }

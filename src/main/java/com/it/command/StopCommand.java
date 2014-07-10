@@ -1,12 +1,10 @@
 package com.it.command;
 
 public class StopCommand extends Command {
-  private static final long serialVersionUID = -1887486853983762813L;
+  private static final long serialVersionUID = 8700197457995030892L;
 
-  public StopCommand() {}
-
-  public StopCommand(String srcHost, int srcPort) {
-    super(srcHost, srcPort);
+  public StopCommand(String myCluster, int myId) {
+    super(myCluster, myId);
   }
 
   @Override

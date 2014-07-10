@@ -25,18 +25,18 @@ public class JoptConfig {
   private ArgumentAcceptingOptionSpec<String> mailPropertiesOpt = parser
       .accepts("mailProp", "mail properties file").withOptionalArg().ofType(String.class)
       .defaultsTo(DEFAULT_MAIL_PROPERTIES);
-  private ArgumentAcceptingOptionSpec<String> hostOpt = parser
-      .accepts("host", "this server's host").withOptionalArg().ofType(String.class)
+  private ArgumentAcceptingOptionSpec<String> clusterOpt = parser
+      .accepts("cluster", "this server's cluster").withOptionalArg().ofType(String.class)
       .defaultsTo(StringUtils.EMPTY);
-  private ArgumentAcceptingOptionSpec<Integer> portOpt = parser
-      .accepts("port", "this server's port").withOptionalArg().ofType(Integer.class).defaultsTo(0);
+  private ArgumentAcceptingOptionSpec<Integer> idOpt = parser.accepts("id", "this server's id")
+      .withOptionalArg().ofType(Integer.class).defaultsTo(-1);
   private ArgumentAcceptingOptionSpec<Integer> monitorPortOpt = parser
       .accepts("monitorPort", "this monitor's port").withOptionalArg().ofType(Integer.class)
       .defaultsTo(0);
   private OptionSpecBuilder senderOpt = parser.accepts("sender", "If set, this is the sender.");
 
-  private String host;
-  private int port;
+  private String cluster;
+  private int id;
   private int monitorPort;
   private boolean isSender;
 
@@ -47,23 +47,29 @@ public class JoptConfig {
   }
 
   public void init(String[] args) throws FileNotFoundException {
-    loadJoptOptions(args);
+    OptionSet options = parser.parse(args);
+    MemberConfig.getInstance().setPropertiesFile(options.valueOf(memberPropertiesOpt));
+    MailConfig.getInstance().setPropertiesFile(options.valueOf(mailPropertiesOpt));
+    setCluster(options.valueOf(clusterOpt));
+    setId(options.valueOf(idOpt));
+    setMonitorPort(options.valueOf(monitorPortOpt));
+    setSender(options.has(senderOpt));
   }
 
-  public String getHost() {
-    return host;
+  public String getCluster() {
+    return cluster;
   }
 
-  public void setHost(String host) {
-    this.host = host;
+  public void setCluster(String cluster) {
+    this.cluster = cluster;
   }
 
-  public int getPort() {
-    return port;
+  public int getId() {
+    return id;
   }
 
-  public void setPort(int port) {
-    this.port = port;
+  public void setId(int id) {
+    this.id = id;
   }
 
   public int getMonitorPort() {
@@ -80,15 +86,5 @@ public class JoptConfig {
 
   public void setSender(boolean isSender) {
     this.isSender = isSender;
-  }
-
-  private void loadJoptOptions(String[] args) {
-    OptionSet options = parser.parse(args);
-    MemberConfig.getInstance().setPropertiesFile(options.valueOf(memberPropertiesOpt));
-    MailConfig.getInstance().setPropertiesFile(options.valueOf(mailPropertiesOpt));
-    setHost(options.valueOf(hostOpt));
-    setPort(options.valueOf(portOpt));
-    setMonitorPort(options.valueOf(monitorPortOpt));
-    setSender(options.has(senderOpt));
   }
 }

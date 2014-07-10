@@ -3,8 +3,6 @@ package com.it.config;
 import java.util.Date;
 import java.util.List;
 
-import com.it.common.Utils;
-import com.it.exception.InvalidMemberException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
@@ -13,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.it.common.Utils;
+import com.it.exception.InvalidMemberException;
 import com.it.model.AllMember;
 import com.it.model.Member;
 
@@ -21,9 +21,9 @@ public class MemberConfig {
   private static MemberConfig instance = new MemberConfig();
 
   private static final String CLUSTER = "cluster";
-  private static final String HOST = "myinfo.host";
-  private static final String PORT = "myinfo.port";
-  private static final String DESC = "myinfo.desc";
+  private static final String MY_CLUSTER = "my.cluster";
+  private static final String MY_ID = "my.id";
+  private static final String MY_DESC = "my.desc";
   private static final String SPREAD_TIME = "config.spreadTime";
   private static final String MASTER_PRIORITY = "master.priority";
   private static final String MONITOR_ENABLE = "monitor.enable";
@@ -31,9 +31,10 @@ public class MemberConfig {
 
   private PropertiesConfiguration config;
   private String propertiesFile;
-  private String host;
-  private int port;
-  private String desc;
+
+  private String myCluster;
+  private int myId;
+  private String myDesc;
 
   private int spreadTime = 5;
 
@@ -51,61 +52,55 @@ public class MemberConfig {
   }
 
   public void init(String[] args) throws ConfigurationException {
-    loadProperties();
-    logger.info(" * Config");
-    logger.info(AllMember.getInstance().toString());
-  }
+    config = new PropertiesConfiguration(propertiesFile);
+    config.setAutoSave(true);
 
-  public String getHost() {
-    return host;
-  }
+    // from jopt
+    setMyCluster(JoptConfig.getInstance().getCluster());
+    setMyId(JoptConfig.getInstance().getId());
+    setMonitorPort(JoptConfig.getInstance().getMonitorPort());
 
-  public void setHost(String host) {
-    this.host = host;
-  }
+    if (myCluster.equals(StringUtils.EMPTY)) {
+      setMyCluster(config.getString(MY_CLUSTER));
+    }
 
-  public int getPort() {
-    return port;
-  }
+    if (myId == -1) {
+      setMyId(config.getInt(MY_ID));
+    }
 
-  public void setPort(int port) {
-    this.port = port;
-  }
+    setMyDesc(config.getString(MY_DESC));
 
-  public String getDesc() {
-    return desc;
-  }
+    // config
+    setSpreadTime(config.getInt(SPREAD_TIME));
 
-  public void setDesc(String desc) {
-    this.desc = desc;
-  }
+    // monitor
+    setMonitorEnable(config.getBoolean(MONITOR_ENABLE));
+    if (monitorPort == 0) {
+      setMonitorPort(config.getInt(MONITOR_PORT));
+    }
 
-  public int getSpreadTime() {
-    return spreadTime;
-  }
+    // add cluster
+    AllMember.getInstance().addClusters(getClustersArray());
 
-  public void setSpreadTime(int spreadTime) {
-    this.spreadTime = spreadTime;
-  }
+    // add member
+    for (String cluster : AllMember.getInstance().getClusters().getClusterNames()) {
+      for (String idHostPort : getMembers(cluster)) {
+        if (!Utils.isMemberValid(idHostPort)) {
+          throw new InvalidMemberException(idHostPort + " is invalid.");
+        }
+        String[] split = StringUtils.split(idHostPort, ":");
+        boolean me = StringUtils.equals(cluster, myCluster) && (Utils.parseInt(split[0]) == myId);
+        AllMember.getInstance().addMember(cluster, new Member(split[0], split[1], split[2], me));
+      }
+    }
 
-  public boolean isAutoSpread() {
-    return getSpreadTime() != 0;
-  }
+    logger.info(AllMember.getInstance().getClusters().toString());
 
-  public boolean isMonitorEnable() {
-    return monitorEnable;
-  }
-
-  public void setMonitorEnable(boolean monitorEnable) {
-    this.monitorEnable = monitorEnable;
-  }
-
-  public void setMonitorPort(int monitorPort) {
-    this.monitorPort = monitorPort;
-  }
-
-  public int getMonitorPort() {
-    return monitorPort;
+    // set master.priority & bootup time & desc.
+    Member me = AllMember.getInstance().me();
+    me.setMasterPriority(config.getShort(MASTER_PRIORITY, (short) 0));
+    me.setBootupTime(new Date());
+    me.setDesc(myDesc);
   }
 
   public void addMember(String cluster, Member member) {
@@ -144,6 +139,58 @@ public class MemberConfig {
     }
   }
 
+  public String getMyCluster() {
+    return myCluster;
+  }
+
+  public void setMyCluster(String myCluster) {
+    this.myCluster = myCluster;
+  }
+
+  public int getMyId() {
+    return myId;
+  }
+
+  public void setMyId(int myId) {
+    this.myId = myId;
+  }
+
+  public String getMyDesc() {
+    return myDesc;
+  }
+
+  public void setMyDesc(String myDesc) {
+    this.myDesc = myDesc;
+  }
+
+  public int getSpreadTime() {
+    return spreadTime;
+  }
+
+  public void setSpreadTime(int spreadTime) {
+    this.spreadTime = spreadTime;
+  }
+
+  public boolean isAutoSpread() {
+    return getSpreadTime() != 0;
+  }
+
+  public boolean isMonitorEnable() {
+    return monitorEnable;
+  }
+
+  public void setMonitorEnable(boolean monitorEnable) {
+    this.monitorEnable = monitorEnable;
+  }
+
+  public int getMonitorPort() {
+    return monitorPort;
+  }
+
+  public void setMonitorPort(int monitorPort) {
+    this.monitorPort = monitorPort;
+  }
+
   @SuppressWarnings("unchecked")
   public List<String> getMembers(String cluster) {
     return config.getList(getSubCluster(cluster));
@@ -160,55 +207,5 @@ public class MemberConfig {
 
   private String getSubCluster(String cluster) {
     return CLUSTER + "." + cluster;
-  }
-
-  private void loadProperties() throws ConfigurationException {
-    config = new PropertiesConfiguration(propertiesFile);
-    config.setAutoSave(true);
-
-    // from jopt
-    setHost(JoptConfig.getInstance().getHost());
-    setPort(JoptConfig.getInstance().getPort());
-    setMonitorPort(JoptConfig.getInstance().getMonitorPort());
-
-    if (host.equals(StringUtils.EMPTY)) {
-      setHost(config.getString(HOST));
-    }
-
-    if (port == 0) {
-      setPort(config.getInt(PORT));
-    }
-
-    setDesc(config.getString(DESC));
-
-    // config
-    setSpreadTime(config.getInt(SPREAD_TIME));
-
-    // monitor
-    setMonitorEnable(config.getBoolean(MONITOR_ENABLE));
-    if (monitorPort == 0) {
-      setMonitorPort(config.getInt(MONITOR_PORT));
-    }
-
-    // add cluster
-    AllMember.getInstance().addClusters(getClustersArray());
-
-    // add member
-    for (String cluster : AllMember.getInstance().getClusters().getClusterNames()) {
-      for (String idHostPort : getMembers(cluster)) {
-        if (!Utils.isMemberValid(idHostPort)) {
-          throw new InvalidMemberException(idHostPort + " is invalid.");
-        }
-        String[] split = StringUtils.split(idHostPort, ":");
-        AllMember.getInstance().addMember(cluster,
-            new Member(split[0], split[1], split[2], getHost(), getPort()));
-      }
-    }
-
-    // set master.priority & bootup time & desc.
-    Member me = AllMember.getInstance().me();
-    me.setMasterPriority(config.getShort(MASTER_PRIORITY, (short) 0));
-    me.setBootupTime(new Date());
-    me.setDesc(desc);
   }
 }

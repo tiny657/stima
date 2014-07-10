@@ -32,7 +32,8 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
     if (msg instanceof Command) {
       if (msg instanceof StartCommand) {
         StartCommand cmd = (StartCommand) msg;
-        Member member = AllMember.getInstance().getMember(cmd.getSrcHost(), cmd.getSrcPort());
+        Member member =
+            AllMember.getInstance().getMemberByClusterAndId(cmd.getMyCluster(), cmd.getMyId());
         if (savedClusters != null) {
           removeMembers(savedClusters);
           addMembers(savedClusters);
@@ -41,21 +42,22 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
 
         if (member != null) {
           member.setStatus(Status.RUNNING);
-          logger.info("StartCommand was received from {}:{}.", cmd.getSrcHost(), cmd.getSrcPort());
+          logger.info("StartCommand was received from {}.{}.", cmd.getMyCluster(), cmd.getMyId());
         } else {
-          logger.error("StartCommand was received from {}:{}.  But that isn't existed.",
-              cmd.getSrcHost(), cmd.getSrcPort());
+          logger.error("StartCommand was received from {}.{}.  But that isn't existed.",
+              cmd.getMyCluster(), cmd.getMyId());
         }
         ReferenceCountUtil.release(msg);
       } else if (msg instanceof StopCommand) {
         StopCommand cmd = (StopCommand) msg;
-        Member member = AllMember.getInstance().getMember(cmd.getSrcHost(), cmd.getSrcPort());
+        Member member =
+            AllMember.getInstance().getMemberByClusterAndId(cmd.getMyCluster(), cmd.getMyId());
         if (member != null) {
           member.setStatus(Status.STANDBY);
-          logger.info("StopCommand was received from {}:{}.", cmd.getSrcHost(), cmd.getSrcPort());
+          logger.info("StopCommand was received from {}.{}", cmd.getMyCluster(), cmd.getMyId());
         } else {
-          logger.error("StopCommand was received from {}:{}.  But that isn't existed.",
-              cmd.getSrcHost(), cmd.getSrcPort());
+          logger.error("StopCommand was received from {}.{}.  But that isn't existed.",
+              cmd.getMyCluster(), cmd.getMyId());
         }
         ReferenceCountUtil.release(msg);
       } else if (msg instanceof InfoCommand) {

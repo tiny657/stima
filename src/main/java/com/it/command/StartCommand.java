@@ -1,12 +1,10 @@
 package com.it.command;
 
 public class StartCommand extends Command {
-  private static final long serialVersionUID = 761930442713735729L;
+  private static final long serialVersionUID = -297920249892130471L;
 
-  public StartCommand() {}
-
-  public StartCommand(String host, int port) {
-    super(host, port);
+  public StartCommand(String myCluster, int myId) {
+    super(myCluster, myId);
   }
 
   @Override

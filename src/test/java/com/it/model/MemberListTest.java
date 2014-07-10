@@ -16,13 +16,13 @@ public class MemberListTest {
   @Test
   public void randomRunningMember() {
     // Given
-    int count = 3;
+    int count = 3, basePort = 5000;
     List<Member> members = Lists.newArrayList();
     MemberList memberList = new MemberList();
     for (int i = 0; i < count; i++) {
-      members.add(new Member(i, "host", i));
+      members.add(new Member(i, "host", basePort + i));
       memberList.addMember(members.get(i));
-      memberList.setStatus("host", i, Status.RUNNING);
+      memberList.setStatus("host", basePort + i, Status.RUNNING);
     }
 
     // When

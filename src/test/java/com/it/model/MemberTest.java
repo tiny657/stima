@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 
+import com.it.exception.InvalidMemberException;
 import org.junit.Test;
 
 public class MemberTest {
@@ -12,26 +13,20 @@ public class MemberTest {
   public void validatePort() {
     // When
     Member memberWithValidPort = new Member(1, "host", 1);
-    Member memberWithInvalidPort1 = new Member(2, "host", 0);
-    Member memberWithInvalidPort2 = new Member(3, "host", 70000);
-
-    // Then
-    assertThat(memberWithValidPort.getPort(), is(not(0)));
-    assertThat(memberWithInvalidPort1.getPort(), is(0));
-    assertThat(memberWithInvalidPort2.getPort(), is(0));
+    Member memberWithInvalidPort2 = new Member(2, "host", 30000);
+    Member memberWithInvalidPort3 = new Member(3, "host", 65535);
   }
 
-  @Test
-  public void isMe() {
+  @Test(expected= InvalidMemberException.class)
+  public void validatePort0() {
     // When
-    Member me = new Member(1, "host", 1, "host", 1);
-    Member notMe1 = new Member(2, "host", 1, "host", 2);
-    Member notMe2 = new Member(3, "host1", 2, "host2", 2);
+    Member memberWithValidPort = new Member(1, "host", 0);
+  }
 
-    // Then
-    assertThat(me.isMe(), is(true));
-    assertThat(notMe1.isMe(), is(false));
-    assertThat(notMe2.isMe(), is(false));
+  @Test(expected= InvalidMemberException.class)
+  public void validatePort65536() {
+    // When
+    Member memberWithValidPort = new Member(1, "host", 65536);
   }
 
   @Test
