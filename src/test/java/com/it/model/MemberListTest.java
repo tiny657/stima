@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.Set;
 
-import com.it.exception.DuplicatedIdException;
+import com.it.exception.InvalidMemberException;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -94,7 +94,7 @@ public class MemberListTest {
     assertThat(findMember2, nullValue());
   }
 
-  @Test(expected= DuplicatedIdException.class)
+  @Test(expected= InvalidMemberException.class)
   public void isDuplicatedId() {
     // Given
     MemberList memberList = new MemberList();

@@ -12,7 +12,7 @@ import com.google.common.collect.Maps;
 public class Clusters implements Serializable {
   private static final long serialVersionUID = -8267158344891748076L;
 
-  private Map<String, MemberList> memberListMap = Maps.newTreeMap();
+  private Map<String, MemberList> memberListMap = Maps.newTreeMap();  // clusterName, Members
   transient private static final MemberList EMPTY_MEMBERLIST = new MemberList();
 
   public Member findMe() {

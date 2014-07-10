@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.it.exception.DuplicatedIdException;
+import com.it.exception.InvalidMemberException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +133,7 @@ public class MemberList implements Serializable {
   public void addMember(Member member) {
     if (isDuplicatedId(member)) {
       logger.error("The id({}) is duplicated.", member.getId());
-      throw new DuplicatedIdException();
+      throw new InvalidMemberException("The id is duplicated.");
     }
     members.add(member);
   }

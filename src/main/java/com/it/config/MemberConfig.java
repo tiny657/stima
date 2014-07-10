@@ -3,6 +3,8 @@ package com.it.config;
 import java.util.Date;
 import java.util.List;
 
+import com.it.common.Utils;
+import com.it.exception.InvalidMemberException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
@@ -193,10 +195,13 @@ public class MemberConfig {
 
     // add member
     for (String cluster : AllMember.getInstance().getClusters().getClusterNames()) {
-      for (String hostPort : getMembers(cluster)) {
-        String[] idHostPort = StringUtils.split(hostPort, ":");
+      for (String idHostPort : getMembers(cluster)) {
+        if (!Utils.isMemberValid(idHostPort)) {
+          throw new InvalidMemberException(idHostPort + " is invalid.");
+        }
+        String[] split = StringUtils.split(idHostPort, ":");
         AllMember.getInstance().addMember(cluster,
-            new Member(idHostPort[0], idHostPort[1], idHostPort[2], getHost(), getPort()));
+            new Member(split[0], split[1], split[2], getHost(), getPort()));
       }
     }
 
