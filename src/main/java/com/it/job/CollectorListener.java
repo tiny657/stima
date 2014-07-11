@@ -2,6 +2,8 @@ package com.it.job;
 
 import java.util.List;
 
+import com.it.common.Consts;
+import com.it.model.ResourceMetrics;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -10,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.EvictingQueue;
-import com.it.job.FilesystemMetrics.FileSystem;
-import com.it.job.NetworkMetrics.Network;
+import com.it.model.FilesystemMetrics.FileSystem;
+import com.it.model.NetworkMetrics.Network;
 
 public class CollectorListener implements JobListener {
   private final Logger logger = LoggerFactory.getLogger(CollectorListener.class);
@@ -43,8 +45,8 @@ public class CollectorListener implements JobListener {
 
   @Override
   public void jobToBeExecuted(JobExecutionContext context) {
-    context.getJobDetail().getJobDataMap().put("network", prevNetwork);
-    context.getJobDetail().getJobDataMap().put("fileSystems", prevFileSystems);
+    context.getJobDetail().getJobDataMap().put(Consts.NETWORK, prevNetwork);
+    context.getJobDetail().getJobDataMap().put(Consts.FILESYSTEMS, prevFileSystems);
   }
 
   @Override
@@ -53,9 +55,9 @@ public class CollectorListener implements JobListener {
   @Override
   public void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
     JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-    prevNetwork = (Network) dataMap.get("network");
-    prevFileSystems = (List<FileSystem>) dataMap.get("fileSystems");
-    resource = (ResourceMetrics) dataMap.get("resource");
+    prevNetwork = (Network) dataMap.get(Consts.NETWORK);
+    prevFileSystems = (List<FileSystem>) dataMap.get(Consts.FILESYSTEMS);
+    resource = (ResourceMetrics) dataMap.get(Consts.RESOURCE);
 
     history.add(resource);
   }

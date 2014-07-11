@@ -1,4 +1,4 @@
-package com.it.job;
+package com.it.model;
 
 import java.util.Date;
 import java.util.List;
@@ -6,9 +6,8 @@ import java.util.List;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.common.collect.Lists;
-import com.it.job.CpuMetrics.CpuInfo;
-import com.it.job.FilesystemMetrics.FileSystem;
-import com.it.job.NetworkMetrics.Network;
+import com.it.model.FilesystemMetrics.FileSystem;
+import com.it.model.NetworkMetrics.Network;
 
 public class ResourceMetrics {
   // Current Time
@@ -65,7 +64,7 @@ public class ResourceMetrics {
 
   public ResourceMetrics(CpuMetrics cpuMetrics, MemoryMetrics memoryMetrics,
       List<FileSystem> fileSystems, Network network) {
-    CpuInfo cpu = cpuMetrics.cpu();
+    CpuMetrics.CpuInfo cpu = cpuMetrics.cpu();
     cpuUserUsedPercent = cpu.userUsedPercent();
     cpuSysUsedPercent = cpu.sysUsedPercent();
 

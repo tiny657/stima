@@ -1,4 +1,4 @@
-package com.it.job;
+package com.it.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
 public class FilesystemMetrics extends AbstractSigarMetric {
-  protected FilesystemMetrics(Sigar sigar) {
+  public FilesystemMetrics(Sigar sigar) {
     super(sigar);
   }
 

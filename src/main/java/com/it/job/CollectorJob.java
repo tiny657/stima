@@ -2,6 +2,8 @@ package com.it.job;
 
 import java.util.List;
 
+import com.it.common.Consts;
+import com.it.model.*;
 import org.hyperic.sigar.Sigar;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -11,31 +13,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import com.it.job.FilesystemMetrics.FileSystem;
-import com.it.job.NetworkMetrics.Network;
+import com.it.model.FilesystemMetrics.FileSystem;
+import com.it.model.NetworkMetrics.Network;
 
 public class CollectorJob implements Job {
   private final Logger logger = LoggerFactory.getLogger(CollectorJob.class);
 
   private Sigar sigar;
-  private Network prevNetwork;
-  private List<FileSystem> prevFileSystems;
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
-    // receive data
     JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-    sigar = (Sigar) dataMap.get("sigar");
-    prevNetwork = (Network) dataMap.get("network");
-    prevFileSystems = (List<FileSystem>) dataMap.get("fileSystems");
+    sigar = (Sigar) dataMap.get(Consts.SIGAR);
+    Network prevNetwork = (Network) dataMap.get(Consts.NETWORK);
+    List<FileSystem> prevFileSystems = (List<FileSystem>) dataMap.get(Consts.FILESYSTEMS);
 
-    // cpu
-    CpuMetrics cpuMetrics = new CpuMetrics(sigar);
+    CpuMetrics cpuMetrics = getCpuMetrics();
+    MemoryMetrics memoryMetrics = getMemoryMetrics();
+    List<FileSystem> fileSystems = getFilesystems(context, prevFileSystems);
+    Network network = getNetwork(context, prevNetwork);
 
-    // memory
-    MemoryMetrics memoryMetrics = new MemoryMetrics(sigar);
+    if (prevFileSystems != null && prevNetwork != null) {
+      ResourceMetrics resource =
+          new ResourceMetrics(cpuMetrics, memoryMetrics, fileSystems, network);
+      context.getJobDetail().getJobDataMap().put(Consts.RESOURCE, resource);
+    }
+  }
 
-    // file system
+  private CpuMetrics getCpuMetrics() {
+    return new CpuMetrics(sigar);
+  }
+
+  private MemoryMetrics getMemoryMetrics() {
+    return new MemoryMetrics(sigar);
+  }
+
+  private List<FileSystem> getFilesystems(JobExecutionContext context,
+      List<FileSystem> prevFileSystems) {
     FilesystemMetrics fileSystemMetrics = new FilesystemMetrics(sigar);
     List<FileSystem> fileSystems = fileSystemMetrics.fileSystems();
     List<FileSystem> fileSystemsDiff = Lists.newArrayList();
@@ -45,23 +59,18 @@ public class CollectorJob implements Job {
         fileSystemsDiff.add(fileSystemDiff);
       }
     }
+    context.getJobDetail().getJobDataMap().put(Consts.FILESYSTEMS, fileSystems);
+    return fileSystemsDiff;
+  }
 
-    // network
+  private Network getNetwork(JobExecutionContext context, Network prevNetwork) {
     NetworkMetrics networkMetrics = new NetworkMetrics(sigar);
     Network network = networkMetrics.sumOfNetworks();
     Network networkDiff = null;
     if (prevNetwork != null) {
       networkDiff = network.diff(prevNetwork);
     }
-
-    // send data
-    context.getJobDetail().getJobDataMap().put("network", network);
-    context.getJobDetail().getJobDataMap().put("fileSystems", fileSystems);
-
-    if (prevFileSystems != null && prevNetwork != null) {
-      ResourceMetrics resource =
-          new ResourceMetrics(cpuMetrics, memoryMetrics, fileSystemsDiff, networkDiff);
-      context.getJobDetail().getJobDataMap().put("resource", resource);
-    }
+    context.getJobDetail().getJobDataMap().put(Consts.NETWORK, network);
+    return networkDiff;
   }
 }

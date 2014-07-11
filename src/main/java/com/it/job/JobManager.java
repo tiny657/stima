@@ -4,6 +4,7 @@ import static org.quartz.JobBuilder.*;
 import static org.quartz.SimpleScheduleBuilder.*;
 import static org.quartz.TriggerBuilder.*;
 
+import com.it.common.Consts;
 import org.hyperic.sigar.Sigar;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -34,7 +35,7 @@ public class JobManager {
       try {
         JobKey jobKey = new JobKey("collector", "group");
         JobDetail job = newJob(CollectorJob.class).withIdentity(jobKey).build();
-        job.getJobDataMap().put("sigar", new Sigar());
+        job.getJobDataMap().put(Consts.SIGAR, new Sigar());
 
         Trigger trigger =
             newTrigger().withIdentity("collectorTrigger", "group").startNow()
@@ -47,7 +48,7 @@ public class JobManager {
         scheduler.scheduleJob(job, trigger);
         scheduler.start();
       } catch (SchedulerException e) {
-        log.error("SchedulerException: ", e);
+        e.printStackTrace();
       }
     }
   }
@@ -56,7 +57,7 @@ public class JobManager {
     try {
       scheduler.shutdown();
     } catch (SchedulerException e) {
-      log.error("SchedulerException: ", e);
+      e.printStackTrace();
     }
   }
 }

@@ -1,4 +1,4 @@
-package com.it.job;
+package com.it.model;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hyperic.sigar.Mem;
@@ -7,7 +7,7 @@ import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.Swap;
 
 public class MemoryMetrics extends AbstractSigarMetric {
-  protected MemoryMetrics(Sigar sigar) {
+  public MemoryMetrics(Sigar sigar) {
     super(sigar);
   }
 

@@ -1,4 +1,4 @@
-package com.it.job;
+package com.it.model;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import org.hyperic.sigar.SigarException;
 import com.google.common.collect.Lists;
 
 public class NetworkMetrics extends AbstractSigarMetric {
-  protected NetworkMetrics(Sigar sigar) {
+  public NetworkMetrics(Sigar sigar) {
     super(sigar);
   }
 

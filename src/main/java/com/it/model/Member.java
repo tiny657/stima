@@ -5,8 +5,6 @@ import java.util.Date;
 
 import com.it.exception.InvalidMemberException;
 import com.it.job.CollectorListener;
-import com.it.job.ResourceMetrics;
-import com.mchange.v2.util.ResourceClosedException;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;

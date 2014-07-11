@@ -1,4 +1,4 @@
-package com.it.job;
+package com.it.model;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hyperic.sigar.CpuPerc;
@@ -6,7 +6,7 @@ import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
 public class CpuMetrics extends AbstractSigarMetric {
-  protected CpuMetrics(Sigar sigar) {
+  public CpuMetrics(Sigar sigar) {
     super(sigar);
   }
 
