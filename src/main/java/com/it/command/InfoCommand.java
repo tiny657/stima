@@ -1,6 +1,6 @@
 package com.it.command;
 
-import com.it.model.Clusters;
+import com.it.domain.Clusters;
 
 public class InfoCommand extends Command {
   private static final long serialVersionUID = 1748350973388041584L;

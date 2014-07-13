@@ -1,5 +1,6 @@
 package com.it.main;
 
+import com.it.common.MsgSender;
 import io.netty.channel.ChannelFuture;
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
@@ -9,15 +10,14 @@ import com.it.client.Client;
 import com.it.client.ClientHandlerAdapter;
 import com.it.command.StartCommand;
 import com.it.command.StopCommand;
-import com.it.common.Sender;
 import com.it.config.JoptConfig;
 import com.it.config.MailConfig;
 import com.it.config.MemberConfig;
 import com.it.job.JobManager;
-import com.it.model.AllMember;
-import com.it.model.Clusters;
-import com.it.model.Member;
-import com.it.model.Status;
+import com.it.domain.AllMember;
+import com.it.domain.Clusters;
+import com.it.domain.Member;
+import com.it.domain.Status;
 import com.it.monitor.MonitorServer;
 import com.it.server.Server;
 import com.it.server.ServerHandlerAdapter;
@@ -84,8 +84,8 @@ public class ItRunner {
       Thread.sleep(MemberConfig.getInstance().getSpreadTime() * 1000);
 
       // broadcast StartCommand
-      Sender.sendBroadcast(new StartCommand(MemberConfig.getInstance().getMyCluster(), MemberConfig
-          .getInstance().getMyId()));
+      MsgSender.sendBroadcast(new StartCommand(MemberConfig.getInstance().getMyCluster(), MemberConfig
+              .getInstance().getMyId()));
     } catch (Exception e) {
       e.printStackTrace();
       shutdown();
@@ -93,8 +93,8 @@ public class ItRunner {
   }
 
   public void shutdown() {
-    Sender.sendBroadcast(new StopCommand(MemberConfig.getInstance().getMyCluster(), MemberConfig
-        .getInstance().getMyId()));
+    MsgSender.sendBroadcast(new StopCommand(MemberConfig.getInstance().getMyCluster(), MemberConfig
+            .getInstance().getMyId()));
 
     try {
       // wait for 1000ms after sending StopCommand.

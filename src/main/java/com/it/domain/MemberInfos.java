@@ -1,4 +1,4 @@
-package com.it.model;
+package com.it.domain;
 
 import io.netty.channel.ChannelFuture;
 

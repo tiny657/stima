@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.it.command.InfoCommand;
 import com.it.config.MemberConfig;
-import com.it.model.AllMember;
+import com.it.domain.AllMember;
 
 @Sharable
 public class ClientHandlerAdapter extends ChannelHandlerAdapter {

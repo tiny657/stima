@@ -15,9 +15,9 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.model.AllMember;
-import com.it.model.Member;
-import com.it.model.Status;
+import com.it.domain.AllMember;
+import com.it.domain.Member;
+import com.it.domain.Status;
 
 public class Client extends Thread {
   private static final Logger logger = LoggerFactory.getLogger(Client.class);

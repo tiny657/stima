@@ -3,7 +3,7 @@ package com.it.job;
 import java.util.List;
 
 import com.it.common.Consts;
-import com.it.model.*;
+import com.it.domain.*;
 import org.hyperic.sigar.Sigar;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import com.it.model.FilesystemMetrics.FileSystem;
-import com.it.model.NetworkMetrics.Network;
+import com.it.domain.FilesystemMetrics.FileSystem;
+import com.it.domain.NetworkMetrics.Network;
 
 public class CollectorJob implements Job {
   private final Logger logger = LoggerFactory.getLogger(CollectorJob.class);

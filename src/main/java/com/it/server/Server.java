@@ -3,9 +3,9 @@ package com.it.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.model.AllMember;
-import com.it.model.Member;
-import com.it.model.Status;
+import com.it.domain.AllMember;
+import com.it.domain.Member;
+import com.it.domain.Status;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

@@ -1,4 +1,4 @@
-package com.it.model;
+package com.it.domain;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;

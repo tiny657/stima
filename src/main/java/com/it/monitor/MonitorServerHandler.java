@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.it.common.Utils;
-import com.it.model.AllMember;
+import com.it.domain.AllMember;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;

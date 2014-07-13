@@ -1,9 +1,9 @@
 package com.it.main;
 
+import com.it.common.MsgSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.it.common.Sender;
 import com.it.config.JoptConfig;
 
 public class Sample {
@@ -13,7 +13,7 @@ public class Sample {
     ItRunner.getInstance().execute(new ServerHandler(), new ClientHandler(), args);
     if (JoptConfig.getInstance().isSender()) {
       for (int i = 0; i < 30; i++) {
-        Sender.sendAnycast("b", new TestCommand());
+        MsgSender.sendAnycast("b", new TestCommand());
         Thread.sleep(100);
       }
       ItRunner.getInstance().shutdown();

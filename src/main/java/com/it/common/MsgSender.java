@@ -6,13 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.it.command.Command;
-import com.it.model.AllMember;
-import com.it.model.Member;
-import com.it.model.MemberList;
+import com.it.domain.AllMember;
+import com.it.domain.Member;
+import com.it.domain.MemberList;
 import io.netty.channel.ChannelFuture;
 
-public class Sender {
-  private static final Logger logger = LoggerFactory.getLogger(Sender.class);
+public class MsgSender {
+  private static final Logger logger = LoggerFactory.getLogger(MsgSender.class);
 
   // public static boolean sendBroadcast(String targetCluster, String msg) {
   // ByteBuf byteBuf = Unpooled.buffer(msg.length());

@@ -1,4 +1,4 @@
-package com.it.model;
+package com.it.domain;
 
 import java.util.Date;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.List;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.common.collect.Lists;
-import com.it.model.FilesystemMetrics.FileSystem;
-import com.it.model.NetworkMetrics.Network;
+import com.it.domain.FilesystemMetrics.FileSystem;
+import com.it.domain.NetworkMetrics.Network;
 
 public class ResourceMetrics {
   // Current Time

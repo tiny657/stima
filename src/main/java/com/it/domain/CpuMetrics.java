@@ -1,4 +1,4 @@
-package com.it.model;
+package com.it.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hyperic.sigar.CpuPerc;

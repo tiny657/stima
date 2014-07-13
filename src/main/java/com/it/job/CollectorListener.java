@@ -13,9 +13,9 @@ import com.google.common.collect.EvictingQueue;
 import com.it.common.Consts;
 import com.it.common.Notifier;
 import com.it.config.MemberConfig;
-import com.it.model.FilesystemMetrics.FileSystem;
-import com.it.model.NetworkMetrics.Network;
-import com.it.model.ResourceMetrics;
+import com.it.domain.FilesystemMetrics.FileSystem;
+import com.it.domain.NetworkMetrics.Network;
+import com.it.domain.ResourceMetrics;
 
 public class CollectorListener implements JobListener {
   private final Logger logger = LoggerFactory.getLogger(CollectorListener.class);

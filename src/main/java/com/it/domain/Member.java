@@ -1,4 +1,4 @@
-package com.it.model;
+package com.it.domain;
 
 import java.io.Serializable;
 import java.util.Date;

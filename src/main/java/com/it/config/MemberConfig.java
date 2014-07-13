@@ -14,8 +14,8 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.it.common.Utils;
 import com.it.exception.InvalidMemberException;
-import com.it.model.AllMember;
-import com.it.model.Member;
+import com.it.domain.AllMember;
+import com.it.domain.Member;
 
 public class MemberConfig {
   private static final Logger logger = LoggerFactory.getLogger(MemberConfig.class);
