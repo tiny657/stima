@@ -85,11 +85,11 @@ public class ResourceMetrics {
     networkTxKBytes = (int) network.txKBytes();
   }
 
-  public float getCpuUserUsedPercent() {
+  public byte getCpuUserUsedPercent() {
     return cpuUserUsedPercent;
   }
 
-  public float getCpuSysUsedPercent() {
+  public byte getCpuSysUsedPercent() {
     return cpuSysUsedPercent;
   }
 

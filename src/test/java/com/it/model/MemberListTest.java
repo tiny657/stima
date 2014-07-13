@@ -94,7 +94,7 @@ public class MemberListTest {
     assertThat(findMember2, nullValue());
   }
 
-  @Test(expected= InvalidMemberException.class)
+  @Test(expected = InvalidMemberException.class)
   public void isDuplicatedId() {
     // Given
     MemberList memberList = new MemberList();

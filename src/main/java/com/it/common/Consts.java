@@ -14,7 +14,10 @@ package com.it.common;
 public class Consts {
   // job
   public static final String SIGAR = "sigar";
-  public static final String NETWORK = "network";
+  public static final String CPU = "cpu";
+  public static final String LOADAVERAGE = "loadAverage";
+  public static final String MEMORY = "memory";
   public static final String FILESYSTEMS = "fileSystems";
+  public static final String NETWORK = "network";
   public static final String RESOURCE = "resource";
 }

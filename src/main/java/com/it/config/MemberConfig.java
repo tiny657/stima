@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.it.common.Utils;
 import com.it.exception.InvalidMemberException;
 import com.it.model.AllMember;
@@ -28,6 +29,9 @@ public class MemberConfig {
   private static final String MASTER_PRIORITY = "master.priority";
   private static final String MONITOR_ENABLE = "monitor.enable";
   private static final String MONITOR_PORT = "monitor.port";
+  private static final String MONITOR_THRESHOLD_CPU = "monitor.threshold.cpu";
+  private static final String MONITOR_THRESHOLD_LOADAVERAGE = "monitor.threshold.loadAverage";
+  private static final String MONITOR_THRESHOLD_MEMORY = "monitor.threshold.memory";
 
   private PropertiesConfiguration config;
   private String propertiesFile;
@@ -40,6 +44,9 @@ public class MemberConfig {
 
   private boolean monitorEnable;
   private int monitorPort;
+  private List<Integer> thresholdCpus;
+  private List<Integer> thresholdLoadAverages;
+  private List<Integer> thresholdMemories;
 
   private MemberConfig() {}
 
@@ -55,18 +62,8 @@ public class MemberConfig {
     config = new PropertiesConfiguration(propertiesFile);
     config.setAutoSave(true);
 
-    // from jopt
-    setMyCluster(JoptConfig.getInstance().getCluster());
-    setMyId(JoptConfig.getInstance().getId());
-    setMonitorPort(JoptConfig.getInstance().getMonitorPort());
-
-    if (myCluster.equals(StringUtils.EMPTY)) {
-      setMyCluster(config.getString(MY_CLUSTER));
-    }
-
-    if (myId == -1) {
-      setMyId(config.getInt(MY_ID));
-    }
+    setMyCluster(config.getString(MY_CLUSTER));
+    setMyId(config.getInt(MY_ID));
 
     setMyDesc(config.getString(MY_DESC));
 
@@ -75,9 +72,15 @@ public class MemberConfig {
 
     // monitor
     setMonitorEnable(config.getBoolean(MONITOR_ENABLE));
-    if (monitorPort == 0) {
-      setMonitorPort(config.getInt(MONITOR_PORT));
-    }
+    setMonitorPort(config.getInt(MONITOR_PORT));
+    setThresholdCpus(config.getList(MONITOR_THRESHOLD_CPU));
+    setThresholdLoadAverage(config.getList(MONITOR_THRESHOLD_LOADAVERAGE));
+    setThresholdMemories(config.getList(MONITOR_THRESHOLD_MEMORY));
+
+    // from JOPT
+    setMyCluster(JoptConfig.getInstance().getCluster());
+    setMyId(JoptConfig.getInstance().getId());
+    setMonitorPort(JoptConfig.getInstance().getMonitorPort());
 
     // add cluster
     AllMember.getInstance().addClusters(getClustersArray());
@@ -144,6 +147,9 @@ public class MemberConfig {
   }
 
   public void setMyCluster(String myCluster) {
+    if (StringUtils.equals(myCluster, StringUtils.EMPTY)) {
+      return;
+    }
     this.myCluster = myCluster;
   }
 
@@ -152,6 +158,9 @@ public class MemberConfig {
   }
 
   public void setMyId(int myId) {
+    if (myId == -1) {
+      return;
+    }
     this.myId = myId;
   }
 
@@ -188,7 +197,34 @@ public class MemberConfig {
   }
 
   public void setMonitorPort(int monitorPort) {
+    if (monitorPort == -1) {
+      return;
+    }
     this.monitorPort = monitorPort;
+  }
+
+  public List<Integer> getThresholdCpus() {
+    return thresholdCpus;
+  }
+
+  public void setThresholdCpus(List<String> thresholdCpus) {
+    this.thresholdCpus = getIntegerList(thresholdCpus);
+  }
+
+  public List<Integer> getThresholdLoadAverages() {
+    return thresholdLoadAverages;
+  }
+
+  public void setThresholdLoadAverage(List<String> thresholdLoadAverages) {
+    this.thresholdLoadAverages = getIntegerList(thresholdLoadAverages);
+  }
+
+  public List<Integer> getThresholdMemories() {
+    return thresholdMemories;
+  }
+
+  public void setThresholdMemories(List<String> thresholdMemories) {
+    this.thresholdMemories = getIntegerList(thresholdMemories);
   }
 
   @SuppressWarnings("unchecked")
@@ -207,5 +243,13 @@ public class MemberConfig {
 
   private String getSubCluster(String cluster) {
     return CLUSTER + "." + cluster;
+  }
+
+  private List<Integer> getIntegerList(List<String> thresholds) {
+    List<Integer> result = Lists.newArrayList();
+    for (String threshold : thresholds) {
+      result.add(Utils.parseInt(threshold));
+    }
+    return result;
   }
 }

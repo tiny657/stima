@@ -2,8 +2,6 @@ package com.it.job;
 
 import java.util.List;
 
-import com.it.common.Consts;
-import com.it.model.ResourceMetrics;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -12,12 +10,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.EvictingQueue;
+import com.it.common.Consts;
+import com.it.common.Notifier;
+import com.it.config.MemberConfig;
 import com.it.model.FilesystemMetrics.FileSystem;
 import com.it.model.NetworkMetrics.Network;
+import com.it.model.ResourceMetrics;
 
 public class CollectorListener implements JobListener {
   private final Logger logger = LoggerFactory.getLogger(CollectorListener.class);
-
   private static CollectorListener instance = new CollectorListener();
 
   private Network prevNetwork = null;
@@ -25,6 +26,16 @@ public class CollectorListener implements JobListener {
 
   private ResourceMetrics resource = null;
   private EvictingQueue<ResourceMetrics> history = EvictingQueue.create(30 * 24 * 60 * 60);
+
+  private Notifier notifier;
+
+  private CollectorListener() {
+    notifier = new Notifier();
+    notifier.createLatches(Consts.CPU, MemberConfig.getInstance().getThresholdCpus(), 1, 5);
+    notifier.createLatches(Consts.LOADAVERAGE, MemberConfig.getInstance()
+        .getThresholdLoadAverages(), 1, 5);
+    notifier.createLatches(Consts.CPU, MemberConfig.getInstance().getThresholdMemories(), 1, 5);
+  }
 
   public static CollectorListener getInstance() {
     return instance;
@@ -60,5 +71,11 @@ public class CollectorListener implements JobListener {
     resource = (ResourceMetrics) dataMap.get(Consts.RESOURCE);
 
     history.add(resource);
+
+    notifier.setValue(Consts.CPU,
+        resource.getCpuUserUsedPercent() + resource.getCpuSysUsedPercent());
+    notifier.setValue(Consts.LOADAVERAGE, resource.getLoadAvg1M());
+    notifier.setValue(Consts.MEMORY, resource.getMemUsedMB() * 100 / resource.getMemTotalMB());
+    notifier.send();
   }
 }

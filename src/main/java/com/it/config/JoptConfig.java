@@ -32,7 +32,7 @@ public class JoptConfig {
       .withOptionalArg().ofType(Integer.class).defaultsTo(-1);
   private ArgumentAcceptingOptionSpec<Integer> monitorPortOpt = parser
       .accepts("monitorPort", "this monitor's port").withOptionalArg().ofType(Integer.class)
-      .defaultsTo(0);
+      .defaultsTo(-1);
   private OptionSpecBuilder senderOpt = parser.accepts("sender", "If set, this is the sender.");
 
   private String cluster;
