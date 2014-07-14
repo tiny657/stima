@@ -2,6 +2,7 @@ package com.it.server;
 
 import java.util.Map;
 
+import com.it.common.MailSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,71 +32,22 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
     if (msg instanceof Command) {
       if (msg instanceof StartCommand) {
-        StartCommand cmd = (StartCommand) msg;
-        Member member =
-            AllMember.getInstance().getMemberByClusterAndId(cmd.getMyCluster(), cmd.getMyId());
-        if (savedClusters != null) {
-          removeMembers(savedClusters);
-          addMembers(savedClusters);
-          logger.info("Applied the received properties.");
+        handleStartCommand(msg);
+        if (AllMember.getInstance().me().isMaster()) {
+          logger.info("Master: received StartCommand");
+          if (savedClusters != null) {
+            MailSender.getInstance().send("tiny657@naver.com", "testTitle", "");
+            logger.info("Master: received different member.properties");
+          }
         }
-
-        if (member != null) {
-          member.setStatus(Status.RUNNING);
-          logger.info("StartCommand was received from {}.{}.", cmd.getMyCluster(), cmd.getMyId());
-        } else {
-          logger.error("StartCommand was received from {}.{}.  But that isn't existed.",
-              cmd.getMyCluster(), cmd.getMyId());
-        }
-        ReferenceCountUtil.release(msg);
       } else if (msg instanceof StopCommand) {
-        StopCommand cmd = (StopCommand) msg;
-        Member member =
-            AllMember.getInstance().getMemberByClusterAndId(cmd.getMyCluster(), cmd.getMyId());
-        if (member != null) {
-          member.setStatus(Status.STANDBY);
-          logger.info("StopCommand was received from {}.{}", cmd.getMyCluster(), cmd.getMyId());
-        } else {
-          logger.error("StopCommand was received from {}.{}.  But that isn't existed.",
-              cmd.getMyCluster(), cmd.getMyId());
+        handleStopCommand(msg);
+        if (AllMember.getInstance().me().isMaster()) {
+          MailSender.getInstance().send("tiny657@naver.com", "testTitle", "");
+          logger.info("Master: received StopCommand");
         }
-        ReferenceCountUtil.release(msg);
       } else if (msg instanceof InfoCommand) {
-        InfoCommand cmd = (InfoCommand) msg;
-        Clusters clusters = cmd.getClusters();
-        Member receivedMember = clusters.findMe();
-
-        // compare the received properties.
-        if (AllMember.getInstance().me().isEarlier(receivedMember)) {
-          if (AllMember.getInstance().getClusters().equals(clusters)) {
-            logger.info("Properties are same.");
-            savedClusters = null;
-          } else {
-            logger.info("Properties are different.");
-            savedClusters = clusters;
-          }
-
-          logger.info("InfoCommand was received. {}.", clusters.toString());
-        } else {
-          if (AllMember.getInstance().getClusters().equals(clusters)) {
-            logger.info("Properties are same.");
-          } else {
-            logger
-                .info(
-                    "Properties are different.  Stop this application in {} seconds if this properties don't spread to all members.",
-                    MemberConfig.getInstance().getSpreadTime());
-          }
-        }
-
-        // update the status of the sender.
-        Member receivedMemberInLocal =
-            AllMember.getInstance().getMember(receivedMember.getHost(), receivedMember.getPort());
-        receivedMemberInLocal.setStatus(receivedMember.getStatus());
-        receivedMemberInLocal.setBootupTime(receivedMember.getBootupTime());
-        receivedMemberInLocal.setDesc(receivedMember.getDesc());
-
-        AllMember.getInstance().me().calculatePriorityPointWhenConnect(receivedMember);
-        ReferenceCountUtil.release(msg);
+        handleInfoCommand(msg);
       }
       logger.info(AllMember.getInstance().toString());
     } else {
@@ -112,6 +64,78 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
     cause.printStackTrace();
     ctx.close();
+  }
+
+  private void handleStartCommand(Object msg) {
+    StartCommand cmd = (StartCommand) msg;
+    Member member =
+        AllMember.getInstance().getMemberByClusterAndId(cmd.getMyCluster(), cmd.getMyId());
+    if (savedClusters != null) {
+      removeMembers(savedClusters);
+      addMembers(savedClusters);
+      logger.info("Applied the received properties.");
+    }
+
+    if (member != null) {
+      member.setStatus(Status.RUNNING);
+      logger.info("StartCommand was received from {}.{}.", cmd.getMyCluster(), cmd.getMyId());
+    } else {
+      logger.error("StartCommand was received from {}.{}.  But that isn't existed.",
+          cmd.getMyCluster(), cmd.getMyId());
+    }
+    ReferenceCountUtil.release(msg);
+  }
+
+  private void handleStopCommand(Object msg) {
+    StopCommand cmd = (StopCommand) msg;
+    Member member =
+        AllMember.getInstance().getMemberByClusterAndId(cmd.getMyCluster(), cmd.getMyId());
+    if (member != null) {
+      member.setStatus(Status.STANDBY);
+      logger.info("StopCommand was received from {}.{}", cmd.getMyCluster(), cmd.getMyId());
+    } else {
+      logger.error("StopCommand was received from {}.{}.  But that isn't existed.",
+          cmd.getMyCluster(), cmd.getMyId());
+    }
+    ReferenceCountUtil.release(msg);
+  }
+
+  private void handleInfoCommand(Object msg) {
+    InfoCommand cmd = (InfoCommand) msg;
+    Clusters clusters = cmd.getClusters();
+    Member receivedMember = clusters.findMe();
+
+    // compare the received properties.
+    if (AllMember.getInstance().me().isEarlier(receivedMember)) {
+      if (AllMember.getInstance().getClusters().equals(clusters)) {
+        logger.info("Properties are same.");
+        savedClusters = null;
+      } else {
+        logger.info("Properties are different.");
+        savedClusters = clusters;
+      }
+
+      logger.info("InfoCommand was received. {}.", clusters.toString());
+    } else {
+      if (AllMember.getInstance().getClusters().equals(clusters)) {
+        logger.info("Properties are same.");
+      } else {
+        logger
+            .info(
+                "Properties are different.  Stop this application in {} seconds if this properties don't spread to all members.",
+                MemberConfig.getInstance().getSpreadTime());
+      }
+    }
+
+    // update the status of the sender.
+    Member receivedMemberInLocal =
+        AllMember.getInstance().getMember(receivedMember.getHost(), receivedMember.getPort());
+    receivedMemberInLocal.setStatus(receivedMember.getStatus());
+    receivedMemberInLocal.setBootupTime(receivedMember.getBootupTime());
+    receivedMemberInLocal.setDesc(receivedMember.getDesc());
+
+    AllMember.getInstance().me().calculatePriorityPointWhenConnect(receivedMember);
+    ReferenceCountUtil.release(msg);
   }
 
   private void removeMembers(Clusters clusters) {

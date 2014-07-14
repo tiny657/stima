@@ -3,18 +3,17 @@ package com.it.common;
 import java.util.Date;
 import java.util.Properties;
 
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.it.config.MailConfig;
 
 public class MailSender {
+  private static final Logger logger = LoggerFactory.getLogger(MailSender.class);
   public static MailSender mailSender = new MailSender();
   private Properties props;
 
@@ -31,6 +30,11 @@ public class MailSender {
   }
 
   public void send(String to, String subject, String content) {
+    if (true) {
+      logger.info("Mail will be send!!!");
+      return;
+    }
+
     EmailAuthenticator authenticator =
         new EmailAuthenticator(MailConfig.getInstance().getId(), MailConfig.getInstance()
             .getPassword());

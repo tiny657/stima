@@ -44,7 +44,7 @@ public class Notifier {
         if (latch.isStatusChanged()) {
           content.append(latch.getThreshold());
           content.append(latch.getStatus().toString());
-          // MailSender.getInstance().send("tiny657@naver.com", "testTitle", content.toString());
+          MailSender.getInstance().send("tiny657@naver.com", "testTitle", content.toString());
           logger.info(content.toString());
           break;
         }
