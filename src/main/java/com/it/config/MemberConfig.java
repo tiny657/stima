@@ -1,21 +1,21 @@
 package com.it.config;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.it.common.Utils;
-import com.it.exception.InvalidMemberException;
 import com.it.domain.AllMember;
 import com.it.domain.Member;
+import com.it.exception.InvalidMemberException;
 
 public class MemberConfig {
   private static final Logger logger = LoggerFactory.getLogger(MemberConfig.class);
@@ -102,7 +102,7 @@ public class MemberConfig {
     // set master.priority & bootup time & desc.
     Member me = AllMember.getInstance().me();
     me.setMasterPriority(config.getShort(MASTER_PRIORITY, (short) 0));
-    me.setBootupTime(new Date());
+    me.setBootupTime(DateTime.now());
     me.setDesc(myDesc);
   }
 

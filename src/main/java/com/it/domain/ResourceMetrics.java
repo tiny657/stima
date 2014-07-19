@@ -1,6 +1,5 @@
 package com.it.domain;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -10,9 +9,6 @@ import com.it.domain.FilesystemMetrics.FileSystem;
 import com.it.domain.NetworkMetrics.Network;
 
 public class ResourceMetrics {
-  // Current Time
-  private Date date = new Date();
-
   // CPU
   private byte cpuUserUsedPercent, cpuSysUsedPercent;
   private byte loadAvg1M, loadAvg5M, loadAvg15M;
@@ -23,7 +19,6 @@ public class ResourceMetrics {
 
   // FileSystem
   private List<System> fileSystems = Lists.newArrayList();
-
 
   public static final class System {
     private String deviceName;

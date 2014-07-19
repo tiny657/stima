@@ -1,14 +1,15 @@
 package com.it.domain;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
-import java.util.Date;
-
-import com.it.exception.InvalidMemberException;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
+import com.it.exception.InvalidMemberException;
+
 public class MemberTest {
+
   @Test
   public void validatePort() {
     // When
@@ -30,23 +31,23 @@ public class MemberTest {
   }
 
   @Test
-  public void isEarlier() throws InterruptedException {
+  public void isBefore() throws InterruptedException {
     // Given
     Member member1 = new Member();
-    member1.setBootupTime(new Date());
+    member1.setBootupTime(DateTime.now());
     Thread.sleep(10);
     Member member2 = new Member();
-    member2.setBootupTime(new Date());
+    member2.setBootupTime(DateTime.now());
 
     // When
-    boolean earlier1 = member1.isEarlier(member2);
-    boolean earlier2 = member2.isEarlier(member1);
-    boolean earlier3 = member1.isEarlier(member1);
+    boolean before1 = member1.isBefore(member2);
+    boolean before2 = member2.isBefore(member1);
+    boolean before3 = member1.isBefore(member1);
 
     // Then
-    assertThat(earlier1, is(true));
-    assertThat(earlier2, is(false));
-    assertThat(earlier3, is(false));
+    assertThat(before1, is(true));
+    assertThat(before2, is(false));
+    assertThat(before3, is(false));
   }
 
   @Test
@@ -55,11 +56,11 @@ public class MemberTest {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 1);
-    member1.setBootupTime(new Date()); // ignore
+    member1.setBootupTime(DateTime.now());
     Thread.sleep(1);
     Member member2 = new Member();
     member2.setMasterPriority((short) 2);
-    member2.setBootupTime(new Date()); // ignore
+    member2.setBootupTime(DateTime.now());
 
     // When
     member1.calculatePriorityPointWhenConnect(member2);
@@ -76,11 +77,11 @@ public class MemberTest {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 2);
-    member1.setBootupTime(new Date()); // ignore
+    member1.setBootupTime(DateTime.now());
     Thread.sleep(1);
     Member member2 = new Member();
     member2.setMasterPriority((short) 1);
-    member2.setBootupTime(new Date()); // ignore
+    member2.setBootupTime(DateTime.now());
 
     // When
     member1.calculatePriorityPointWhenConnect(member2);
@@ -97,15 +98,15 @@ public class MemberTest {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 0);
-    member1.setBootupTime(new Date());
+    member1.setBootupTime(DateTime.now());
     Thread.sleep(1);
     Member member2 = new Member();
     member2.setMasterPriority((short) 1);
-    member2.setBootupTime(new Date());
+    member2.setBootupTime(DateTime.now());
     Thread.sleep(1);
     Member member3 = new Member();
     member3.setMasterPriority((short) 0);
-    member3.setBootupTime(new Date());
+    member3.setBootupTime(DateTime.now());
 
     // When
     member1.calculatePriorityPointWhenConnect(member2);
@@ -127,11 +128,11 @@ public class MemberTest {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 1);
-    member1.setBootupTime(new Date());
+    member1.setBootupTime(DateTime.now());
     Thread.sleep(1);
     Member member2 = new Member();
     member2.setMasterPriority((short) 1);
-    member2.setBootupTime(new Date());
+    member2.setBootupTime(DateTime.now());
 
     // When
     member1.calculatePriorityPointWhenConnect(member2);
@@ -148,11 +149,11 @@ public class MemberTest {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 0);
-    member1.setBootupTime(new Date());
+    member1.setBootupTime(DateTime.now());
     Thread.sleep(1);
     Member member2 = new Member();
     member2.setMasterPriority((short) 1);
-    member2.setBootupTime(new Date());
+    member2.setBootupTime(DateTime.now());
 
     // When
     member1.calculatePriorityPointWhenConnect(member2);
@@ -169,11 +170,11 @@ public class MemberTest {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 1);
-    member1.setBootupTime(new Date()); // ignore
+    member1.setBootupTime(DateTime.now());
     Thread.sleep(1);
     Member member2 = new Member();
     member2.setMasterPriority((short) 2);
-    member2.setBootupTime(new Date()); // ignore
+    member2.setBootupTime(DateTime.now());
 
     member1.calculatePriorityPointWhenConnect(member2);
     member2.calculatePriorityPointWhenConnect(member1);
@@ -192,11 +193,11 @@ public class MemberTest {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 1);
-    member1.setBootupTime(new Date());
+    member1.setBootupTime(DateTime.now());
     Thread.sleep(1);
     Member member2 = new Member();
     member2.setMasterPriority((short) 0);
-    member2.setBootupTime(new Date());
+    member2.setBootupTime(DateTime.now());
 
     member1.calculatePriorityPointWhenConnect(member2);
     member2.calculatePriorityPointWhenConnect(member1);
@@ -215,15 +216,15 @@ public class MemberTest {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 1);
-    member1.setBootupTime(new Date());
+    member1.setBootupTime(DateTime.now());
     Thread.sleep(1);
     Member member2 = new Member();
     member2.setMasterPriority((short) 0);
-    member2.setBootupTime(new Date());
+    member2.setBootupTime(DateTime.now());
     Thread.sleep(1);
     Member member3 = new Member();
     member3.setMasterPriority((short) 2);
-    member3.setBootupTime(new Date());
+    member3.setBootupTime(DateTime.now());
 
     member1.calculatePriorityPointWhenConnect(member2);
     member1.calculatePriorityPointWhenConnect(member3);

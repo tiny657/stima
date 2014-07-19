@@ -106,7 +106,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
     Member receivedMember = clusters.findMe();
 
     // compare the received properties.
-    if (AllMember.getInstance().me().isEarlier(receivedMember)) {
+    if (AllMember.getInstance().me().isBefore(receivedMember)) {
       if (AllMember.getInstance().getClusters().equals(clusters)) {
         logger.info("Properties are same.");
         savedClusters = null;

@@ -1,10 +1,7 @@
 package com.it.domain;
 
 import java.io.Serializable;
-import java.util.Date;
 
-import com.it.exception.InvalidMemberException;
-import com.it.job.CollectorListener;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -12,13 +9,15 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.it.common.Utils;
+import com.it.exception.InvalidMemberException;
+import com.it.job.CollectorListener;
 
 public class Member implements Comparable<Member>, Serializable {
   private static final long serialVersionUID = -5112411599686358922L;
 
   private static final Logger logger = LoggerFactory.getLogger(Member.class);
 
-  private Date bootupTime;
+  private DateTime bootupTime;
   private short masterPriority, priorityPoint;
   private int id;
   private String host;
@@ -61,15 +60,19 @@ public class Member implements Comparable<Member>, Serializable {
     }
   }
 
-  public boolean isEarlier(Member member) {
-    return bootupTime.compareTo(member.getBootupTime()) < 0;
+  public boolean isBefore(Member member) {
+    return bootupTime.isBefore(member.getBootupTime());
   }
 
-  public Date getBootupTime() {
+  public boolean isAfter(Member member) {
+    return !isBefore(member);
+  }
+
+  public DateTime getBootupTime() {
     return bootupTime;
   }
 
-  public void setBootupTime(Date bootupTime) {
+  public void setBootupTime(DateTime bootupTime) {
     this.bootupTime = bootupTime;
   }
 
@@ -115,7 +118,7 @@ public class Member implements Comparable<Member>, Serializable {
 
     if (masterPriority > member.getMasterPriority()) {
       increasePriorityPoint();
-    } else if (masterPriority == member.getMasterPriority() && !isEarlier(member)) {
+    } else if (masterPriority == member.getMasterPriority() && isAfter(member)) {
       increasePriorityPoint();
     }
     logger.info("master: {}", isMaster());
@@ -128,7 +131,7 @@ public class Member implements Comparable<Member>, Serializable {
 
     if (masterPriority > member.getMasterPriority()) {
       decreasePriorityPoint();
-    } else if (masterPriority == member.getMasterPriority() && !isEarlier(member)) {
+    } else if (masterPriority == member.getMasterPriority() && isAfter(member)) {
       decreasePriorityPoint();
     }
     logger.info("master: {}", isMaster());
