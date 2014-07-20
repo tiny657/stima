@@ -38,13 +38,15 @@ public class Notifier {
   }
 
   public void send() {
+    StringBuilder subject = new StringBuilder();
     StringBuilder content = new StringBuilder();
     for (String key : latchMap.keySet()) {
       for (Latch latch : latchMap.get(key)) {
         if (latch.isStatusChanged()) {
-          content.append(latch.getThreshold());
-          content.append(latch.getStatus().toString());
-          MailSender.getInstance().send("tiny657@naver.com", "testTitle", content.toString());
+          subject.append(key).append(" ").append(latch.getThreshold()).append(" ")
+              .append(latch.getStatus().toString());
+          MailSender.getInstance()
+              .send("tiny657@naver.com", subject.toString(), content.toString());
           logger.info(content.toString());
           break;
         }

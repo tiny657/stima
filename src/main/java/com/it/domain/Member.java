@@ -13,7 +13,7 @@ import com.it.exception.InvalidMemberException;
 import com.it.job.CollectorListener;
 
 public class Member implements Comparable<Member>, Serializable {
-  private static final long serialVersionUID = -5112411599686358922L;
+  private static final long serialVersionUID = 4848152770088013661L;
 
   private static final Logger logger = LoggerFactory.getLogger(Member.class);
 
@@ -68,12 +68,20 @@ public class Member implements Comparable<Member>, Serializable {
     return !isBefore(member);
   }
 
+  @JsonIgnore
   public DateTime getBootupTime() {
     return bootupTime;
   }
 
   public void setBootupTime(DateTime bootupTime) {
     this.bootupTime = bootupTime;
+  }
+
+  public String getStringBootupTime() {
+    if (bootupTime == null) {
+      return StringUtils.EMPTY;
+    }
+    return bootupTime.toString();
   }
 
   @JsonIgnore

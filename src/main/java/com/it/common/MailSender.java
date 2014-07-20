@@ -7,6 +7,7 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.it.domain.History;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +31,13 @@ public class MailSender {
   }
 
   public void send(String to, String subject, String content) {
+    History.getInstance().save(subject, content);
+
     if (true) {
+      // for test
       logger.info("Mail will be send!!!");
+      logger.info("subject: {}", subject);
+      logger.info("content: {}", content);
       return;
     }
 

@@ -32,23 +32,27 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
     if (msg instanceof Command) {
       if (msg instanceof StartCommand) {
-        handleStartCommand(msg);
+        StartCommand cmd = (StartCommand) msg;
+        handleStartCommand(cmd);
         if (AllMember.getInstance().me().isMaster()) {
-          logger.info("Master: received StartCommand");
-          if (savedClusters != null) {
-            MailSender.getInstance().send("tiny657@naver.com", "testTitle", "");
-            logger.info("Master: received different member.properties");
-          }
+          String subject = getSubject(cmd, "Member is added: ");
+          String content = getContent(cmd);
+          MailSender.getInstance().send("tiny657@naver.com", subject, content);
         }
       } else if (msg instanceof StopCommand) {
-        handleStopCommand(msg);
+        StopCommand cmd = (StopCommand) msg;
+        handleStopCommand(cmd);
         if (AllMember.getInstance().me().isMaster()) {
-          MailSender.getInstance().send("tiny657@naver.com", "testTitle", "");
-          logger.info("Master: received StopCommand");
+          String subject = getSubject(cmd, "Member is removed: ");
+          String content = getContent(cmd);
+          MailSender.getInstance().send("tiny657@naver.com", subject, content);
         }
       } else if (msg instanceof InfoCommand) {
-        handleInfoCommand(msg);
+        InfoCommand cmd = (InfoCommand) msg;
+        handleInfoCommand(cmd);
       }
+
+      ReferenceCountUtil.release(msg);
       logger.info(AllMember.getInstance().toString());
     } else {
       AllMember.getInstance().me().increaseReceivedCount();
@@ -66,8 +70,7 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
     ctx.close();
   }
 
-  private void handleStartCommand(Object msg) {
-    StartCommand cmd = (StartCommand) msg;
+  private void handleStartCommand(StartCommand cmd) {
     Member member =
         AllMember.getInstance().getMemberByClusterAndId(cmd.getMyCluster(), cmd.getMyId());
     if (savedClusters != null) {
@@ -83,11 +86,9 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
       logger.error("StartCommand was received from {}.{}.  But that isn't existed.",
           cmd.getMyCluster(), cmd.getMyId());
     }
-    ReferenceCountUtil.release(msg);
   }
 
-  private void handleStopCommand(Object msg) {
-    StopCommand cmd = (StopCommand) msg;
+  private void handleStopCommand(StopCommand cmd) {
     Member member =
         AllMember.getInstance().getMemberByClusterAndId(cmd.getMyCluster(), cmd.getMyId());
     if (member != null) {
@@ -97,11 +98,9 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
       logger.error("StopCommand was received from {}.{}.  But that isn't existed.",
           cmd.getMyCluster(), cmd.getMyId());
     }
-    ReferenceCountUtil.release(msg);
   }
 
-  private void handleInfoCommand(Object msg) {
-    InfoCommand cmd = (InfoCommand) msg;
+  private void handleInfoCommand(InfoCommand cmd) {
     Clusters clusters = cmd.getClusters();
     Member receivedMember = clusters.findMe();
 
@@ -135,7 +134,6 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
     receivedMemberInLocal.setDesc(receivedMember.getDesc());
 
     AllMember.getInstance().me().calculatePriorityPointWhenConnect(receivedMember);
-    ReferenceCountUtil.release(msg);
   }
 
   private void removeMembers(Clusters clusters) {
@@ -181,5 +179,17 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
         MemberConfig.getInstance().addMember(cluster, member);
       }
     }
+  }
+
+  private String getSubject(Command cmd, String subjectPrefix) {
+    StringBuilder subject = new StringBuilder();
+    subject.append(subjectPrefix).append(cmd.getMyCluster()).append(".").append(cmd.getMyId());
+    return subject.toString();
+  }
+
+  private String getContent(Command cmd) {
+    Member receivedMember =
+        AllMember.getInstance().getMemberByClusterAndId(cmd.getMyCluster(), cmd.getMyId());
+    return receivedMember.toString();
   }
 }

@@ -18,13 +18,13 @@ public class MemberTest {
     Member memberWithInvalidPort3 = new Member(3, "host", 65535);
   }
 
-  @Test(expected= InvalidMemberException.class)
+  @Test(expected = InvalidMemberException.class)
   public void validatePort0() {
     // When
     Member memberWithValidPort = new Member(1, "host", 0);
   }
 
-  @Test(expected= InvalidMemberException.class)
+  @Test(expected = InvalidMemberException.class)
   public void validatePort65536() {
     // When
     Member memberWithValidPort = new Member(1, "host", 65536);
@@ -51,8 +51,7 @@ public class MemberTest {
   }
 
   @Test
-  public void selectedMasterAsPriorityWhenConnected()
-      throws InterruptedException {
+  public void selectedMasterAsPriorityWhenConnected() throws InterruptedException {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 1);
@@ -72,8 +71,7 @@ public class MemberTest {
   }
 
   @Test
-  public void selectedMasterAsPriorityWhenConnected2()
-      throws InterruptedException {
+  public void selectedMasterAsPriorityWhenConnected2() throws InterruptedException {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 2);
@@ -93,8 +91,7 @@ public class MemberTest {
   }
 
   @Test
-  public void selectedMasterExceptPriority0WhenConnected()
-      throws InterruptedException {
+  public void selectedMasterExceptPriority0WhenConnected() throws InterruptedException {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 0);
@@ -123,8 +120,7 @@ public class MemberTest {
   }
 
   @Test
-  public void selectedMasterAsBootupWhenConnected()
-      throws InterruptedException {
+  public void selectedMasterAsBootupWhenConnected() throws InterruptedException {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 1);
@@ -144,8 +140,7 @@ public class MemberTest {
   }
 
   @Test
-  public void selectedMasterAsBootupExceptPriority0WhenConnected()
-      throws InterruptedException {
+  public void selectedMasterAsBootupExceptPriority0WhenConnected() throws InterruptedException {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 0);
@@ -165,8 +160,7 @@ public class MemberTest {
   }
 
   @Test
-  public void selectedMasterAsPriorityWhenDisconnected()
-      throws InterruptedException {
+  public void selectedMasterAsPriorityWhenDisconnected() throws InterruptedException {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 1);
@@ -188,8 +182,7 @@ public class MemberTest {
   }
 
   @Test
-  public void selectedMasterExceptPriority0WhenDisconnected()
-      throws InterruptedException {
+  public void selectedMasterExceptPriority0WhenDisconnected() throws InterruptedException {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 1);
@@ -211,8 +204,7 @@ public class MemberTest {
   }
 
   @Test
-  public void selectedMasterExceptPriority0WhenDisconnected2()
-      throws InterruptedException {
+  public void selectedMasterExceptPriority0WhenDisconnected2() throws InterruptedException {
     // Given
     Member member1 = new Member();
     member1.setMasterPriority((short) 1);

@@ -25,7 +25,7 @@ public class CollectorListener implements JobListener {
   private List<FileSystem> prevFileSystems = null;
 
   private ResourceMetrics resource = null;
-  private EvictingQueue<ResourceMetrics> history = EvictingQueue.create(30 * 24 * 60 * 60);
+  private EvictingQueue<ResourceMetrics> resourceHistory = EvictingQueue.create(30 * 24 * 60 * 60);
 
   private Notifier notifier;
 
@@ -34,7 +34,7 @@ public class CollectorListener implements JobListener {
     notifier.createLatches(Consts.CPU, MemberConfig.getInstance().getThresholdCpus(), 1, 5);
     notifier.createLatches(Consts.LOADAVERAGE, MemberConfig.getInstance()
         .getThresholdLoadAverages(), 1, 5);
-    notifier.createLatches(Consts.CPU, MemberConfig.getInstance().getThresholdMemories(), 1, 5);
+    notifier.createLatches(Consts.MEMORY, MemberConfig.getInstance().getThresholdMemories(), 1, 5);
   }
 
   public static CollectorListener getInstance() {
@@ -42,7 +42,7 @@ public class CollectorListener implements JobListener {
   }
 
   public EvictingQueue<ResourceMetrics> getHistory() {
-    return history;
+    return resourceHistory;
   }
 
   public ResourceMetrics getLastResourceMetrics() {
@@ -69,8 +69,7 @@ public class CollectorListener implements JobListener {
     prevNetwork = (Network) dataMap.get(Consts.NETWORK);
     prevFileSystems = (List<FileSystem>) dataMap.get(Consts.FILESYSTEMS);
     resource = (ResourceMetrics) dataMap.get(Consts.RESOURCE);
-
-    history.add(resource);
+    resourceHistory.add(resource);
 
     notifier.setValue(Consts.CPU,
         resource.getCpuUserUsedPercent() + resource.getCpuSysUsedPercent());
