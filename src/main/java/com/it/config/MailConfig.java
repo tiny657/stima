@@ -11,7 +11,6 @@ public class MailConfig {
   private static final Logger logger = LoggerFactory.getLogger(MailConfig.class);
   private static MailConfig instance = new MailConfig();
 
-  private static final String MASTER_PRIORITY = "master.priority";
   private static final String MAIL_SMTP_STARTTLS_ENABLE = "mail.smtp.starttls.enable";
   private static final String MAIL_SMTP_AUTH = "mail.smtp.auth";
   private static final String MAIL_SMTP_HOST = "mail.smtp.host";
@@ -44,7 +43,6 @@ public class MailConfig {
   public void init(String[] args) {
     try {
       config = new PropertiesConfiguration(propertiesFile);
-      setMasterPriority(config.getInt(MASTER_PRIORITY));
       setStarttlsEnable(config.getBoolean(MAIL_SMTP_STARTTLS_ENABLE));
       setSmtpAuth(config.getBoolean(MAIL_SMTP_AUTH));
       setSmtpHost(config.getString(MAIL_SMTP_HOST));
@@ -57,14 +55,6 @@ public class MailConfig {
       isEnable = false;
     }
     logger.info(" * MailConfig is {}", isEnable);
-  }
-
-  public int getMasterPriority() {
-    return masterPriority;
-  }
-
-  public void setMasterPriority(int masterPriority) {
-    this.masterPriority = masterPriority;
   }
 
   public boolean isStarttlsEnable() {

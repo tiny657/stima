@@ -25,8 +25,8 @@ public class MailSender {
   public void init() {
     props = new Properties();
     props.put("mail.smtp.starttls.enable", MailConfig.getInstance().isStarttlsEnable());
-    props.put("mail.smtp.host", MailConfig.getInstance().getSmtpHost());
     props.put("mail.smtp.auth", MailConfig.getInstance().isSmtpAuth());
+    props.put("mail.smtp.host", MailConfig.getInstance().getSmtpHost());
     props.put("mail.smtp.port", MailConfig.getInstance().getSmtpPort());
   }
 
@@ -36,6 +36,7 @@ public class MailSender {
     if (true) {
       // for test
       logger.info("Mail will be send!!!");
+      logger.info("to: {}", to);
       logger.info("subject: {}", subject);
       logger.info("content: {}", content);
       return;

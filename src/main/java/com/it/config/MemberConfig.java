@@ -28,6 +28,7 @@ public class MemberConfig {
   private static final String SPREAD_TIME = "config.spreadTime";
   private static final String MASTER_PRIORITY = "master.priority";
   private static final String MONITOR_ENABLE = "monitor.enable";
+  private static final String MONITOR_MAIL = "monitor.mail";
   private static final String MONITOR_PORT = "monitor.port";
   private static final String MONITOR_THRESHOLD_CPU = "monitor.threshold.cpu";
   private static final String MONITOR_THRESHOLD_LOADAVERAGE = "monitor.threshold.loadAverage";
@@ -44,6 +45,8 @@ public class MemberConfig {
 
   private boolean monitorEnable;
   private int monitorPort;
+  private String monitorMail;
+
   private List<Integer> thresholdCpus;
   private List<Integer> thresholdLoadAverages;
   private List<Integer> thresholdMemories;
@@ -64,7 +67,6 @@ public class MemberConfig {
 
     setMyCluster(config.getString(MY_CLUSTER));
     setMyId(config.getInt(MY_ID));
-
     setMyDesc(config.getString(MY_DESC));
 
     // config
@@ -73,6 +75,7 @@ public class MemberConfig {
     // monitor
     setMonitorEnable(config.getBoolean(MONITOR_ENABLE));
     setMonitorPort(config.getInt(MONITOR_PORT));
+    setMonitorMail(Joiner.on(",").join(config.getList(MONITOR_MAIL)));
     setThresholdCpus(config.getList(MONITOR_THRESHOLD_CPU));
     setThresholdLoadAverage(config.getList(MONITOR_THRESHOLD_LOADAVERAGE));
     setThresholdMemories(config.getList(MONITOR_THRESHOLD_MEMORY));
@@ -201,6 +204,14 @@ public class MemberConfig {
       return;
     }
     this.monitorPort = monitorPort;
+  }
+
+  public String getMonitorMail() {
+    return monitorMail;
+  }
+
+  public void setMonitorMail(String monitorMail) {
+    this.monitorMail = monitorMail;
   }
 
   public List<Integer> getThresholdCpus() {

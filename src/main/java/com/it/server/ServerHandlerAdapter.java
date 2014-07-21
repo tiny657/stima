@@ -37,7 +37,8 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
         if (AllMember.getInstance().me().isMaster()) {
           String subject = getSubject(cmd, "Member is added: ");
           String content = getContent(cmd);
-          MailSender.getInstance().send("tiny657@naver.com", subject, content);
+          MailSender.getInstance().send(MemberConfig.getInstance().getMonitorMail(), subject,
+              content);
         }
       } else if (msg instanceof StopCommand) {
         StopCommand cmd = (StopCommand) msg;
@@ -45,7 +46,8 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
         if (AllMember.getInstance().me().isMaster()) {
           String subject = getSubject(cmd, "Member is removed: ");
           String content = getContent(cmd);
-          MailSender.getInstance().send("tiny657@naver.com", subject, content);
+          MailSender.getInstance().send(MemberConfig.getInstance().getMonitorMail(), subject,
+              content);
         }
       } else if (msg instanceof InfoCommand) {
         InfoCommand cmd = (InfoCommand) msg;

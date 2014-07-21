@@ -1,5 +1,6 @@
 package com.it.common;
 
+import com.it.config.MemberConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +46,8 @@ public class Notifier {
         if (latch.isStatusChanged()) {
           subject.append(key).append(" ").append(latch.getThreshold()).append(" ")
               .append(latch.getStatus().toString());
-          MailSender.getInstance()
-              .send("tiny657@naver.com", subject.toString(), content.toString());
+          MailSender.getInstance().send(MemberConfig.getInstance().getMonitorMail(),
+              subject.toString(), content.toString());
           logger.info(content.toString());
           break;
         }
