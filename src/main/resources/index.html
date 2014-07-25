@@ -19,8 +19,9 @@
 <body>
 
 
-<div id="base">
-</div>
+<div id="base"></div>
+
+<div id="history"></div>
 
 <script type="text/javascript">
   function interval() {
@@ -83,9 +84,36 @@
     });
   }
 
+  function history() {
+    var data = {};
+    $.ajax({
+      url: "/history",
+      type: "GET",
+      dataType: "json",
+      data: data,
+      success: function (json) {
+        var code = "";
+        code += '<div class="panel panel-default">';
+        code += '<div class="panel-heading">history</div>';
+        code += '<div class=panel-body>';
+        code += '<div class="panel-group">';
+        code += '<table class="table">';
+        code += '<thead><tr><th>time</th><th>event</th></tr></thread><tbody>';
+        $.each(json, function (i, event) {
+          code += '<tr><td>' + event.eventTime + '</td><td>' + event.subject + '</td></tr>';
+        });
+        code += '</tbody></table>';
+        code += '</div></div></div>';
+        $("#history").html(code);
+      }
+    });
+  }
+
   var refresh = setInterval(function () {
     interval();
   }, 1000);
+
+  history();
 </script>
 
 </body>

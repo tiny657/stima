@@ -248,7 +248,7 @@ public class Member implements Comparable<Member>, Serializable {
     if (timeForReceived != DateTime.now().getSecondOfDay()) {
       receivedTPS = (int) (totalReceived - prevTotalReceived);
       prevTotalReceived = totalReceived;
-      logger.info("receivedTps: {}, totalReceived: {}", receivedTPS, totalReceived);
+      logger.info("receivedTPS: {}, totalReceived: {}", receivedTPS, totalReceived);
       timeForReceived = DateTime.now().getSecondOfDay();
     }
 

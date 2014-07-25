@@ -8,7 +8,10 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
+import com.it.domain.History;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -18,26 +21,27 @@ import com.it.common.Utils;
 import com.it.domain.AllMember;
 
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.util.CharsetUtil;
 
-public class MonitorServerHandler extends SimpleChannelInboundHandler<Object> {
+public class MonitorServerHandler extends ChannelHandlerAdapter {
   private static final Logger logger = LoggerFactory.getLogger(MonitorServerHandler.class);
 
   private static final String INDEX = "/index.html";
+  private static final String ROOT = "/";
+  private static final String INTERVAL = "/interval";
+  private static final String HISTORY = "/history";
 
   @Override
-  public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-    ctx.flush();
-  }
+  public void channelActive(ChannelHandlerContext ctx) {}
 
   @Override
-  protected void messageReceived(ChannelHandlerContext ctx, Object msg) {
+  public void channelRead(ChannelHandlerContext ctx, Object msg) {
     if (msg instanceof HttpRequest) {
       HttpRequest request = (HttpRequest) msg;
 
@@ -47,6 +51,17 @@ public class MonitorServerHandler extends SimpleChannelInboundHandler<Object> {
 
       writeResponse(ctx, request);
     }
+  }
+
+  @Override
+  public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    ctx.flush();
+  }
+
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    cause.printStackTrace();
+    ctx.close();
   }
 
   private boolean writeResponse(ChannelHandlerContext ctx, HttpRequest request) {
@@ -71,9 +86,11 @@ public class MonitorServerHandler extends SimpleChannelInboundHandler<Object> {
 
   private String getContent(String path) {
     String content = StringUtils.EMPTY;
-    if (StringUtils.equals(path, "/interval")) {
+    if (StringUtils.equals(path, INTERVAL)) {
       content = Utils.toJson(AllMember.getInstance().getClusters().getMemberListMap());
-    } else if (StringUtils.equals(path, "/")) {
+    } else if (StringUtils.equals(path, HISTORY)) {
+      content = Utils.toJson(History.getInstance().getAlerts());
+    } else if (StringUtils.equals(path, ROOT)) {
       try {
         content = IOUtils.toString(getClass().getResourceAsStream(INDEX), "UTF-8");
       } catch (IOException e) {
@@ -83,14 +100,8 @@ public class MonitorServerHandler extends SimpleChannelInboundHandler<Object> {
     return content;
   }
 
-  private static void send100Continue(ChannelHandlerContext ctx) {
+  private void send100Continue(ChannelHandlerContext ctx) {
     FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, CONTINUE);
     ctx.write(response);
-  }
-
-  @Override
-  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-    cause.printStackTrace();
-    ctx.close();
   }
 }
