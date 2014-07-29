@@ -8,41 +8,54 @@ import com.google.common.collect.Maps;
 import com.it.client.Client;
 
 public class MemberInfos {
-  private Map<String, ChannelFuture> channelFutureMap;
-  private Map<String, Client> clientMap;
+  private Map<String, ChannelFuture> dataChannelFutureMap;
+  private Map<String, ChannelFuture> controlChannelFutureMap;
+  private Map<String, Client> dataClientMap;
+  private Map<String, Client> controlClientMap;
 
   public MemberInfos() {
-    channelFutureMap = Maps.newHashMap();
-    clientMap = Maps.newHashMap();
+    dataChannelFutureMap = Maps.newHashMap();
+    controlChannelFutureMap = Maps.newHashMap();
+    dataClientMap = Maps.newHashMap();
+    controlClientMap = Maps.newHashMap();
   }
 
-  public void put(Member member, ChannelFuture channelFuture, Client client) {
-    if (member == null) {
-      return;
-    }
-
-    put(member, channelFuture);
-    put(member, client);
+  public ChannelFuture getDataChannelFuture(Member member) {
+    return dataChannelFutureMap.get(member.getHostPort());
   }
 
-  public ChannelFuture getChannelFuture(Member member) {
-    return channelFutureMap.get(member.getHostPort());
+  public void putDataChannelFuture(Member member, ChannelFuture channelFuture) {
+    dataChannelFutureMap.put(member.getHostPort(), channelFuture);
   }
 
-  public void put(Member member, ChannelFuture channelFuture) {
-    channelFutureMap.put(member.getHostPort(), channelFuture);
+  public ChannelFuture getControlChannelFuture(Member member) {
+    return controlChannelFutureMap.get(member.getHostPort());
   }
 
-  public Client getClient(Member member) {
-    return clientMap.get(member.getHostPort());
+  public void putControlChannelFuture(Member member, ChannelFuture channelFuture) {
+    controlChannelFutureMap.put(member.getHostPort(), channelFuture);
   }
 
-  public void put(Member member, Client client) {
-    clientMap.put(member.getHostPort(), client);
+  public Client getDataClient(Member member) {
+    return dataClientMap.get(member.getHostPort());
+  }
+
+  public void putDataClient(Member member, Client client) {
+    dataClientMap.put(member.getHostPort(), client);
+  }
+
+  public Client getControlClient(Member member) {
+    return controlClientMap.get(member.getHostPort());
+  }
+
+  public void putControlClient(Member member, Client client) {
+    controlClientMap.put(member.getHostPort(), client);
   }
 
   public void removeInfo(Member member) {
-    channelFutureMap.remove(member);
-    clientMap.remove(member);
+    dataChannelFutureMap.remove(member);
+    controlChannelFutureMap.remove(member);
+    dataClientMap.remove(member);
+    controlClientMap.remove(member);
   }
 }

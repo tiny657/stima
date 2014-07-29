@@ -13,7 +13,10 @@ public class ClientHandler extends ClientHandlerAdapter {
   private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
   @Override
+  public void channelActive(ChannelHandlerContext ctx) {
+  }
+
+  @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
-    super.channelRead(ctx, msg);
   }
 }

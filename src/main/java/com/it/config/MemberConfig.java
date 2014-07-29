@@ -96,7 +96,8 @@ public class MemberConfig {
         }
         String[] split = StringUtils.split(idHostPort, ":");
         boolean me = StringUtils.equals(cluster, myCluster) && (Utils.parseInt(split[0]) == myId);
-        AllMember.getInstance().addMember(cluster, new Member(split[0], split[1], split[2], me));
+        AllMember.getInstance().addMember(cluster,
+            new Member(split[0], split[1], split[2], split[3], me));
       }
     }
 

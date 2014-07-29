@@ -21,7 +21,8 @@ public class Member implements Comparable<Member>, Serializable {
   private short masterPriority, priorityPoint;
   private int id;
   private String host;
-  private int port;
+  private int dataPort;
+  private int controlPort;
   private String desc;
   private Status status = Status.SHUTDOWN;
   private boolean me = false;
@@ -33,15 +34,16 @@ public class Member implements Comparable<Member>, Serializable {
 
   public Member() {}
 
-  public Member(String id, String host, String port, boolean me) {
-    this(Utils.parseInt(id), host, Utils.parseInt(port));
+  public Member(String id, String host, String dataPort, String controlPort, boolean me) {
+    this(Utils.parseInt(id), host, Utils.parseInt(dataPort), Utils.parseInt(controlPort));
     setMe(me);
   }
 
-  public Member(int id, String host, int port) {
+  public Member(int id, String host, int dataPort, int controlPort) {
     setId(id);
     setHost(host);
-    setPort(port);
+    setDataPort(dataPort);
+    setControlPort(controlPort);
   }
 
   public boolean isMe() {
@@ -53,11 +55,11 @@ public class Member implements Comparable<Member>, Serializable {
   }
 
   public ResourceMetrics getResource() {
-    if (me) {
-      return CollectorListener.getInstance().getLastResourceMetrics();
-    } else {
+    if (!me) {
       return null;
     }
+
+    return CollectorListener.getInstance().getLastResourceMetrics();
   }
 
   public boolean isBefore(Member member) {
@@ -81,6 +83,7 @@ public class Member implements Comparable<Member>, Serializable {
     if (bootupTime == null) {
       return StringUtils.EMPTY;
     }
+
     return bootupTime.toString();
   }
 
@@ -163,24 +166,42 @@ public class Member implements Comparable<Member>, Serializable {
   }
 
   @JsonIgnore
-  public int getPort() {
-    return port;
+  public int getDataPort() {
+    return dataPort;
   }
 
-  public void setPort(String port) {
-    setPort(Utils.parseInt(port));
+  public void setDataPort(String port) {
+    setDataPort(Utils.parseInt(port));
   }
 
-  public void setPort(int port) {
+  public void setDataPort(int port) {
     if (!Utils.isPortValid(port)) {
-      throw new InvalidMemberException("Port (" + port + ") is invalid.");
+      throw new InvalidMemberException("dataPort (" + port + ") is invalid.");
     }
 
-    this.port = port;
+    this.dataPort = port;
   }
 
+  @JsonIgnore
+  public int getControlPort() {
+    return controlPort;
+  }
+
+  public void setControlPort(String port) {
+    setControlPort(Utils.parseInt(port));
+  }
+
+  public void setControlPort(int port) {
+    if (!Utils.isPortValid(port)) {
+      throw new InvalidMemberException("controlPort (" + port + ") is invalid.");
+    }
+
+    this.controlPort = port;
+  }
+
+  // TODO: separate dataPort, controlPort
   public String getHostPort() {
-    return host + ":" + port;
+    return host + ":" + dataPort + ":" + controlPort;
   }
 
   public String getDesc() {
@@ -256,11 +277,18 @@ public class Member implements Comparable<Member>, Serializable {
   }
 
   public boolean equals(Member member) {
-    return equals(member.host, member.port);
+    return equalsByDataPort(member.host, member.dataPort);
   }
 
-  public boolean equals(String host, int port) {
-    if (StringUtils.equals(this.host, host) && this.port == port) {
+  public boolean equalsByDataPort(String host, int dataPort) {
+    if (StringUtils.equals(this.host, host) && this.dataPort == dataPort) {
+      return true;
+    }
+    return false;
+  }
+
+  public boolean equalsByControlPort(String host, int controlPort) {
+    if (StringUtils.equals(this.host, host) && this.controlPort == controlPort) {
       return true;
     }
     return false;
@@ -269,7 +297,7 @@ public class Member implements Comparable<Member>, Serializable {
   @Override
   public int compareTo(Member member) {
     if (host.compareTo(member.getHost()) == 0) {
-      return port - member.getPort();
+      return dataPort - member.getDataPort();
     } else {
       return host.compareTo(member.getHost());
     }
@@ -282,7 +310,7 @@ public class Member implements Comparable<Member>, Serializable {
       status += ", me";
     }
 
-    return id + ":" + host + ":" + port + "(" + status + ", sent: " + +sentTPS + "/" + totalSent
-        + ", received: " + receivedTPS + "/" + totalReceived + ")";
+    return id + ":" + host + ":" + dataPort + ":" + controlPort + "(" + status + ", sent: "
+        + +sentTPS + "/" + totalSent + ", received: " + receivedTPS + "/" + totalReceived + ")";
   }
 }

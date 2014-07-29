@@ -18,8 +18,8 @@ public class Utils {
 
   public static boolean isMemberValid(String idHostPort) {
     String[] split = StringUtils.split(idHostPort, ":");
-    if (split.length != 3) {
-      logger.error("The member must be [ID]:[IP]:[port]");
+    if (split.length != 4) {
+      logger.error("The member must be [ID]:[IP]:[dataPort]:[controlPort]");
       return false;
     }
 
@@ -34,7 +34,12 @@ public class Utils {
     }
 
     if (!isPortValid(split[2])) {
-      logger.error("The port({}) range is 0-65535.", split[2]);
+      logger.error("The dataPort({}) range is 0-65535.", split[2]);
+      return false;
+    }
+
+    if (!isPortValid(split[3])) {
+      logger.error("The controlPort({}) range is 0-65535.", split[3]);
       return false;
     }
 

@@ -1,32 +1,31 @@
 package com.it.server;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.it.domain.AllMember;
 import com.it.domain.Member;
 import com.it.domain.Status;
 
-import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.channel.ChannelHandler;
 
-public class Server extends Thread {
+abstract public class Server extends Thread {
   private static final Logger logger = LoggerFactory.getLogger(Server.class);
-  private Member myInfo;
-  private ServerHandlerAdapter serverHandlerAdapter;
-  private boolean isStartup = false;
+  protected Member myInfo;
+  protected ServerHandlerAdapter serverHandlerAdapter;
+  protected boolean isStartup = false;
+  protected List<ChannelHandler> pipelines = Lists.newArrayList();
 
-  public Server(Member member) {
+  protected Server(Member member) {
     myInfo = member;
+  }
+
+  public void addPipeline(ChannelHandler channelHandler) {
+    pipelines.add(channelHandler);
   }
 
   public void setServerHandler(ServerHandlerAdapter serverHandlerAdapter) {
@@ -41,40 +40,7 @@ public class Server extends Thread {
     return myInfo.getHost();
   }
 
-  public int getPort() {
-    return myInfo.getPort();
-  }
-
-  @Override
-  public void run() {
-    EventLoopGroup bossGroup = new NioEventLoopGroup();
-    EventLoopGroup workerGroup = new NioEventLoopGroup();
-    try {
-      ServerBootstrap bootstrap = new ServerBootstrap();
-      bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-          .childHandler(new ChannelInitializer<SocketChannel>() {
-            @Override
-            public void initChannel(SocketChannel socketChannel) throws Exception {
-              socketChannel.pipeline().addLast(new ObjectEncoder(),
-                  new ObjectDecoder(ClassResolvers.cacheDisabled(null)), serverHandlerAdapter);
-            }
-          }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
-
-      ChannelFuture channelFuture = bootstrap.bind(myInfo.getPort()).sync();
-
-      AllMember.getInstance().getMemberInfos().put(myInfo, channelFuture);
-      myInfo.setStatus(Status.STANDBY);
-      isStartup = true;
-      logger.info("server started ({})", myInfo.toString());
-
-      awaitDisconnection(channelFuture);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } finally {
-      workerGroup.shutdownGracefully();
-      bossGroup.shutdownGracefully();
-    }
-  }
+  abstract public int getPort();
 
   public void await() {
     while (!isStartup) {
@@ -85,13 +51,13 @@ public class Server extends Thread {
     }
   }
 
-  private void awaitDisconnection(ChannelFuture channelFuture) throws InterruptedException {
+  protected void awaitDisconnection(ChannelFuture channelFuture) throws InterruptedException {
     channelFuture.channel().closeFuture().sync();
 
     // change status to Shutdown
-    AllMember.getInstance().getMember(myInfo.getHost(), myInfo.getPort())
+    AllMember.getInstance().getMemberByDataPort(myInfo.getHost(), myInfo.getDataPort())
         .setStatus(Status.SHUTDOWN);
 
-    logger.info("server closed ({})", myInfo.getHostPort());
+    logger.info("server closed ({}:{})", getHost(), getPort());
   }
 }

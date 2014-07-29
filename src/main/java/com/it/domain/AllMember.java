@@ -58,20 +58,18 @@ public class AllMember {
     return clusters.getMemberListIn(cluster).getMembers();
   }
 
-  public Member getMember(String host, int port) {
+  public Member getMemberByDataPort(String host, int dataPort) {
     for (String clusterName : clusters.getClusterNames()) {
-      Member member = clusters.getMemberListIn(clusterName).findMember(host, port);
+      Member member = clusters.getMemberListIn(clusterName).findMemberByDataPort(host, dataPort);
       if (member != null) {
         return member;
       }
     }
-
     return null;
   }
 
   public Member getMemberByClusterAndId(String cluster, int id) {
     MemberList memberList = clusters.getMemberListIn(cluster);
-    System.out.println("@" + memberList.toString());
     if (memberList == null) {
       return null;
     }

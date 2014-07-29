@@ -84,7 +84,7 @@ public class MemberList implements Serializable {
   }
 
   public boolean setStatus(String host, int port, Status status) {
-    Member member = findMember(host, port);
+    Member member = findMemberByDataPort(host, port);
     if (member == null) {
       return false;
     }
@@ -94,20 +94,27 @@ public class MemberList implements Serializable {
   }
 
   public boolean contains(Member member) {
-    if (findMember(member.getHost(), member.getPort()) == null) {
+    if (findMemberByDataPort(member.getHost(), member.getDataPort()) == null) {
       return false;
     }
-
     return true;
   }
 
-  public Member findMember(String host, int port) {
+  public Member findMemberByDataPort(String host, int dataPort) {
     for (Member member : members) {
-      if (member.equals(host, port)) {
+      if (member.equalsByDataPort(host, dataPort)) {
         return member;
       }
     }
+    return null;
+  }
 
+  public Member findMemberByControlPort(String host, int controlPort) {
+    for (Member member : members) {
+      if (member.equalsByDataPort(host, controlPort)) {
+        return member;
+      }
+    }
     return null;
   }
 
@@ -121,6 +128,7 @@ public class MemberList implements Serializable {
     return result;
   }
 
+  // TODO: change member2
   public boolean isDuplicatedId(Member member2) {
     for (Member member : members) {
       if (member.getId() == member2.getId()) {

@@ -27,7 +27,7 @@ public class Clusters implements Serializable {
 
   public Member findMember(String host, int port) {
     for (Entry<String, MemberList> entry : memberListMap.entrySet()) {
-      Member member = entry.getValue().findMember(host, port);
+      Member member = entry.getValue().findMemberByDataPort(host, port);
       if (member != null) {
         return member;
       }

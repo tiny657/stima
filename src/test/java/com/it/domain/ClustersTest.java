@@ -45,10 +45,10 @@ public class ClustersTest {
   public void addMember() {
     // Given
     Clusters clusters = new Clusters();
-    clusters.addMember("cluster1", new Member(1, "host", 1001));
-    clusters.addMember("cluster1", new Member(2, "host", 1002));
+    clusters.addMember("cluster1", new Member(1, "host", 1001, 2001));
+    clusters.addMember("cluster1", new Member(2, "host", 1002, 2002));
     clusters.createCluster("cluster2");
-    clusters.addMember("cluster2", new Member(3, "host", 1003));
+    clusters.addMember("cluster2", new Member(3, "host", 1003, 2003));
 
     // When
     int size = clusters.getClusterNames().size();
@@ -61,12 +61,12 @@ public class ClustersTest {
   public void notEqualsToClusterCount() {
     // Given
     Clusters clusters1 = new Clusters();
-    clusters1.addMember("cluster1", new Member(1, "host", 1001));
-    clusters1.addMember("cluster1", new Member(2, "host", 1002));
-    clusters1.addMember("cluster2", new Member(3, "host", 1003));
+    clusters1.addMember("cluster1", new Member(1, "host", 1001, 2001));
+    clusters1.addMember("cluster1", new Member(2, "host", 1002, 2002));
+    clusters1.addMember("cluster2", new Member(3, "host", 1003, 2003));
     Clusters clusters2 = new Clusters();
-    clusters2.addMember("cluster1", new Member(4, "host", 1001));
-    clusters2.addMember("cluster1", new Member(5, "host", 1002));
+    clusters2.addMember("cluster1", new Member(4, "host", 1001, 2001));
+    clusters2.addMember("cluster1", new Member(5, "host", 1002, 2002));
 
     // When
     boolean equals = clusters1.equals(clusters2);
@@ -79,12 +79,12 @@ public class ClustersTest {
   public void notEqualsToMemberCount() {
     // Given
     Clusters clusters1 = new Clusters();
-    clusters1.addMember("cluster1", new Member(1, "host", 1001));
-    clusters1.addMember("cluster1", new Member(2, "host", 1002));
-    clusters1.addMember("cluster1", new Member(3, "host", 1003));
+    clusters1.addMember("cluster1", new Member(1, "host", 1001, 2001));
+    clusters1.addMember("cluster1", new Member(2, "host", 1002, 2002));
+    clusters1.addMember("cluster1", new Member(3, "host", 1003, 2003));
     Clusters clusters2 = new Clusters();
-    clusters2.addMember("cluster1", new Member(4, "host", 1001));
-    clusters2.addMember("cluster1", new Member(5, "host", 1002));
+    clusters2.addMember("cluster1", new Member(4, "host", 1001, 2001));
+    clusters2.addMember("cluster1", new Member(5, "host", 1002, 2002));
 
     // When
     boolean equals = clusters1.equals(clusters2);
@@ -97,13 +97,13 @@ public class ClustersTest {
   public void notEqualsToPort() {
     // Given
     Clusters clusters1 = new Clusters();
-    clusters1.addMember("cluster1", new Member(1, "host", 1001));
-    clusters1.addMember("cluster1", new Member(2, "host", 1002));
-    clusters1.addMember("cluster1", new Member(3, "host", 1003));
+    clusters1.addMember("cluster1", new Member(1, "host", 1001, 2001));
+    clusters1.addMember("cluster1", new Member(2, "host", 1002, 2002));
+    clusters1.addMember("cluster1", new Member(3, "host", 1003, 2003));
     Clusters clusters2 = new Clusters();
-    clusters2.addMember("cluster1", new Member(4, "host", 1001));
-    clusters2.addMember("cluster1", new Member(5, "host", 1002));
-    clusters2.addMember("cluster1", new Member(6, "host", 1004));
+    clusters2.addMember("cluster1", new Member(4, "host", 1001, 2001));
+    clusters2.addMember("cluster1", new Member(5, "host", 1002, 2002));
+    clusters2.addMember("cluster1", new Member(6, "host", 1004, 2004));
 
     // When
     boolean equals = clusters1.equals(clusters2);
@@ -116,13 +116,13 @@ public class ClustersTest {
   public void notEqualsToHost() {
     // Given
     Clusters clusters1 = new Clusters();
-    clusters1.addMember("cluster1", new Member(1, "host", 1001));
-    clusters1.addMember("cluster1", new Member(2, "host", 1002));
-    clusters1.addMember("cluster1", new Member(3, "host", 1003));
+    clusters1.addMember("cluster1", new Member(1, "host", 1001, 2001));
+    clusters1.addMember("cluster1", new Member(2, "host", 1002, 2002));
+    clusters1.addMember("cluster1", new Member(3, "host", 1003, 2003));
     Clusters clusters2 = new Clusters();
-    clusters2.addMember("cluster1", new Member(4, "host", 1001));
-    clusters2.addMember("cluster1", new Member(5, "host", 1002));
-    clusters2.addMember("cluster1", new Member(6, "host2", 1003));
+    clusters2.addMember("cluster1", new Member(4, "host", 1001, 2001));
+    clusters2.addMember("cluster1", new Member(5, "host", 1002, 2002));
+    clusters2.addMember("cluster1", new Member(6, "host2", 1003, 2003));
 
     // When
     boolean equals = clusters1.equals(clusters2);
@@ -135,13 +135,13 @@ public class ClustersTest {
   public void equals() {
     // Given
     Clusters clusters1 = new Clusters();
-    clusters1.addMember("cluster1", new Member(1, "host", 1001));
-    clusters1.addMember("cluster1", new Member(2, "host", 1002));
-    clusters1.addMember("cluster2", new Member(3, "host", 1003));
+    clusters1.addMember("cluster1", new Member(1, "host", 1001, 2001));
+    clusters1.addMember("cluster1", new Member(2, "host", 1002, 2002));
+    clusters1.addMember("cluster2", new Member(3, "host", 1003, 2003));
     Clusters clusters2 = new Clusters();
-    clusters2.addMember("cluster1", new Member(4, "host", 1001));
-    clusters2.addMember("cluster1", new Member(5, "host", 1002));
-    clusters2.addMember("cluster2", new Member(6, "host", 1003));
+    clusters2.addMember("cluster1", new Member(4, "host", 1001, 2001));
+    clusters2.addMember("cluster1", new Member(5, "host", 1002, 2002));
+    clusters2.addMember("cluster2", new Member(6, "host", 1003, 2003));
 
     // When
     boolean equals = clusters1.equals(clusters2);
@@ -154,13 +154,13 @@ public class ClustersTest {
   public void diffCluster() {
     // Given
     Clusters clusters1 = new Clusters();
-    clusters1.addMember("cluster1", new Member(1, "host", 1001));
-    clusters1.addMember("cluster1", new Member(2, "host", 1002));
-    clusters1.addMember("cluster2", new Member(3, "host", 1003));
+    clusters1.addMember("cluster1", new Member(1, "host", 1001, 2001));
+    clusters1.addMember("cluster1", new Member(2, "host", 1002, 2002));
+    clusters1.addMember("cluster2", new Member(3, "host", 1003, 2003));
 
     Clusters clusters2 = new Clusters();
-    clusters2.addMember("cluster1", new Member(4, "host", 1001));
-    clusters2.addMember("cluster1", new Member(5, "host", 1002));
+    clusters2.addMember("cluster1", new Member(4, "host", 1001, 2001));
+    clusters2.addMember("cluster1", new Member(5, "host", 1002, 2002));
 
     // When
     Map<String, MemberList> diff = clusters1.diff(clusters2);
@@ -174,14 +174,14 @@ public class ClustersTest {
   public void diffMember() {
     // Given
     Clusters clusters1 = new Clusters();
-    clusters1.addMember("cluster1", new Member(1, "host", 1001));
-    clusters1.addMember("cluster1", new Member(2, "host", 1002));
+    clusters1.addMember("cluster1", new Member(1, "host", 1001, 2001));
+    clusters1.addMember("cluster1", new Member(2, "host", 1002, 2002));
 
     Clusters clusters2 = new Clusters();
-    clusters2.addMember("cluster1", new Member(3, "host", 1001));
-    clusters2.addMember("cluster1", new Member(4, "host", 1002));
-    clusters2.addMember("cluster1", new Member(5, "host", 1003));
-    clusters2.addMember("cluster2", new Member(6, "host", 1004));
+    clusters2.addMember("cluster1", new Member(3, "host", 1001, 2001));
+    clusters2.addMember("cluster1", new Member(4, "host", 1002, 2002));
+    clusters2.addMember("cluster1", new Member(5, "host", 1003, 2003));
+    clusters2.addMember("cluster2", new Member(6, "host", 1004, 2004));
 
     // When
     Map<String, MemberList> diff = clusters1.diff(clusters2);

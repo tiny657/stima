@@ -1,17 +1,5 @@
 package com.it.client;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,17 +7,20 @@ import com.it.domain.AllMember;
 import com.it.domain.Member;
 import com.it.domain.Status;
 
-public class Client extends Thread {
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
+
+abstract public class Client extends Thread {
   private static final Logger logger = LoggerFactory.getLogger(Client.class);
 
-  private Member myInfo;
-  private ClientHandlerAdapter clientHandlerAdapter;
-  private ChannelFuture channelFuture = null;
+  protected Member myInfo;
+  protected ClientHandlerAdapter clientHandlerAdapter;
+  protected ChannelFuture channelFuture = null;
 
-  private boolean stopped = false;
-  private boolean isStartup = false;
+  protected boolean stopped = false;
+  protected boolean isStartup = false;
 
-  public Client(Member member) {
+  protected Client(Member member) {
     myInfo = member;
   }
 
@@ -37,36 +28,11 @@ public class Client extends Thread {
     this.clientHandlerAdapter = clientHandlerAdapter;
   }
 
-  @Override
-  public void run() {
-    EventLoopGroup workerGroup = new NioEventLoopGroup();
-
-    try {
-      Bootstrap bootstrap = new Bootstrap();
-      bootstrap.group(workerGroup);
-      bootstrap.channel(NioSocketChannel.class);
-      bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
-      bootstrap.handler(new ChannelInitializer<SocketChannel>() {
-        @Override
-        public void initChannel(SocketChannel socketChannel) throws Exception {
-          socketChannel.pipeline().addLast(new ObjectEncoder(),
-              new ObjectDecoder(ClassResolvers.cacheDisabled(null)), clientHandlerAdapter);
-        }
-      });
-
-      AllMember.getInstance().getMemberInfos().put(myInfo, this);
-      while (!stopped) {
-        channelFuture = connect(bootstrap);
-        update(channelFuture);
-        awaitDisconnection(channelFuture);
-        AllMember.getInstance().me().calculatePriorityPointWhenDisconnect(myInfo);
-      }
-    } catch (InterruptedException e) {
-      logger.info("Connection({}) is closed.", myInfo.getHostPort());
-    } finally {
-      workerGroup.shutdownGracefully();
-    }
+  public String getHost() {
+    return myInfo.getHost();
   }
+
+  abstract public int getPort();
 
   public void await() {
     while (!isStartup) {
@@ -83,29 +49,27 @@ public class Client extends Thread {
       channelFuture.channel().close();
     }
     stopped = true;
-    logger.info("The client({}) is stopped.", myInfo.getHostPort());
+    logger.info("The client({}:{}) is stopped.", getHost(), getPort());
   }
 
-  private ChannelFuture connect(Bootstrap bootstrap) throws InterruptedException {
-    logger.info("Connecting to {}", myInfo.getHostPort());
+  protected ChannelFuture connect(Bootstrap bootstrap) throws InterruptedException {
+    logger.info("Connecting to {}:{}", getHost(), getPort());
 
     ChannelFuture channelFuture;
     do {
-      channelFuture = bootstrap.connect(myInfo.getHost(), myInfo.getPort()).await();
+      channelFuture = bootstrap.connect(getHost(), getPort()).await();
       isStartup = true;
       Thread.sleep(100);
     } while (!stopped && !channelFuture.isSuccess());
 
     if (channelFuture.isSuccess()) {
-      logger.info("Connection({}) is established.", myInfo.getHostPort());
+      logger.info("Connection({}:{}) is established.", getHost(), getPort());
     }
 
     return channelFuture;
   }
 
-  private void update(ChannelFuture channelFuture) {
-    AllMember.getInstance().getMemberInfos().put(myInfo, channelFuture);
-
+  protected void updateStatus() {
     // update status
     if (myInfo.getStatus() == Status.SHUTDOWN) {
       myInfo.setStatus(Status.STANDBY);
@@ -114,12 +78,12 @@ public class Client extends Thread {
     logger.info(AllMember.getInstance().toString());
   }
 
-  private void awaitDisconnection(ChannelFuture channelFuture) throws InterruptedException {
+  protected void awaitDisconnection(ChannelFuture channelFuture) throws InterruptedException {
     channelFuture.channel().closeFuture().sync();
 
     myInfo.setStatus(Status.SHUTDOWN);
 
-    logger.info("Connection({}) is closed.", myInfo.getHostPort());
+    logger.info("Connection({}:{}) is closed.", getHost(), getPort());
     logger.info(AllMember.getInstance().toString());
   }
 }

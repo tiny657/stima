@@ -16,11 +16,11 @@ public class MemberListTest {
   @Test
   public void randomRunningMember() {
     // Given
-    int count = 3, basePort = 5000;
+    int count = 3, basePort = 5000, controlBasePort = 6000;
     List<Member> members = Lists.newArrayList();
     MemberList memberList = new MemberList();
     for (int i = 0; i < count; i++) {
-      members.add(new Member(i, "host", basePort + i));
+      members.add(new Member(i, "host", basePort + i, controlBasePort + i));
       memberList.addMember(members.get(i));
       memberList.setStatus("host", basePort + i, Status.RUNNING);
     }
@@ -40,7 +40,7 @@ public class MemberListTest {
   public void setStatusWhenNotExists() {
     // Given
     MemberList memberList = new MemberList();
-    memberList.addMember(new Member(1, "host", 1));
+    memberList.addMember(new Member(1, "host", 1, 1001));
 
     // When
     boolean status = memberList.setStatus("host", 2, Status.RUNNING);
@@ -54,7 +54,7 @@ public class MemberListTest {
   public void setStatusToRunning() {
     // Given
     MemberList memberList = new MemberList();
-    memberList.addMember(new Member(1, "host", 1));
+    memberList.addMember(new Member(1, "host", 1, 1001));
 
     // When
     boolean status = memberList.setStatus("host", 1, Status.RUNNING);
@@ -68,14 +68,14 @@ public class MemberListTest {
   public void setStatusToNotRunning() {
     // Given
     MemberList memberList = new MemberList();
-    memberList.addMember(new Member(1, "host", 1));
+    memberList.addMember(new Member(1, "host", 1, 1001));
     memberList.setStatus("host", 1, Status.RUNNING);
 
     // When
-    boolean status = memberList.setStatus("host", 1, Status.SHUTDOWN);
+    boolean isChanged = memberList.setStatus("host", 1, Status.SHUTDOWN);
 
     // Then
-    assertThat(status, is(true));
+    assertThat(isChanged, is(true));
     assertThat(memberList.getRunningMembers().size(), is(0));
   }
 
@@ -83,11 +83,11 @@ public class MemberListTest {
   public void findMember() {
     // Given
     MemberList memberList = new MemberList();
-    memberList.addMember(new Member(1, "host", 1));
+    memberList.addMember(new Member(1, "host", 1, 1001));
 
     // When
-    Member findMember = memberList.findMember("host", 1);
-    Member findMember2 = memberList.findMember("host", 2);
+    Member findMember = memberList.findMemberByDataPort("host", 1);
+    Member findMember2 = memberList.findMemberByDataPort("host", 2);
 
     // Then
     assertThat(findMember, notNullValue());
@@ -98,23 +98,23 @@ public class MemberListTest {
   public void isDuplicatedId() {
     // Given
     MemberList memberList = new MemberList();
-    memberList.addMember(new Member(1, "host", 1));
-    memberList.addMember(new Member(2, "host", 2));
+    memberList.addMember(new Member(1, "host", 1, 1001));
+    memberList.addMember(new Member(2, "host", 2, 1002));
 
     // When
-    memberList.addMember(new Member(1, "host", 3));
+    memberList.addMember(new Member(1, "host", 3, 1003));
   }
 
   @Test
   public void contains() {
     // Given
-    Member member = new Member(1, "host", 1);
+    Member member = new Member(1, "host", 1, 1001);
     MemberList memberList = new MemberList();
     memberList.addMember(member);
 
     // When
     boolean contains1 = memberList.contains(member);
-    Member testMember = new Member(2, "host", 2);
+    Member testMember = new Member(2, "host", 2, 1002);
     boolean contains2 = memberList.contains(testMember);
 
     // Then
@@ -126,13 +126,13 @@ public class MemberListTest {
   public void diff() {
     // Given
     MemberList memberList1 = new MemberList();
-    memberList1.addMember(new Member(1, "host", 1));
-    memberList1.addMember(new Member(2, "host", 2));
-    memberList1.addMember(new Member(3, "host", 3));
+    memberList1.addMember(new Member(1, "host", 1, 1001));
+    memberList1.addMember(new Member(2, "host", 2, 1002));
+    memberList1.addMember(new Member(3, "host", 3, 1003));
 
     MemberList memberList2 = new MemberList();
-    memberList2.addMember(new Member(4, "host", 3));
-    memberList2.addMember(new Member(5, "host", 4));
+    memberList2.addMember(new Member(4, "host", 3, 1003));
+    memberList2.addMember(new Member(5, "host", 4, 1004));
 
     MemberList memberList3 = new MemberList();
 

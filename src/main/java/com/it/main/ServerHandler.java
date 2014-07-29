@@ -1,5 +1,6 @@
 package com.it.main;
 
+import com.it.domain.AllMember;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -14,6 +15,6 @@ public class ServerHandler extends ServerHandlerAdapter {
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
-    super.channelRead(ctx, msg);
+    AllMember.getInstance().me().increaseReceivedCount();
   }
 }

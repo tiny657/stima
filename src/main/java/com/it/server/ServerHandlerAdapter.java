@@ -2,6 +2,8 @@ package com.it.server;
 
 import java.util.Map;
 
+import com.it.client.ControlClient;
+import com.it.client.DataClient;
 import com.it.common.MailSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,35 +32,31 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
-    if (msg instanceof Command) {
-      if (msg instanceof StartCommand) {
-        StartCommand cmd = (StartCommand) msg;
-        handleStartCommand(cmd);
-        if (AllMember.getInstance().me().isMaster()) {
-          String subject = getSubject(cmd, "Member is added: ");
-          String content = getContent(cmd);
-          MailSender.getInstance().send(MemberConfig.getInstance().getMonitorMail(), subject,
-              content);
-        }
-      } else if (msg instanceof StopCommand) {
-        StopCommand cmd = (StopCommand) msg;
-        handleStopCommand(cmd);
-        if (AllMember.getInstance().me().isMaster()) {
-          String subject = getSubject(cmd, "Member is removed: ");
-          String content = getContent(cmd);
-          MailSender.getInstance().send(MemberConfig.getInstance().getMonitorMail(), subject,
-              content);
-        }
-      } else if (msg instanceof InfoCommand) {
-        InfoCommand cmd = (InfoCommand) msg;
-        handleInfoCommand(cmd);
+    if (msg instanceof StartCommand) {
+      StartCommand cmd = (StartCommand) msg;
+      handleStartCommand(cmd);
+      if (AllMember.getInstance().me().isMaster()) {
+        String subject = getSubject(cmd, "Member is added: ");
+        String content = getContent(cmd);
+        MailSender.getInstance()
+            .send(MemberConfig.getInstance().getMonitorMail(), subject, content);
       }
-
-      ReferenceCountUtil.release(msg);
-      logger.info(AllMember.getInstance().toString());
-    } else {
-      AllMember.getInstance().me().increaseReceivedCount();
+    } else if (msg instanceof StopCommand) {
+      StopCommand cmd = (StopCommand) msg;
+      handleStopCommand(cmd);
+      if (AllMember.getInstance().me().isMaster()) {
+        String subject = getSubject(cmd, "Member is removed: ");
+        String content = getContent(cmd);
+        MailSender.getInstance()
+            .send(MemberConfig.getInstance().getMonitorMail(), subject, content);
+      }
+    } else if (msg instanceof InfoCommand) {
+      InfoCommand cmd = (InfoCommand) msg;
+      handleInfoCommand(cmd);
     }
+
+    ReferenceCountUtil.release(msg);
+    logger.info(AllMember.getInstance().toString());
   }
 
   @Override
@@ -130,7 +128,8 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
 
     // update the status of the sender.
     Member receivedMemberInLocal =
-        AllMember.getInstance().getMember(receivedMember.getHost(), receivedMember.getPort());
+        AllMember.getInstance().getMemberByDataPort(receivedMember.getHost(),
+            receivedMember.getDataPort());
     receivedMemberInLocal.setStatus(receivedMember.getStatus());
     receivedMemberInLocal.setBootupTime(receivedMember.getBootupTime());
     receivedMemberInLocal.setDesc(receivedMember.getDesc());
@@ -153,7 +152,8 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
 
       for (Member member : removedmember.get(cluster).getMembers()) {
         // stop the client thread
-        AllMember.getInstance().getMemberInfos().getClient(member).interrupt();
+        AllMember.getInstance().getMemberInfos().getDataClient(member).interrupt();
+        AllMember.getInstance().getMemberInfos().getControlClient(member).interrupt();
 
         // remove the client and the client info
         AllMember.getInstance().removeMember(cluster, member);
@@ -171,13 +171,17 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
       AllMember.getInstance().addCluster(cluster);
       for (Member member : addedMember.get(cluster).getMembers()) {
         // start the client
-        Client client = new Client(member);
-        client.setClientHandler(new ClientHandler());
-        client.start();
+        Client dataClient = new DataClient(member);
+        dataClient.setClientHandler(new ClientHandler());
+        dataClient.start();
+
+        Client controlClient = new ControlClient(member);
+        controlClient.start();
 
         // add the client data
         AllMember.getInstance().addMember(cluster, member);
-        AllMember.getInstance().getMemberInfos().put(member, client);
+        AllMember.getInstance().getMemberInfos().putDataClient(member, dataClient);
+        AllMember.getInstance().getMemberInfos().putControlClient(member, controlClient);
         MemberConfig.getInstance().addMember(cluster, member);
       }
     }
