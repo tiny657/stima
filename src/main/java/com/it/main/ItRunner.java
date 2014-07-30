@@ -1,7 +1,11 @@
 package com.it.main;
 
 import java.io.FileNotFoundException;
+import java.util.Set;
 
+import com.google.common.collect.Sets;
+import com.it.domain.*;
+import com.it.exception.InvalidMemberException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +20,6 @@ import com.it.common.ControlSender;
 import com.it.config.JoptConfig;
 import com.it.config.MailConfig;
 import com.it.config.MemberConfig;
-import com.it.domain.AllMember;
-import com.it.domain.Clusters;
-import com.it.domain.Member;
-import com.it.domain.Status;
 import com.it.job.JobManager;
 import com.it.monitor.MonitorServer;
 import com.it.server.ControlServer;
@@ -97,7 +97,7 @@ public class ItRunner {
 
       // broadcast StartCommand
       ControlSender.sendBroadcast(new StartCommand(MemberConfig.getInstance().getMyCluster(),
-              MemberConfig.getInstance().getMyId()));
+          MemberConfig.getInstance().getMyId()));
     } catch (Exception e) {
       e.printStackTrace();
       shutdown();
@@ -105,8 +105,8 @@ public class ItRunner {
   }
 
   public void shutdown() {
-    ControlSender.sendBroadcast(new StopCommand(MemberConfig.getInstance().getMyCluster(), MemberConfig
-            .getInstance().getMyId()));
+    ControlSender.sendBroadcast(new StopCommand(MemberConfig.getInstance().getMyCluster(),
+        MemberConfig.getInstance().getMyId()));
 
     try {
       // wait for 1000ms after sending StopCommand.
@@ -135,25 +135,46 @@ public class ItRunner {
 
     // close server.
     Member me = AllMember.getInstance().me();
-    ChannelFuture dataChannelFuture = AllMember.getInstance().getMemberInfos().getDataChannelFuture(me);
+    ChannelFuture dataChannelFuture =
+        AllMember.getInstance().getMemberInfos().getDataChannelFuture(me);
     if (dataChannelFuture != null) {
       dataChannelFuture.channel().close();
     }
-    ChannelFuture controlChannelFuture = AllMember.getInstance().getMemberInfos().getControlChannelFuture(me);
+    ChannelFuture controlChannelFuture =
+        AllMember.getInstance().getMemberInfos().getControlChannelFuture(me);
     if (controlChannelFuture != null) {
       controlChannelFuture.channel().close();
     }
   }
 
-  private void initialize(String[] args) throws ConfigurationException, FileNotFoundException {
-    // config
+  private void initialize(String[] args) throws ConfigurationException, FileNotFoundException,
+      InvalidMemberException {
+    // initialize config
     JoptConfig.getInstance().init(args);
     MemberConfig.getInstance().init(args);
     MailConfig.getInstance().init(args);
 
-    // TODO: validate ip, port
+    validateIpAndPort();
 
     // monitor
     JobManager.getInstance().runCollectorJob();
+  }
+
+  private boolean validateIpAndPort() throws InvalidMemberException {
+    Clusters clusters = AllMember.getInstance().getClusters();
+    Set<String> uniqueIpPort = Sets.newHashSet();
+    for (MemberList memberList : clusters.getMemberListMap().values()) {
+      for (Member member : memberList.getMembers()) {
+        if (!uniqueIpPort.add(member.getHost() + ":" + member.getDataPort())) {
+          throw new InvalidMemberException("Member is duplicated. " + member.getHost() + ":"
+              + member.getDataPort());
+        }
+        if (!uniqueIpPort.add(member.getHost() + ":" + member.getControlPort())) {
+          throw new InvalidMemberException("Member is duplicated. " + member.getHost() + ":"
+              + member.getControlPort());
+        }
+      }
+    }
+    return true;
   }
 }

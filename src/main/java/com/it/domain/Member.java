@@ -199,7 +199,6 @@ public class Member implements Comparable<Member>, Serializable {
     this.controlPort = port;
   }
 
-  // TODO: separate dataPort, controlPort
   public String getHostPort() {
     return host + ":" + dataPort + ":" + controlPort;
   }
