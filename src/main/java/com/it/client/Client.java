@@ -15,21 +15,25 @@
 
 package com.it.client;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.it.domain.AllMember;
 import com.it.domain.Member;
 import com.it.domain.Status;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandler;
 
 abstract public class Client extends Thread {
   private static final Logger logger = LoggerFactory.getLogger(Client.class);
 
   protected Member myInfo;
-  protected ClientHandlerAdapter clientHandlerAdapter;
+  protected List<ChannelHandler> handlers = Lists.newArrayList();
   protected ChannelFuture channelFuture = null;
 
   protected boolean stopped = false;
@@ -39,8 +43,8 @@ abstract public class Client extends Thread {
     myInfo = member;
   }
 
-  public void setClientHandler(ClientHandlerAdapter clientHandlerAdapter) {
-    this.clientHandlerAdapter = clientHandlerAdapter;
+  public void addHandlers(List<ChannelHandler> channelHandlers) {
+    handlers.addAll(channelHandlers);
   }
 
   public String getHost() {

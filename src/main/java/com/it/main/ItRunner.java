@@ -4,9 +4,9 @@
  * copyright ownership. The ASF licenses this file to You under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a
  * copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -16,17 +16,15 @@
 package com.it.main;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
-import com.it.domain.*;
-import com.it.exception.InvalidMemberException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
 import com.it.client.Client;
-import com.it.client.ClientHandlerAdapter;
 import com.it.client.ControlClient;
 import com.it.client.DataClient;
 import com.it.command.StartCommand;
@@ -35,37 +33,32 @@ import com.it.common.ControlSender;
 import com.it.config.JoptConfig;
 import com.it.config.MailConfig;
 import com.it.config.MemberConfig;
+import com.it.domain.*;
+import com.it.exception.InvalidMemberException;
 import com.it.job.JobManager;
 import com.it.monitor.MonitorServer;
 import com.it.server.ControlServer;
 import com.it.server.DataServer;
 import com.it.server.Server;
-import com.it.server.ServerHandlerAdapter;
+
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandler;
 
 public class ItRunner {
   private static final Logger logger = LoggerFactory.getLogger(ItRunner.class);
 
   public static ItRunner instance = new ItRunner();
-  private ServerHandlerAdapter serverHandlerAdapter;
-  private ClientHandlerAdapter clientHandlerAdapter;
+  private List<ChannelHandler> serverHandlers;
+  private List<ChannelHandler> clientHandlers;
 
   public static ItRunner getInstance() {
     return instance;
   }
 
-  public ServerHandlerAdapter getServerHandlerAdapter() {
-    return serverHandlerAdapter;
-  }
-
-  public ClientHandlerAdapter getClientHandlerAdapter() {
-    return clientHandlerAdapter;
-  }
-
-  public void execute(ServerHandlerAdapter serverHandlerAdapter,
-      ClientHandlerAdapter clientHandlerAdapter, String[] args) {
-    this.serverHandlerAdapter = serverHandlerAdapter;
-    this.clientHandlerAdapter = clientHandlerAdapter;
+  public void execute(List<ChannelHandler> serverHandlers, List<ChannelHandler> clientHandlers,
+      String[] args) {
+    this.serverHandlers = serverHandlers;
+    this.clientHandlers = clientHandlers;
 
     try {
       initialize(args);
@@ -77,7 +70,7 @@ public class ItRunner {
 
       // server
       Server dataServer = new DataServer(AllMember.getInstance().me());
-      dataServer.setServerHandler(serverHandlerAdapter);
+      dataServer.addHandlers(serverHandlers);
       dataServer.start();
       dataServer.await();
 
@@ -89,14 +82,8 @@ public class ItRunner {
       for (String clusterName : clusters.getClusterNames()) {
         for (Member member : clusters.getMemberListIn(clusterName).getMembers()) {
           if (!member.isMe()) {
-            Client dataClient = new DataClient(member);
-            dataClient.setClientHandler(clientHandlerAdapter);
-            dataClient.start();
-            dataClient.await();
-
-            Client controlClient = new ControlClient(member);
-            controlClient.start();
-            controlClient.await();
+            createDataClient(member);
+            createControlClient(member);
           }
         }
       }
@@ -160,6 +147,21 @@ public class ItRunner {
     if (controlChannelFuture != null) {
       controlChannelFuture.channel().close();
     }
+  }
+
+  public Client createDataClient(Member member) {
+    Client client = new DataClient(member);
+    client.addHandlers(clientHandlers);
+    client.start();
+    client.await();
+    return client;
+  }
+
+  public Client createControlClient(Member member) {
+    Client client = new ControlClient(member);
+    client.start();
+    client.await();
+    return client;
   }
 
   private void initialize(String[] args) throws ConfigurationException, FileNotFoundException,

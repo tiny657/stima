@@ -4,9 +4,9 @@
  * copyright ownership. The ASF licenses this file to You under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a
  * copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -17,9 +17,6 @@ package com.it.server;
 
 import java.util.Map;
 
-import com.it.client.ControlClient;
-import com.it.client.DataClient;
-import com.it.common.MailSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +25,10 @@ import com.it.command.Command;
 import com.it.command.InfoCommand;
 import com.it.command.StartCommand;
 import com.it.command.StopCommand;
+import com.it.common.MailSender;
 import com.it.config.MemberConfig;
-import com.it.main.ClientHandler;
 import com.it.domain.*;
+import com.it.main.ItRunner;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerAdapter;
@@ -186,12 +184,8 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
       AllMember.getInstance().addCluster(cluster);
       for (Member member : addedMember.get(cluster).getMembers()) {
         // start the client
-        Client dataClient = new DataClient(member);
-        dataClient.setClientHandler(new ClientHandler());
-        dataClient.start();
-
-        Client controlClient = new ControlClient(member);
-        controlClient.start();
+        Client dataClient = ItRunner.getInstance().createDataClient(member);
+        Client controlClient = ItRunner.getInstance().createControlClient(member);
 
         // add the client data
         AllMember.getInstance().addMember(cluster, member);
