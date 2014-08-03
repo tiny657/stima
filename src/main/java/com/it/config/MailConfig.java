@@ -55,7 +55,7 @@ public class MailConfig {
     this.propertiesFile = propertiesFile;
   }
 
-  public void init(String[] args) {
+  public void init() {
     try {
       config = new PropertiesConfiguration(propertiesFile);
       setStarttlsEnable(config.getBoolean(MAIL_SMTP_STARTTLS_ENABLE));

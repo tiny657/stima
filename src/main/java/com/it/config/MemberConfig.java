@@ -76,7 +76,7 @@ public class MemberConfig {
     this.propertiesFile = propertiesFile;
   }
 
-  public void init(String[] args) throws ConfigurationException {
+  public void init() throws ConfigurationException {
     config = new PropertiesConfiguration(propertiesFile);
     config.setAutoSave(true);
 

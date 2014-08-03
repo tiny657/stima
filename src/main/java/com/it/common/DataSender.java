@@ -50,9 +50,7 @@ public class DataSender {
         if (member.isRunning() && !member.isMe()) {
           AllMember.getInstance().getMemberInfos().getDataChannelFuture(member).channel()
               .writeAndFlush(msg);
-          if (!(msg instanceof Command)) {
-            member.increaseSentCount();
-          }
+          member.increaseSentCount();
         }
       }
     }
@@ -71,9 +69,7 @@ public class DataSender {
 
     AllMember.getInstance().getMemberInfos().getDataChannelFuture(member).channel()
         .writeAndFlush(msg);
-    if (!(msg instanceof Command)) {
-      member.increaseSentCount();
-    }
+    member.increaseSentCount();
 
     return true;
   }

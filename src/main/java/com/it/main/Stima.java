@@ -16,9 +16,11 @@
 package com.it.main;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,22 +46,25 @@ import com.it.server.Server;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 
-public class ItRunner {
-  private static final Logger logger = LoggerFactory.getLogger(ItRunner.class);
+public class Stima {
+  private static final Logger logger = LoggerFactory.getLogger(Stima.class);
 
-  public static ItRunner instance = new ItRunner();
+  public static Stima instance;
   private List<ChannelHandler> serverHandlers;
   private List<ChannelHandler> clientHandlers;
+  private String[] args;
 
-  public static ItRunner getInstance() {
+  private Stima(Builder builder) {
+    serverHandlers = Lists.newArrayList(builder.serverHandlers);
+    clientHandlers = Lists.newArrayList(builder.clientHandlers);
+    args = Arrays.copyOf(builder.args, builder.args.length);
+  }
+
+  public static Stima getInstance() {
     return instance;
   }
 
-  public void execute(List<ChannelHandler> serverHandlers, List<ChannelHandler> clientHandlers,
-      String[] args) {
-    this.serverHandlers = serverHandlers;
-    this.clientHandlers = clientHandlers;
-
+  public void start() {
     try {
       initialize(args);
       Clusters clusters = AllMember.getInstance().getClusters();
@@ -164,12 +169,49 @@ public class ItRunner {
     return client;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+    List<ChannelHandler> serverHandlers = Lists.newArrayList();
+    List<ChannelHandler> clientHandlers = Lists.newArrayList();
+    String[] args;
+
+    public Builder serverHandler(ChannelHandler handler) {
+      serverHandlers.add(handler);
+      return this;
+    }
+
+    public List<ChannelHandler> getServerhandlers() {
+      return serverHandlers;
+    }
+
+    public Builder clientHandler(ChannelHandler handler) {
+      clientHandlers.add(handler);
+      return this;
+    }
+
+    public List<ChannelHandler> getClientHandlers() {
+      return clientHandlers;
+    }
+
+    public Builder args(String[] args) {
+      this.args = Arrays.copyOf(args, args.length);
+      return this;
+    }
+
+    public Stima build() {
+      return new Stima(this);
+    }
+  }
+
   private void initialize(String[] args) throws ConfigurationException, FileNotFoundException,
       InvalidMemberException {
     // initialize config
     JoptConfig.getInstance().init(args);
-    MemberConfig.getInstance().init(args);
-    MailConfig.getInstance().init(args);
+    MemberConfig.getInstance().init();
+    MailConfig.getInstance().init();
 
     validateIpAndPort();
 

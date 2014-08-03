@@ -4,9 +4,9 @@
  * copyright ownership. the asf licenses this file to you under the apache license, version 2.0 (the
  * "license"); you may not use this file except in compliance with the license. you may obtain a
  * copy of the license at
- *
+ * 
  * http://www.apache.org/licenses/license-2.0
- *
+ * 
  * unless required by applicable law or agreed to in writing, software distributed under the license
  * is distributed on an "as is" basis, without warranties or conditions of any kind, either express
  * or implied. see the license for the specific language governing permissions and limitations under
@@ -15,9 +15,12 @@
 
 package com.it.client;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.it.domain.AllMember;
 import com.it.domain.Member;
 
@@ -51,7 +54,9 @@ public class DataClient extends Client {
       bootstrap.handler(new ChannelInitializer<SocketChannel>() {
         @Override
         public void initChannel(SocketChannel socketChannel) throws Exception {
-          socketChannel.pipeline().addLast(handlers.toArray(new ChannelHandler[handlers.size()]));
+          List<ChannelHandler> copiedHandlers = Lists.newArrayList(handlers);
+          socketChannel.pipeline().addLast(
+              copiedHandlers.toArray(new ChannelHandler[handlers.size()]));
         }
       });
 

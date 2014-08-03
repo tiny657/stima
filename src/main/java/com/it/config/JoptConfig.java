@@ -62,6 +62,10 @@ public class JoptConfig {
   }
 
   public void init(String[] args) throws FileNotFoundException {
+    if (args == null) {
+      return;
+    }
+
     OptionSet options = parser.parse(args);
     MemberConfig.getInstance().setPropertiesFile(options.valueOf(memberPropertiesOpt));
     MailConfig.getInstance().setPropertiesFile(options.valueOf(mailPropertiesOpt));

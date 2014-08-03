@@ -17,6 +17,7 @@ package com.it.server;
 
 import java.util.Map;
 
+import com.it.main.Stima;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,6 @@ import com.it.command.StopCommand;
 import com.it.common.MailSender;
 import com.it.config.MemberConfig;
 import com.it.domain.*;
-import com.it.main.ItRunner;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerAdapter;
@@ -184,8 +184,8 @@ public class ServerHandlerAdapter extends ChannelHandlerAdapter {
       AllMember.getInstance().addCluster(cluster);
       for (Member member : addedMember.get(cluster).getMembers()) {
         // start the client
-        Client dataClient = ItRunner.getInstance().createDataClient(member);
-        Client controlClient = ItRunner.getInstance().createControlClient(member);
+        Client dataClient = Stima.getInstance().createDataClient(member);
+        Client controlClient = Stima.getInstance().createControlClient(member);
 
         // add the client data
         AllMember.getInstance().addMember(cluster, member);
