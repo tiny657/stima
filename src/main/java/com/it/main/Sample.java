@@ -21,25 +21,42 @@ import org.slf4j.LoggerFactory;
 import com.it.common.DataSender;
 import com.it.config.JoptConfig;
 
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.CharsetUtil;
 
 public class Sample {
   private static final Logger logger = LoggerFactory.getLogger(Sample.class);
 
   public static void main(String[] args) throws InterruptedException {
-    Stima stima = createStima(args);
-    stima.start();
-    if (JoptConfig.getInstance().isSender()) {
-      for (int i = 0; i < 10; i++) {
-        DataSender.sendAnycast("b", new TestCommand());
+    final boolean isStringHandler = true;
+    if (isStringHandler) {
+      Stima stima = createStringHandler(args);
+      stima.start();
+      if (JoptConfig.getInstance().isSender()) {
+        for (int i = 0; i < 10; i++) {
+          DataSender.sendAnycast("b", "test" + i + "\n");
+        }
+        stima.shutdown();
       }
-      stima.shutdown();
+    } else {
+      Stima stima = createObjectHandler(args);
+      stima.start();
+      if (JoptConfig.getInstance().isSender()) {
+        for (int i = 0; i < 10; i++) {
+          DataSender.sendAnycast("b", new TestCommand());
+        }
+        stima.shutdown();
+      }
     }
   }
 
-  private static Stima createStima(String[] args) {
+  private static Stima createObjectHandler(String[] args) {
     Stima.Builder builder = Stima.builder();
 
     // server handler
@@ -51,6 +68,27 @@ public class Sample {
     builder.clientHandler(new ObjectEncoder());
     builder.clientHandler(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
     builder.serverHandler(new ClientHandler());
+
+    // args
+    builder.args(args);
+
+    return builder.build();
+  }
+
+  private static Stima createStringHandler(String[] args) {
+    Stima.Builder builder = Stima.builder();
+
+    // server handler
+    builder.serverHandler(new DelimiterBasedFrameDecoder(80, Delimiters.lineDelimiter()));
+    builder.serverHandler(new StringEncoder(CharsetUtil.UTF_8));
+    builder.serverHandler(new StringDecoder(CharsetUtil.UTF_8));
+    builder.serverHandler(new ServerHandler());
+
+    // client handler
+    builder.clientHandler(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
+    builder.clientHandler(new StringDecoder(CharsetUtil.UTF_8));
+    builder.clientHandler(new StringEncoder(CharsetUtil.UTF_8));
+    builder.clientHandler(new ClientHandler());
 
     // args
     builder.args(args);

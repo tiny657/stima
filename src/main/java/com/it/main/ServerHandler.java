@@ -23,6 +23,7 @@ import com.it.domain.AllMember;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.ReferenceCountUtil;
 
 @Sharable
 public class ServerHandler extends ChannelHandlerAdapter {
@@ -30,7 +31,9 @@ public class ServerHandler extends ChannelHandlerAdapter {
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    logger.info("Received: {}", (String) msg);
     AllMember.getInstance().me().increaseReceivedCount();
+    ReferenceCountUtil.release(msg);
   }
 
   @Override
