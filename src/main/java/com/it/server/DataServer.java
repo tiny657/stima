@@ -26,10 +26,6 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
-import io.netty.util.CharsetUtil;
 
 public class DataServer extends Server {
   private static final Logger logger = LoggerFactory.getLogger(DataServer.class);
@@ -61,7 +57,7 @@ public class DataServer extends Server {
       ChannelFuture channelFuture = bootstrap.bind(getPort()).sync();
 
       AllMember.getInstance().getMemberInfos().putDataChannelFuture(myInfo, channelFuture);
-      isStartup = true;
+      startupLatch.countDown();
       logger.info("dataServer started (port: {})", getPort());
 
       awaitDisconnection(channelFuture);

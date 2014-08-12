@@ -31,7 +31,9 @@ public class ServerHandler extends ChannelHandlerAdapter {
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
-    logger.info("Received: {}", (String) msg);
+    if (msg instanceof String) {
+      logger.info("Received: {}", (String) msg);
+    }
     AllMember.getInstance().me().increaseReceivedCount();
     ReferenceCountUtil.release(msg);
   }

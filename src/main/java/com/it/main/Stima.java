@@ -77,11 +77,11 @@ public class Stima {
       Server dataServer = new DataServer(AllMember.getInstance().me());
       dataServer.addHandlers(serverHandlers);
       dataServer.start();
-      dataServer.await();
+      dataServer.awaitConnection();
 
       Server controlServer = new ControlServer(AllMember.getInstance().me());
       controlServer.start();
-      controlServer.await();
+      controlServer.awaitConnection();
 
       // clients
       for (String clusterName : clusters.getClusterNames()) {
@@ -158,14 +158,14 @@ public class Stima {
     Client client = new DataClient(member);
     client.addHandlers(clientHandlers);
     client.start();
-    client.await();
+    client.awaitConnection();
     return client;
   }
 
   public Client createControlClient(Member member) {
     Client client = new ControlClient(member);
     client.start();
-    client.await();
+    client.awaitConnection();
     return client;
   }
 

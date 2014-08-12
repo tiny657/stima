@@ -34,7 +34,7 @@ public class Sample {
   private static final Logger logger = LoggerFactory.getLogger(Sample.class);
 
   public static void main(String[] args) throws InterruptedException {
-    final boolean isStringHandler = true;
+    final boolean isStringHandler = false;
     if (isStringHandler) {
       Stima stima = createStringHandler(args);
       stima.start();
@@ -67,7 +67,7 @@ public class Sample {
     // client handler
     builder.clientHandler(new ObjectEncoder());
     builder.clientHandler(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
-    builder.serverHandler(new ClientHandler());
+    builder.clientHandler(new ClientHandler());
 
     // args
     builder.args(args);
@@ -79,7 +79,7 @@ public class Sample {
     Stima.Builder builder = Stima.builder();
 
     // server handler
-    builder.serverHandler(new DelimiterBasedFrameDecoder(80, Delimiters.lineDelimiter()));
+    builder.serverHandler(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
     builder.serverHandler(new StringEncoder(CharsetUtil.UTF_8));
     builder.serverHandler(new StringDecoder(CharsetUtil.UTF_8));
     builder.serverHandler(new ServerHandler());

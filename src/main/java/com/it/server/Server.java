@@ -16,6 +16,7 @@
 package com.it.server;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ import io.netty.channel.ChannelHandler;
 abstract public class Server extends Thread {
   private static final Logger logger = LoggerFactory.getLogger(Server.class);
   protected Member myInfo;
-  protected boolean isStartup = false;
+  protected CountDownLatch startupLatch = new CountDownLatch(1);
   protected List<ChannelHandler> handlers = Lists.newArrayList();
 
   protected Server(Member member) {
@@ -52,12 +53,11 @@ abstract public class Server extends Thread {
 
   abstract public int getPort();
 
-  public void await() {
-    while (!isStartup) {
-      try {
-        Thread.sleep(100);
-      } catch (InterruptedException e) {
-      }
+  public void awaitConnection() {
+    try {
+      startupLatch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
   }
 

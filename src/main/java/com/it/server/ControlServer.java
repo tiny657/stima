@@ -65,7 +65,7 @@ public class ControlServer extends Server {
 
       AllMember.getInstance().getMemberInfos().putControlChannelFuture(myInfo, channelFuture);
       myInfo.setStatus(Status.STANDBY);
-      isStartup = true;
+      startupLatch.countDown();
       logger.info("controlServer started (port: {})", getPort());
 
       awaitDisconnection(channelFuture);

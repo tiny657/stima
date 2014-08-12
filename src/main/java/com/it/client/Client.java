@@ -16,6 +16,7 @@
 package com.it.client;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,8 @@ abstract public class Client extends Thread {
 
   abstract public int getPort();
 
-  public void await() {
+
+  public void awaitConnection() {
     while (!isStartup) {
       try {
         Thread.sleep(100);
