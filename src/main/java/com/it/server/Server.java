@@ -15,13 +15,12 @@
 
 package com.it.server;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import com.it.common.HandlerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.it.domain.AllMember;
 import com.it.domain.Member;
 import com.it.domain.Status;
@@ -33,14 +32,19 @@ abstract public class Server extends Thread {
   private static final Logger logger = LoggerFactory.getLogger(Server.class);
   protected Member myInfo;
   protected CountDownLatch startupLatch = new CountDownLatch(1);
-  protected List<ChannelHandler> handlers = Lists.newArrayList();
+  protected HandlerType handlerType;
+  protected ChannelHandler handler;
 
   protected Server(Member member) {
     myInfo = member;
   }
 
-  public void addHandlers(List<ChannelHandler> channelHandler) {
-    handlers.addAll(channelHandler);
+  public void setHandlerType(HandlerType handlerType) {
+    this.handlerType = handlerType;
+  }
+
+  public void setHandler(ChannelHandler channelHandler) {
+    handler = channelHandler;
   }
 
   public Member getMyInfo() {

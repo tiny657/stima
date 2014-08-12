@@ -17,10 +17,8 @@ package com.it.main;
 
 import java.io.FileNotFoundException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +30,7 @@ import com.it.client.DataClient;
 import com.it.command.StartCommand;
 import com.it.command.StopCommand;
 import com.it.common.ControlSender;
+import com.it.common.HandlerType;
 import com.it.config.JoptConfig;
 import com.it.config.MailConfig;
 import com.it.config.MemberConfig;
@@ -50,13 +49,15 @@ public class Stima {
   private static final Logger logger = LoggerFactory.getLogger(Stima.class);
 
   public static Stima instance;
-  private List<ChannelHandler> serverHandlers;
-  private List<ChannelHandler> clientHandlers;
+  private HandlerType handlerType;
+  private ChannelHandler serverHandler;
+  private ChannelHandler clientHandler;
   private String[] args;
 
   private Stima(Builder builder) {
-    serverHandlers = Lists.newArrayList(builder.serverHandlers);
-    clientHandlers = Lists.newArrayList(builder.clientHandlers);
+    handlerType = builder.getType();
+    serverHandler = builder.getServerhandler();
+    clientHandler = builder.getClientHandler();
     args = Arrays.copyOf(builder.args, builder.args.length);
   }
 
@@ -75,7 +76,8 @@ public class Stima {
 
       // server
       Server dataServer = new DataServer(AllMember.getInstance().me());
-      dataServer.addHandlers(serverHandlers);
+      dataServer.setHandlerType(handlerType);
+      dataServer.setHandler(serverHandler);
       dataServer.start();
       dataServer.awaitConnection();
 
@@ -156,7 +158,8 @@ public class Stima {
 
   public Client createDataClient(Member member) {
     Client client = new DataClient(member);
-    client.addHandlers(clientHandlers);
+    client.setHandlerType(handlerType);
+    client.setHandler(clientHandler);
     client.start();
     client.awaitConnection();
     return client;
@@ -174,26 +177,35 @@ public class Stima {
   }
 
   public static class Builder {
-    List<ChannelHandler> serverHandlers = Lists.newArrayList();
-    List<ChannelHandler> clientHandlers = Lists.newArrayList();
+    HandlerType handlerType;
+    ChannelHandler serverHandler;
+    ChannelHandler clientHandler;
     String[] args;
 
+    public void handlerType(HandlerType handlerType) {
+      this.handlerType = handlerType;
+    }
+
+    public HandlerType getType() {
+      return handlerType;
+    }
+
     public Builder serverHandler(ChannelHandler handler) {
-      serverHandlers.add(handler);
+      serverHandler = handler;
       return this;
     }
 
-    public List<ChannelHandler> getServerhandlers() {
-      return serverHandlers;
+    public ChannelHandler getServerhandler() {
+      return serverHandler;
     }
 
     public Builder clientHandler(ChannelHandler handler) {
-      clientHandlers.add(handler);
+      clientHandler = handler;
       return this;
     }
 
-    public List<ChannelHandler> getClientHandlers() {
-      return clientHandlers;
+    public ChannelHandler getClientHandler() {
+      return clientHandler;
     }
 
     public Builder args(String[] args) {

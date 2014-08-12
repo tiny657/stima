@@ -17,6 +17,14 @@ package com.it.client;
 
 import java.util.List;
 
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +62,20 @@ public class DataClient extends Client {
       bootstrap.handler(new ChannelInitializer<SocketChannel>() {
         @Override
         public void initChannel(SocketChannel socketChannel) throws Exception {
-          List<ChannelHandler> copiedHandlers = Lists.newArrayList(handlers);
-          socketChannel.pipeline().addLast(
-              copiedHandlers.toArray(new ChannelHandler[handlers.size()]));
+          switch (handlerType){
+            case STRING:
+              socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
+              socketChannel.pipeline().addLast(new StringEncoder(CharsetUtil.UTF_8));
+              socketChannel.pipeline().addLast(new StringDecoder(CharsetUtil.UTF_8));
+              socketChannel.pipeline().addLast(handler);
+              break;
+
+            case OBJECT:
+              socketChannel.pipeline().addLast(new ObjectEncoder());
+              socketChannel.pipeline().addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
+              socketChannel.pipeline().addLast(handler);
+              break;
+          }
         }
       });
 

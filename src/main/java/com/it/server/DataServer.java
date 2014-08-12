@@ -22,10 +22,21 @@ import com.it.domain.AllMember;
 import com.it.domain.Member;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.CharsetUtil;
 
 public class DataServer extends Server {
   private static final Logger logger = LoggerFactory.getLogger(DataServer.class);
@@ -49,8 +60,20 @@ public class DataServer extends Server {
           .childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             public void initChannel(SocketChannel socketChannel) throws Exception {
-              socketChannel.pipeline().addLast(
-                  handlers.toArray(new ChannelHandler[handlers.size()]));
+              switch (handlerType){
+                case STRING:
+                  socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
+                  socketChannel.pipeline().addLast(new StringEncoder(CharsetUtil.UTF_8));
+                  socketChannel.pipeline().addLast(new StringDecoder(CharsetUtil.UTF_8));
+                  socketChannel.pipeline().addLast(handler);
+                  break;
+
+                case OBJECT:
+                  socketChannel.pipeline().addLast(new ObjectEncoder());
+                  socketChannel.pipeline().addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
+                  socketChannel.pipeline().addLast(handler);
+                  break;
+              }
             }
           }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
 
