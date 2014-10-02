@@ -4,9 +4,9 @@
  * copyright ownership. The ASF licenses this file to You under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a
  * copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -16,39 +16,55 @@
 package com.it.domain;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import java.util.List;
 import java.util.Set;
 
-import com.it.exception.InvalidMemberException;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.it.config.MemberConfig;
+import com.it.exception.InvalidMemberException;
 
 public class MemberListTest {
   @Test
-  public void randomRunningMember() {
+  public void nextRunningMember() {
     // Given
+    MemberConfig.getInstance().setMyRegion("region1");
     int count = 3, basePort = 5000, controlBasePort = 6000;
     List<Member> members = Lists.newArrayList();
     MemberList memberList = new MemberList();
     for (int i = 0; i < count; i++) {
-      members.add(new Member(i, "host", basePort + i, controlBasePort + i));
+      members.add(new Member("region1", i, "host", basePort + i, controlBasePort + i));
       memberList.addMember(members.get(i));
       memberList.setStatus("host", basePort + i, Status.RUNNING);
     }
+    for (int i = count; i < count * 2; i++) {
+      members.add(new Member("region2", i, "host2", basePort + i, controlBasePort + i));
+      memberList.addMember(members.get(i));
+      memberList.setStatus("host2", basePort + i, Status.RUNNING);
+    }
 
     // When
+    MemberConfig.getInstance().setRegionSeparation(true);
     Set<Member> nextMembers = Sets.newHashSet();
     for (int i = 0; i < count * 100; i++) {
       Member next = memberList.nextRunningMember();
       nextMembers.add(next);
     }
 
+    MemberConfig.getInstance().setRegionSeparation(false);
+    Set<Member> nextMembers2 = Sets.newHashSet();
+    for (int i = 0; i < count * 100; i++) {
+      Member next = memberList.nextRunningMember();
+      nextMembers2.add(next);
+    }
+
     // Then
-    assertThat(members.size(), is(3));
+    assertThat(nextMembers.size(), is(3));
+    assertThat(nextMembers2.size(), is(6));
   }
 
   @Test

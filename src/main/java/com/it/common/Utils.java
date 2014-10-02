@@ -31,7 +31,7 @@ public class Utils {
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  public static boolean isMemberValid(String idHostPort) {
+  public static boolean isValidMember(String idHostPort) {
     String[] split = StringUtils.split(idHostPort, ":");
     if (split.length != 4) {
       logger.error("The member must be [ID]:[IP]:[dataPort]:[controlPort]");
@@ -43,39 +43,39 @@ public class Utils {
       return false;
     }
 
-    if (!isIpValid(split[1])) {
+    if (!isValidIP(split[1])) {
       logger.error("The IP({}) of the member is invalid.", split[1]);
       return false;
     }
 
-    if (!isPortValid(split[2])) {
-      logger.error("The dataPort({}) range is 0-65535.", split[2]);
+    if (!isValidPort(split[2])) {
+      logger.error("The dataPort({}) range is 1-65535.", split[2]);
       return false;
     }
 
-    if (!isPortValid(split[3])) {
-      logger.error("The controlPort({}) range is 0-65535.", split[3]);
+    if (!isValidPort(split[3])) {
+      logger.error("The controlPort({}) range is 1-65535.", split[3]);
       return false;
     }
 
     return true;
   }
 
-  public static boolean isIpValid(String ip) {
+  public static boolean isValidIP(String ip) {
     return InetAddressValidator.getInstance().isValid(ip);
   }
 
-  public static boolean isPortValid(String port) {
+  public static boolean isValidPort(String port) {
     boolean valid = false;
     try {
-      valid = isPortValid(parseInt(port));
+      valid = isValidPort(parseInt(port));
     } catch (NumberFormatException e) {
       return valid;
     }
     return valid;
   }
 
-  public static boolean isPortValid(Integer port) {
+  public static boolean isValidPort(Integer port) {
     return IntegerValidator.getInstance().isInRange(port, 1, 65535);
   }
 

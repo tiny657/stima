@@ -26,7 +26,7 @@ import com.it.exception.InvalidMemberException;
 public class MemberTest {
 
   @Test
-  public void validatePort() {
+  public void isValidPort() {
     // When
     Member memberWithValidPort = new Member(1, "host", 1, 2);
     Member memberWithInvalidPort2 = new Member(2, "host", 30000, 30000);
@@ -34,13 +34,13 @@ public class MemberTest {
   }
 
   @Test(expected = InvalidMemberException.class)
-  public void validatePort0() {
+  public void isValidPort0() {
     // When
     Member memberWithValidPort = new Member(1, "host", 0, 0);
   }
 
   @Test(expected = InvalidMemberException.class)
-  public void validatePort65536() {
+  public void isValidPort65536() {
     // When
     Member memberWithValidPort = new Member(1, "host", 65536, 65536);
   }

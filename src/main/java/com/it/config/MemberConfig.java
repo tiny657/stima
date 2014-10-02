@@ -4,9 +4,9 @@
  * copyright ownership. The ASF licenses this file to You under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a
  * copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -37,10 +37,12 @@ public class MemberConfig {
   private static MemberConfig instance = new MemberConfig();
 
   private static final String CLUSTER = "cluster";
+  private static final String MY_REGION = "my.region";
   private static final String MY_CLUSTER = "my.cluster";
   private static final String MY_ID = "my.id";
   private static final String MY_DESC = "my.desc";
   private static final String SPREAD_TIME = "config.spreadTime";
+  private static final String REGION_SEPARATION = "config.regionSeparation";
   private static final String MASTER_PRIORITY = "master.priority";
   private static final String MONITOR_ENABLE = "monitor.enable";
   private static final String MONITOR_MAIL = "monitor.mail";
@@ -52,11 +54,13 @@ public class MemberConfig {
   private PropertiesConfiguration config;
   private String propertiesFile;
 
+  private String myRegion;
   private String myCluster;
   private int myId;
   private String myDesc;
 
   private int spreadTime = 5;
+  private boolean regionSeparation = true;
 
   private boolean monitorEnable;
   private int monitorPort;
@@ -80,12 +84,14 @@ public class MemberConfig {
     config = new PropertiesConfiguration(propertiesFile);
     config.setAutoSave(true);
 
+    setMyRegion(config.getString(MY_REGION));
     setMyCluster(config.getString(MY_CLUSTER));
     setMyId(config.getInt(MY_ID));
     setMyDesc(config.getString(MY_DESC));
 
     // config
     setSpreadTime(config.getInt(SPREAD_TIME));
+    setRegionSeparation(config.getBoolean(REGION_SEPARATION));
 
     // monitor
     setMonitorEnable(config.getBoolean(MONITOR_ENABLE));
@@ -106,13 +112,13 @@ public class MemberConfig {
     // add member
     for (String cluster : AllMember.getInstance().getClusters().getClusterNames()) {
       for (String idHostPort : getMembers(cluster)) {
-        if (!Utils.isMemberValid(idHostPort)) {
+        if (!Utils.isValidMember(idHostPort)) {
           throw new InvalidMemberException(idHostPort + " is invalid.");
         }
         String[] split = StringUtils.split(idHostPort, ":");
         boolean me = StringUtils.equals(cluster, myCluster) && (Utils.parseInt(split[0]) == myId);
         AllMember.getInstance().addMember(cluster,
-            new Member(split[0], split[1], split[2], split[3], me));
+            new Member(getMyRegion(), split[0], split[1], split[2], split[3], me));
       }
     }
 
@@ -161,12 +167,23 @@ public class MemberConfig {
     }
   }
 
+  public String getMyRegion() {
+    return myRegion;
+  }
+
+  public void setMyRegion(String myRegion) {
+    if (StringUtils.isEmpty(myRegion)) {
+      return;
+    }
+    this.myRegion = myRegion;
+  }
+
   public String getMyCluster() {
     return myCluster;
   }
 
   public void setMyCluster(String myCluster) {
-    if (StringUtils.equals(myCluster, StringUtils.EMPTY)) {
+    if (StringUtils.isEmpty(myCluster)) {
       return;
     }
     this.myCluster = myCluster;
@@ -201,6 +218,14 @@ public class MemberConfig {
 
   public boolean isAutoSpread() {
     return getSpreadTime() != 0;
+  }
+
+  public boolean getRegionSeparation() {
+    return regionSeparation;
+  }
+
+  public void setRegionSeparation(boolean regionSeparation) {
+    this.regionSeparation = regionSeparation;
   }
 
   public boolean isMonitorEnable() {

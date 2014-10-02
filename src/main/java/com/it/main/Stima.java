@@ -225,13 +225,13 @@ public class Stima {
     MemberConfig.getInstance().init();
     MailConfig.getInstance().init();
 
-    validateIpAndPort();
+    isValidIpAndPort();
 
     // monitor
     JobManager.getInstance().runCollectorJob();
   }
 
-  private boolean validateIpAndPort() throws InvalidMemberException {
+  private boolean isValidIpAndPort() throws InvalidMemberException {
     Clusters clusters = AllMember.getInstance().getClusters();
     Set<String> uniqueIpPort = Sets.newHashSet();
     for (MemberList memberList : clusters.getMemberListMap().values()) {

@@ -28,12 +28,12 @@ import com.it.exception.InvalidMemberException;
 import com.it.job.CollectorListener;
 
 public class Member implements Comparable<Member>, Serializable {
-  private static final long serialVersionUID = 4848152770088013661L;
-
+  private static final long serialVersionUID = 5126699874590579904L;
   private static final Logger logger = LoggerFactory.getLogger(Member.class);
 
   private DateTime bootupTime;
   private short masterPriority, priorityPoint;
+  private String region;
   private int id;
   private String host;
   private int dataPort;
@@ -50,11 +50,25 @@ public class Member implements Comparable<Member>, Serializable {
   public Member() {}
 
   public Member(String id, String host, String dataPort, String controlPort, boolean me) {
-    this(Utils.parseInt(id), host, Utils.parseInt(dataPort), Utils.parseInt(controlPort));
+    this("commonRegion", Utils.parseInt(id), host, Utils.parseInt(dataPort), Utils.parseInt(controlPort));
+    setMe(me);
+  }
+
+  public Member(String region, String id, String host, String dataPort, String controlPort, boolean me) {
+    this(region, Utils.parseInt(id), host, Utils.parseInt(dataPort), Utils.parseInt(controlPort));
     setMe(me);
   }
 
   public Member(int id, String host, int dataPort, int controlPort) {
+    setRegion("commonRegion");
+    setId(id);
+    setHost(host);
+    setDataPort(dataPort);
+    setControlPort(controlPort);
+  }
+
+  public Member(String region, int id, String host, int dataPort, int controlPort) {
+    setRegion(region);
     setId(id);
     setHost(host);
     setDataPort(dataPort);
@@ -163,6 +177,14 @@ public class Member implements Comparable<Member>, Serializable {
     logger.info("master: {}", isMaster());
   }
 
+  public String getRegion() {
+    return region;
+  }
+
+  public void setRegion(String region) {
+    this.region = region;
+  }
+
   public int getId() {
     return id;
   }
@@ -190,7 +212,7 @@ public class Member implements Comparable<Member>, Serializable {
   }
 
   public void setDataPort(int port) {
-    if (!Utils.isPortValid(port)) {
+    if (!Utils.isValidPort(port)) {
       throw new InvalidMemberException("dataPort (" + port + ") is invalid.");
     }
 
@@ -207,7 +229,7 @@ public class Member implements Comparable<Member>, Serializable {
   }
 
   public void setControlPort(int port) {
-    if (!Utils.isPortValid(port)) {
+    if (!Utils.isValidPort(port)) {
       throw new InvalidMemberException("controlPort (" + port + ") is invalid.");
     }
 
@@ -324,7 +346,7 @@ public class Member implements Comparable<Member>, Serializable {
       status += ", me";
     }
 
-    return id + ":" + host + ":" + dataPort + ":" + controlPort + "(" + status + ", sent: "
+    return id + ":" + host + ":" + dataPort + ":" + controlPort + " in " + region + "(" + status + ", sent: "
         + +sentTPS + "/" + totalSent + ", received: " + receivedTPS + "/" + totalReceived + ")";
   }
 }
